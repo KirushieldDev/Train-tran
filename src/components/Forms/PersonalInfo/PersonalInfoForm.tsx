@@ -4,6 +4,9 @@ import * as React from "react";
 import { FormInput } from "../../Inputs/Form/FormInput";
 import { GenderSelection } from "../../Inputs/Form/GenderSelection";
 import { FormButton } from "../../Inputs/Form/FormButton";
+import MailSVG from "../../../assets/Form/MailSVG.tsx";
+import MailOpenSVG from "../../../assets/Form/MailOpenSVG.tsx";
+import TelSVG from "../../../assets/Form/TelSVG.tsx";
 
 const PersonalInfoForm: React.FC = () => {
     const [formData, setFormData] = React.useState({
@@ -34,10 +37,10 @@ const PersonalInfoForm: React.FC = () => {
             className="flex flex-col justify-center p-8 max-w-2xl bg-white rounded-xl shadow-[0px_1px_2px_rgba(0,0,0,0.05)] max-md:px-5"
         >
             <header className="flex flex-col justify-center w-full leading-none max-md:max-w-full">
-                <h1 className="text-2xl font-semibold text-gray-800 max-md:max-w-full">
+                <h1 className="text-2xl font-semibold text-textPrimary max-md:max-w-full">
                     Informations Personnelles
                 </h1>
-                <p className="mt-3.5 text-base text-gray-600 max-md:max-w-full">
+                <p className="mt-3.5 text-base text-textSecondary max-md:max-w-full">
                     Veuillez renseigner vos informations
                 </p>
             </header>
@@ -71,7 +74,7 @@ const PersonalInfoForm: React.FC = () => {
                     <FormInput
                         label="Téléphone mobile"
                         type="tel"
-                        icon="/tel.svg"
+                        icon={<TelSVG />}
                         value={formData.mobile}
                         onChange={(value) => handleInputChange("mobile", value)}
                         required
@@ -82,7 +85,7 @@ const PersonalInfoForm: React.FC = () => {
                     <FormInput
                         label="Email"
                         type="email"
-                        icon="/mail.svg"
+                        icon={<MailSVG />}
                         value={formData.email}
                         onChange={(value) => handleInputChange("email", value)}
                         required
@@ -93,7 +96,7 @@ const PersonalInfoForm: React.FC = () => {
                     <FormInput
                         label="Confirmation Email"
                         type="email"
-                        icon="/mailopen.svg"
+                        icon={<MailOpenSVG />}
                         value={formData.confirmEmail}
                         onChange={(value) => handleInputChange("confirmEmail", value)}
                         required

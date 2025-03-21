@@ -17,7 +17,7 @@ export const FormButton: React.FC<FormButtonProps> = ({
         <button
             type={type}
             onClick={onClick}
-            className={`w-full px-4 py-3 bg-emerald-600 text-white text-base font-medium rounded-lg hover:bg-emerald-700 transition-colors ${className}`}
+            className={`w-full px-4 py-3 bg-primary text-white text-base font-medium rounded-lg hover:bg-primary/80 transition-colors ${className}`}
         >
             {children}
         </button>

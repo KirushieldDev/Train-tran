@@ -1,0 +1,106 @@
+"use client";
+import * as React from "react";
+import { FormInput } from "../../Inputs/Form/FormInput";
+import { FormButton } from "../../Inputs/Form/FormButton.tsx";
+import UserSVG from "../../../assets/Form/UserSVG.tsx";
+import MdpSVG from "../../../assets/Form/MdpSVG.tsx";
+
+function FormLoginAdherent() {
+    const [formData, setFormData] = React.useState({
+        identifiant: "",
+        password: "",
+        rememberMe: false,
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Handle login logic here
+        console.log("Form submitted:", formData);
+    };
+
+    const handleInputChange = (field: string, value: string|boolean) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
+    return (
+        <section className="overflow-hidden p-8 max-w-md bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.1)]">
+            <header className="px-7 py-1 w-full leading-none text-center">
+                <h1 className="text-2xl font-semibold text-textPrimary">
+                    Espace Adhérents
+                </h1>
+                <p className="mt-3 text-base text-textSecondary">
+                    Connectez-vous pour accéder à vos avantages
+                </p>
+            </header>
+
+            <form onSubmit={handleSubmit} className="mt-7 w-full">
+                <div className="w-full">
+                    <div className="mt-2 w-full">
+                        <FormInput
+                            label="Identifiant"
+                            placeholder={"Votre identifiant"}
+                            value={formData.identifiant}
+                            icon={<UserSVG />}
+                            onChange={(value) => handleInputChange("identifiant", value)}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-6 w-full">
+                    <div className="mt-2 w-full">
+                        <FormInput
+                            label="Mot de passe"
+                            placeholder={"Votre mot de passe"}
+                            value={formData.password}
+                            icon={<MdpSVG />}
+                            onChange={(value) => handleInputChange("password", value)}
+                            type="password"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex gap-5 justify-between mt-6 w-full text-sm">
+                    <div className="flex gap-2">
+                        <input
+                            type="checkbox"
+                            checked={formData.rememberMe}
+                            onChange={() => handleInputChange("rememberMe", !formData.rememberMe)}
+                            className="mt-1"
+                            id="remember-me"
+                        />
+                        <label htmlFor="remember-me" className="py-1.5 cursor-pointer">
+                            Se souvenir de moi
+                        </label>
+                    </div>
+                    <button type="button" className="py-1 text-primary">
+                        Mot de passe oublié ?
+                    </button>
+                </div>
+
+                <div className="mt-3.5">
+                    <FormButton type="submit">
+                        Se connecter
+                    </FormButton>
+                </div>
+            </form>
+
+            <footer className="flex flex-col py-px mt-7 w-full text-sm text-center">
+                <p className="self-center leading-none text-gray-600">
+                    Pas encore adhérent ?
+                </p>
+                <button
+                    type="button"
+                    className="px-16 py-1.5 mt-2 font-medium text-primary"
+                >
+                    Découvrez nos offres d'abonnement
+                </button>
+            </footer>
+        </section>
+    );
+}
+
+export default FormLoginAdherent;
