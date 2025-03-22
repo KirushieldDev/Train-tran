@@ -11,7 +11,7 @@ const AppRoutes = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/panier" element={<CartPage />} />
                 <Route path="/form-info" element={<PersonalInfoForm />}></Route>
-                <Route path="/additional-options" element={<AdditionalOptions />} />
+                <Route path="/options" element={<AdditionalOptions />} />
             </Routes>
         </Router>
     );
