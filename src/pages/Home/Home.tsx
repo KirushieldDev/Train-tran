@@ -1,6 +1,7 @@
 import Header from "../../components/Header/Header.tsx";
-import Features from "../../components/Home/Features.tsx";
+import Features from "../../components/Home/Features/Features.tsx";
 import SearchSection from "../../components/Home/Form/SearchSection.tsx";
+import Footer from "../../components/Footer/Footer.tsx";
 
 
 function Home() {
@@ -9,6 +10,7 @@ function Home() {
             <Header/>
             <SearchSection/>
             <Features/>
+            <Footer/>
         </>
 
     )

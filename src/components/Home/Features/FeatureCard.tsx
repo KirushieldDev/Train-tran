@@ -17,7 +17,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
                                                         }) => {
     return (
         <article
-            className={`flex flex-col items-center self-stretch px-2 pb-2 my-auto min-w-60 w-[389px] ${className}`}
+            className={`flex flex-col items-center mt-10 self-stretch px-2 pb-2 my-auto min-w-60 w-[389px] ${className}`}
         >
             <div className="w-16 h-16">{icon}</div> {/* Affichage de l'icône */}
             <h2 className="mt-4 text-xl font-semibold text-gray-800">

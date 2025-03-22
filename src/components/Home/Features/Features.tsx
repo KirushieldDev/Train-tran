@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { FeatureCard } from "./FeatureCard";
-import Timer from "../../assets/Home/TImer.tsx";
-import Ticket from "../../assets/Home/Ticket.tsx";
-import Reduction from "../../assets/Home/Reduction.tsx";
+import { FeatureCard } from "./FeatureCard.tsx";
+import Timer from "../../../assets/Home/TImer.tsx";
+import Ticket from "../../../assets/Home/Ticket.tsx";
+import Reduction from "../../../assets/Home/Reduction.tsx";
 
 export const Features: React.FC = () => {
     const features = [
@@ -29,7 +29,7 @@ export const Features: React.FC = () => {
     ];
 
     return (
-        <section className="flex flex-wrap gap-10 justify-between items-center px-24 leading-none text-center bg-black bg-opacity-0 max-md:px-5">
+        <section className="flex flex-wrap gap-10 justify-between items-center px-24 leading-none text-center mb-40">
             {features.map((feature, index) => (
                 <FeatureCard
                     key={index}

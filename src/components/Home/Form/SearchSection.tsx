@@ -4,18 +4,18 @@ import { SearchForm } from "./SearchForm";
 
 export default function SearchSection() {
     return (
-        <section className="flex relative flex-col justify-center px-20 py-16 min-h-[573px] max-md:px-5">
+        <section className="flex relative flex-col justify-center px-20 py-16 min-h-[573px] ">
             <img
                 src="/Background.svg"
                 alt=""
                 className="object-cover absolute inset-0 size-full"
             />
-            <div className="flex relative flex-col w-full max-md:max-w-full">
-                <header className="flex flex-col items-center w-full leading-none text-center text-white max-md:max-w-full">
-                    <h1 className="text-4xl font-bold max-md:max-w-full">
+            <div className="flex relative flex-col w-full ">
+                <header className="flex flex-col items-center w-full leading-none text-center text-white ">
+                    <h1 className="text-4xl font-bold ">
                         Trouvez votre train idéal
                     </h1>
-                    <p className="mt-5 text-lg max-md:max-w-full">
+                    <p className="mt-5 text-lg ">
                         Voyagez en toute simplicité à travers la France
                     </p>
                 </header>

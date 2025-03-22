@@ -8,7 +8,7 @@ import Calendar from "../../../assets/Home/Calendar.tsx";
 
 export const SearchForm: React.FC = () => {
     return (
-        <form className="flex flex-col items-center w-full max-md:max-w-full">
+        <form className="flex flex-col items-center w-full">
             <div className="flex flex-wrap gap-6 items-start w-full">
                 <FormInput
                     label="Gare de départ"
