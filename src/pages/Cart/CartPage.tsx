@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import Header from "../../components/Header/Header.tsx";
 import Footer from "../../components/Footer/Footer.tsx";
+import Cart from "../../components/Cart/Cart.tsx";
+import Meal from "../../components/Cart/Meal.tsx";
 
 
 const CartPage = () => {
@@ -69,19 +71,20 @@ const CartPage = () => {
               <div className="space-y-3 mb-5">
                 <div className="flex justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-primary"><i className="fas fa-suitcase"></i></span>
+                    <Cart />
                     <span className="text-gray-900">Bagage supplémentaire</span>
                   </div>
                   <span className="text-gray-900">+15 €</span>
                 </div>
-                
-                <div className="flex justify-between">
+
+                <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <span className="text-primary"><i className="fas fa-utensils"></i></span>
+                    <Meal />
                     <span className="text-gray-900">Repas à bord</span>
                   </div>
                   <span className="text-gray-900">+10 €</span>
                 </div>
+
               </div>
             </div>
 
