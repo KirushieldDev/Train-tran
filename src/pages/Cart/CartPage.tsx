@@ -1,34 +1,13 @@
 import { Link } from 'react-router-dom';
+import Header from "../../components/Header/Header.tsx";
+import Footer from "../../components/Footer/Footer.tsx";
+
 
 const CartPage = () => {
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
       {/* Header with navigation */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-3">
-          <div className="flex items-center space-x-8">
-            <Link to="/" className="flex items-center">
-              <img src="/train-tran-logo.svg" alt="TrainTran Logo" className="h-10" />
-            </Link>
-            <nav className="hidden md:flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-primary">Traffic</Link>
-              <Link to="/" className="text-gray-700 hover:text-primary">Réserver</Link>
-              <Link to="/" className="text-gray-700 hover:text-primary">Contact</Link>
-            </nav>
-          </div>
-          <div>
-            <div className="flex items-center space-x-4">
-              <Link to="/panier" className="text-gray-700 relative">
-                <i className="fas fa-shopping-cart"></i>
-                <span className="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">2</span>
-              </Link>
-              <button className="text-gray-700">
-                <i className="fas fa-user"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header/>
 
       {/* Main Content */}
       <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
@@ -145,12 +124,8 @@ const CartPage = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white py-4 border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-sm text-gray-500 text-center">© 2025 TrainTran. Tous droits réservés.</p>
-        </div>
-      </footer>
+    <Footer/>
+
     </div>
   );
 };
