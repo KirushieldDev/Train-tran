@@ -29,7 +29,7 @@ export const Features: React.FC = () => {
     ];
 
     return (
-        <section className="flex flex-wrap gap-10 justify-between items-center px-24 leading-none text-center mb-40">
+        <section className="flex flex-wrap gap-10 justify-between items-center px-24 leading-none text-center mb-10">
             {features.map((feature, index) => (
                 <FeatureCard
                     key={index}
