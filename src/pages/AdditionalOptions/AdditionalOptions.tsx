@@ -7,6 +7,8 @@ import PowerSVG from '../../assets/AdditionalOptions/PowerSVG';
 import BaggageSVG from '../../assets/AdditionalOptions/BaggageSVG';
 import SmsSVG from '../../assets/AdditionalOptions/SmsSVG';
 import InsuranceSVG from '../../assets/AdditionalOptions/InsuranceSVG';
+import Header from "../../components/Header/Header.tsx";
+import Footer from "../../components/Footer/Footer.tsx";
 
 export const AdditionalOptions: React.FC = () => {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -70,20 +72,24 @@ export const AdditionalOptions: React.FC = () => {
         .filter(opt => selectedOptions.includes(opt.id));
 
     return (
-        <div className="max-w-[1024px] mx-auto px-4 py-8">
-            <div className="flex gap-32 justify-center items-start">
-                <OptionsList
-                    options={options}
-                    selectedOptions={selectedOptions}
-                    onOptionToggle={handleOptionChange}
-                />
-                <OrderSummary
-                    basePrice={basePrice}
-                    selectedOptions={selectedOptionDetails}
-                    totalPrice={totalPrice}
-                    onContinue={handleContinue}
-                />
+        <div>
+            <Header/>
+            <div className="max-w-[1024px] mx-auto px-4 py-8">
+                <div className="flex gap-32 justify-center items-start">
+                    <OptionsList
+                        options={options}
+                        selectedOptions={selectedOptions}
+                        onOptionToggle={handleOptionChange}
+                    />
+                    <OrderSummary
+                        basePrice={basePrice}
+                        selectedOptions={selectedOptionDetails}
+                        totalPrice={totalPrice}
+                        onContinue={handleContinue}
+                    />
+                </div>
             </div>
+            <Footer/>
         </div>
     );
 };
