@@ -6,8 +6,8 @@ import Edit from "../../../assets/Calendar/Edit.tsx";
 
 export const TrainJourneyDisplay: React.FC = () => {
     return (
-        <article className="flex flex-col gap-2.5 items-start p-6 bg-white rounded-lg shadow-sm mt-5 ">
-            <div className="flex justify-between items-center w-full max-w-[1200px] ">
+        <article className="flex flex-col gap-2.5 items-start p-6 bg-white rounded-lg shadow-sm mt-5">
+            <div className="flex justify-between items-center w-full">
                 <div className="flex gap-2.5 items-center">
                     <figure className="flex justify-center items-center w-8 h-[29px]">
                         <TrainGreen />

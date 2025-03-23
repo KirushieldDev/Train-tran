@@ -5,7 +5,7 @@ interface DateCellProps {
 }
 
 export function DateCell({ day, price, isSelected = false }: DateCellProps) {
-    const baseClasses = "flex flex-col gap-1 p-3.5 rounded-lg w-[150px] border";
+    const baseClasses = "flex flex-col gap-1 p-3.5 rounded-lg border flex-1"; // flex-1 pour adapter la largeur
     const selectedClasses = isSelected
         ? "bg-emerald-50 border-2 border-emerald-600"
         : "border border-gray-300";
