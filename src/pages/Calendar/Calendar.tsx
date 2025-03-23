@@ -7,7 +7,7 @@ import Departure from "../../components/Calendar/Departure/Departure.tsx";
 function Calendar() {
     return (
         <>
-            <div className="bg-[#E5E7EB]">
+            <div className="bg-background">
                 <Header />
                 <div className="px-4 md:px-40 lg:px-40">
                     <TrainJourneyDisplay />
