@@ -5,6 +5,13 @@ import { PricingSummary } from "./PricingSummary";
 import Buttons from "./Buttons.tsx";
 
 export default function BookingSummary() {
+    const handleModify = () => {
+        window.location.href = "/calendrier";
+    };
+
+    const handleConfirm = () => {
+        window.location.href = "/paiement";
+    };
     return (
         <>
             <link
@@ -24,7 +31,7 @@ export default function BookingSummary() {
                     arrivalTime="11:45"
                     price="45,00 €"
                     passengers="2 passagers"
-                    title="Trajet aller vers Lyon"
+                    title="Trajet aller vers Lyon le"
                 />
 
                 <TripCard
@@ -35,13 +42,13 @@ export default function BookingSummary() {
                     arrivalTime="20:45"
                     price="45,00 €"
                     passengers="2 passagers"
-                    title="Trajet retour vers Paris"
+                    title="Trajet retour vers Paris le"
                 />
 
                 <OptionsSection />
                 <PricingSummary />
 
-                <Buttons />
+                <Buttons onModify={handleModify} onConfirmAndPay={handleConfirm} />
             </main>
         </>
     );

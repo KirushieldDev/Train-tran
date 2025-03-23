@@ -66,6 +66,7 @@ export const AdditionalOptions: React.FC = () => {
 
     const handleContinue = () => {
         console.log('Continue with selected options:', selectedOptions);
+        window.location.href = "/panier";
     };
 
     const selectedOptionDetails = options
