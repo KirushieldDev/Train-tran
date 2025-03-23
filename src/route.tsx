@@ -4,6 +4,7 @@ import { AdditionalOptions } from "./pages/AdditionalOptions/AdditionalOptions";
 import CartPage from "./pages/Cart/CartPage";
 import PersonalInfoForm from "./components/Forms/PersonalInfo/PersonalInfoForm.tsx";
 import PaymentPage from "./pages/Payment/PaymentPage";
+import Calendar from "./pages/Calendar/Calendar.tsx";
 
 const AppRoutes = () => {
     return (
@@ -14,6 +15,7 @@ const AppRoutes = () => {
                 <Route path="/form-info" element={<PersonalInfoForm />}></Route>
                 <Route path="/options" element={<AdditionalOptions />} />
                 <Route path="/paiement" element={<PaymentPage />} />
+                <Route path="/calendrier" element={<Calendar />} />
             </Routes>
         </Router>
     );
