@@ -35,7 +35,7 @@ const PaymentPage = () => {
                         <h1 className="text-xl font-semibold text-gray-900 mb-1">Paiement sécurisé</h1>
                         <p className="text-sm text-gray-600 mb-5">Veuillez saisir vos informations de paiement</p>
 
-                        <form>
+                        <form action="/confirmation">
                             <div className="mb-4">
                                 <label htmlFor="cardNumber" className="text-sm font-medium text-gray-700 mb-1">
                                     Numéro de carte

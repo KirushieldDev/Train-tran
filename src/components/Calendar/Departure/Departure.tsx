@@ -36,10 +36,12 @@ const Departure: React.FC = () => {
 
     const handleCancel = () => {
         // Handle cancel action
+        window.location.href = "/";
     };
 
     const handleContinue = () => {
         // Handle continue booking action
+        window.location.href = "/options";
     };
 
     return (
