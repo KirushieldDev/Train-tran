@@ -6,6 +6,7 @@ import CreditCardIcon from '../../assets/Payment/CreditCardIcon';
 import HelpIcon from '../../assets/Payment/HelpIcon';
 import LockIcon from '../../assets/Payment/LockIcon';
 import ShieldIcon from '../../assets/Payment/ShieldIcon';
+import Button from '../../components/common/Button';
 
 const PaymentPage = () => {
     // Mock data for the order summary
@@ -100,13 +101,15 @@ const PaymentPage = () => {
                                 />
                             </div>
 
-                            <button
+                            <Button 
                                 type="submit"
-                                className="w-full flex items-center justify-center bg-[#059669] text-white rounded-md py-3.5 text-sm font-medium"
+                                variant="primary"
+                                size="lg"
+                                fullWidth
+                                icon={<LockIcon />}
                             >
-                                <LockIcon />
                                 Payer maintenant
-                            </button>
+                            </Button>
                         </form>
                     </div>
 

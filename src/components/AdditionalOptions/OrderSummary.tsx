@@ -1,5 +1,6 @@
 import React from 'react';
 import { OrderSummaryProps } from './types';
+import Button from '../common/Button';
 
 export const OrderSummary: React.FC<OrderSummaryProps> = ({
     basePrice,
@@ -30,12 +31,14 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                 </div>
             </div>
             {showButton && onContinue && (
-                <button
+                <Button
                     onClick={onContinue}
-                    className="w-full bg-primary text-white rounded-lg py-3 mt-6 hover:bg-primary/90 transition-colors"
+                    variant="secondary"
+                    fullWidth
+                    className="mt-6"
                 >
                     Continuer
-                </button>
+                </Button>
             )}
         </div>
     );
