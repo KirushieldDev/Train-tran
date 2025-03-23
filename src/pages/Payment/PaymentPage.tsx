@@ -23,7 +23,7 @@ const PaymentPage = () => {
     const totalPrice = basePrice + baggage.price;
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col">
             {/* Reusing Header component */}
             <Header />
 
@@ -101,7 +101,7 @@ const PaymentPage = () => {
                                 />
                             </div>
 
-                            <Button 
+                            <Button
                                 type="submit"
                                 variant="primary"
                                 size="lg"

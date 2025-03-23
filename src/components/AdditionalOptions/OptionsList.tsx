@@ -8,8 +8,7 @@ export const OptionsList: React.FC<OptionsListProps> = ({
     onOptionToggle
 }) => {
     return (
-        <div className="w-[480px]">
-            <h1 className="text-2xl font-bold mb-8 text-textPrimary">Options supplémentaires</h1>
+        <div className="w-full">
             <div className="space-y-4">
                 {options.map((option) => (
                     <OptionCard
