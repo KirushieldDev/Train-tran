@@ -3,6 +3,7 @@ import Home from "./pages/Home/Home";
 import { AdditionalOptions } from "./pages/AdditionalOptions/AdditionalOptions";
 import CartPage from "./pages/Cart/CartPage";
 import PersonalInfoForm from "./components/Forms/PersonalInfo/PersonalInfoForm.tsx";
+import ConfirmationPage from "./pages/Confirmation/ConfirmationPage";
 import PaymentPage from "./pages/Payment/PaymentPage";
 import Calendar from "./pages/Calendar/Calendar.tsx";
 
@@ -16,6 +17,7 @@ const AppRoutes = () => {
                 <Route path="/options" element={<AdditionalOptions />} />
                 <Route path="/paiement" element={<PaymentPage />} />
                 <Route path="/calendrier" element={<Calendar />} />
+                <Route path="/confirmation" element={<ConfirmationPage />} />
             </Routes>
         </Router>
     );
