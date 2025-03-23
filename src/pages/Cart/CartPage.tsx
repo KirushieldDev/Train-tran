@@ -137,9 +137,12 @@ const CartPage = () => {
               >
                 Continuer vos achats
               </Link>
-              <button className="px-4 py-2 bg-primary text-white font-medium rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+              <Link 
+                to="/paiement" 
+                className="px-4 py-2 bg-primary text-white font-medium rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              >
                 Payer maintenant
-              </button>
+              </Link>
             </div>
           </div>
         </div>
