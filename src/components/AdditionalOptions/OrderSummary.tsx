@@ -1,41 +1,46 @@
 import React from 'react';
 import { OrderSummaryProps } from './types';
+import Button from '../common/Button';
 
 export const OrderSummary: React.FC<OrderSummaryProps> = ({
     basePrice,
     selectedOptions,
     totalPrice,
-    onContinue
+    onContinue,
+    showButton = true
 }) => {
     return (
-        <div className="w-96">
-            <div className="bg-background rounded-lg p-6 sticky top-4">
-                <h2 className="font-semibold text-lg mb-4 text-textPrimary">Récapitulatif</h2>
-                <div className="space-y-2">
-                    <div className="flex justify-between text-textPrimary">
-                        <span>Billet de base</span>
-                        <span>{basePrice}€</span>
+        <div className="w-full">
+            <h2 className="font-semibold text-xl mb-4 text-textPrimary">Récapitulatif</h2>
+            <div className="space-y-3">
+                <div className="flex justify-between text-textPrimary">
+                    <span>Billet de base</span>
+                    <span className="font-medium">{basePrice}€</span>
+                </div>
+                {selectedOptions.map(option => (
+                    <div key={option.id} className="flex justify-between text-primary">
+                        <span>{option.name}</span>
+                        <span className="font-medium">{option.price === 0 ? 'Gratuit' : `+${option.price}€`}</span>
                     </div>
-                    {selectedOptions.map(option => (
-                        <div key={option.id} className="flex justify-between text-primary">
-                            <span>{option.name}</span>
-                            <span>{option.price === 0 ? 'Gratuit' : `+${option.price}€`}</span>
-                        </div>
-                    ))}
-                    <div className="border-t border-borderContainer pt-2 mt-4">
-                        <div className="flex justify-between font-semibold text-textPrimary">
-                            <span>Total</span>
-                            <span>{totalPrice}€</span>
-                        </div>
+                ))}
+                <div className="border-t border-borderContainer pt-3 mt-4">
+                    <div className="flex justify-between font-semibold text-textPrimary">
+                        <span className="text-lg">Total</span>
+                        <span className="text-lg">{totalPrice}€</span>
                     </div>
                 </div>
-                <button
+            </div>
+            {showButton && onContinue && (
+                <Button
                     onClick={onContinue}
-                    className="w-full bg-primary text-white rounded-lg py-3 mt-6 hover:bg-primary/90 transition-colors"
+                    variant="secondary"
+                    fullWidth
+                    className="mt-8"
+                    size="lg"
                 >
                     Continuer
-                </button>
-            </div>
+                </Button>
+            )}
         </div>
     );
 };

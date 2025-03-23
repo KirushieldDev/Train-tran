@@ -24,5 +24,6 @@ export interface OrderSummaryProps {
     basePrice: number;
     selectedOptions: Option[];
     totalPrice: number;
-    onContinue: () => void;
+    onContinue?: () => void;
+    showButton?: boolean;
 }
