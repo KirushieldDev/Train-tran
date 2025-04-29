@@ -1,8 +1,8 @@
 "use client";
-import { CalendarHeader } from "./CalendarHeader";
-import { WeekDayLabels } from "./WeekDayLabels";
-import { DateCell } from "./DateCell";
-import { PricingSummary } from "./PricingSummary";
+import {CalendarHeader} from "./CalendarHeader";
+import {WeekDayLabels} from "./WeekDayLabels";
+import {DateCell} from "./DateCell";
+import {PricingSummary} from "./PricingSummary";
 
 export default function CalendarPricing() {
     return (

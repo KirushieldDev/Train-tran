@@ -1,22 +1,18 @@
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
-import { Option } from '../../components/AdditionalOptions/types';
-import { OrderSummary } from '../../components/AdditionalOptions/OrderSummary';
-import CreditCardIcon from '../../assets/Payment/CreditCardIcon';
-import HelpIcon from '../../assets/Payment/HelpIcon';
-import LockIcon from '../../assets/Payment/LockIcon';
-import ShieldIcon from '../../assets/Payment/ShieldIcon';
-import Button from '../../components/common/Button';
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import {Option} from "../../components/AdditionalOptions/types";
+import {OrderSummary} from "../../components/AdditionalOptions/OrderSummary";
+import Button from "../../components/common/Button";
+import {IconCreditCard, IconHelp, IconLock, IconShieldCheck} from "@tabler/icons-react";
 
 const PaymentPage = () => {
     // Mock data for the order summary
     const basePrice = 45;
     const baggage: Option = {
-        id: 'baggage',
-        name: 'Bagage supplémentaire',
-        description: 'Un bagage supplémentaire de 20kg max',
+        id: "baggage",
+        name: "Bagage supplémentaire",
+        description: "Un bagage supplémentaire de 20kg max",
         price: 15,
-        Icon: () => null // We don't need the icon here
     };
 
     const selectedOptions = [baggage];
@@ -50,7 +46,7 @@ const PaymentPage = () => {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-gray-700"
                                     />
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <CreditCardIcon />
+                                        <IconCreditCard className="text-textSecondary" size="16" />
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +79,7 @@ const PaymentPage = () => {
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-gray-700"
                                         />
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <HelpIcon />
+                                            <IconHelp className="text-textSecondary" size="16" />
                                         </div>
                                     </div>
                                 </div>
@@ -101,13 +97,7 @@ const PaymentPage = () => {
                                 />
                             </div>
 
-                            <Button
-                                type="submit"
-                                variant="primary"
-                                size="lg"
-                                fullWidth
-                                icon={<LockIcon />}
-                            >
+                            <Button type="submit" variant="primary" size="lg" fullWidth icon={<IconLock className="text-white" size="18" />}>
                                 Payer maintenant
                             </Button>
                         </form>
@@ -118,16 +108,11 @@ const PaymentPage = () => {
                         <div className="flex flex-col items-center md:items-start">
                             <div className="w-96">
                                 <div className="bg-white rounded-lg p-6 shadow-sm">
-                                    <OrderSummary
-                                        basePrice={basePrice}
-                                        selectedOptions={selectedOptions}
-                                        totalPrice={totalPrice}
-                                        showButton={false}
-                                    />
+                                    <OrderSummary basePrice={basePrice} selectedOptions={selectedOptions} totalPrice={totalPrice} showButton={false} />
 
                                     {/* SSL Security message */}
-                                    <div className="mt-4 pt-4 flex items-center justify-center border-t border-gray-200">
-                                        <ShieldIcon />
+                                    <div className="mt-4 pt-4 flex gap-2 items-center justify-center border-t border-gray-200">
+                                        <IconShieldCheck className="text-primary" size="20" />
                                         <span className="text-[#059669] text-sm">Paiement sécurisé par cryptage SSL</span>
                                     </div>
                                 </div>

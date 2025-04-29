@@ -1,16 +1,10 @@
-
-
 interface PricingSummaryProps {
     lowestPrice: number;
     averagePrice: number;
     highestPrice: number;
 }
 
-export function PricingSummary({
-                                   lowestPrice,
-                                   averagePrice,
-                                   highestPrice,
-                               }: PricingSummaryProps) {
+export function PricingSummary({lowestPrice, averagePrice, highestPrice}: PricingSummaryProps) {
     return (
         <section className="flex flex-col gap-2.5 p-4 w-full bg-gray-50 rounded-lg">
             <div className="flex justify-between items-start w-full">
