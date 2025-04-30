@@ -1,6 +1,5 @@
 import React from "react";
-import Cart from "../../assets/Cart/Cart.tsx";
-import Meal from "../../assets/Cart/Meal.tsx";
+import {IconLuggage, IconToolsKitchen2} from "@tabler/icons-react";
 
 export const OptionsSection: React.FC = () => {
     return (
@@ -9,14 +8,14 @@ export const OptionsSection: React.FC = () => {
             <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                     <div className="flex gap-2 items-center">
-                        <Cart/>
+                        <IconLuggage className="text-primary" size="22" />
                         <div className="text-base text-gray-700">Bagage supplémentaire</div>
                     </div>
                     <div className="text-base text-gray-800">+ 15 €</div>
                 </div>
                 <div className="flex justify-between items-center">
                     <div className="flex gap-2 items-center">
-                        <Meal />
+                        <IconToolsKitchen2 className="text-primary" size="22" />
                         <div className="text-base text-gray-700">Repas à bord</div>
                     </div>
                     <div className="text-base text-gray-800">+ 10 €</div>

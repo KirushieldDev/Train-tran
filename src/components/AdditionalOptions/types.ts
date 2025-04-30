@@ -1,11 +1,11 @@
-import { FC, SVGProps } from 'react';
+import {ReactNode} from "react";
 
 export interface Option {
     id: string;
     name: string;
     description: string;
     price: number;
-    Icon: FC<SVGProps<SVGSVGElement>>;
+    Icon?: ReactNode;
 }
 
 export interface OptionCardProps {

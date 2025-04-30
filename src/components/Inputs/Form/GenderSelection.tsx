@@ -7,10 +7,7 @@ interface GenderSelectionProps {
     onChange: (value: string) => void;
 }
 
-export const GenderSelection: React.FC<GenderSelectionProps> = ({
-                                                                    value,
-                                                                    onChange,
-                                                                }) => {
+export const GenderSelection: React.FC<GenderSelectionProps> = ({value, onChange}) => {
     return (
         <div className="w-full text-gray-700">
             <p className="text-sm font-medium">Civilité</p>
@@ -21,7 +18,7 @@ export const GenderSelection: React.FC<GenderSelectionProps> = ({
                         name="gender"
                         value="M"
                         checked={value === "M"}
-                        onChange={(e) => onChange(e.target.value)}
+                        onChange={e => onChange(e.target.value)}
                         className="w-4 h-4 rounded-full border border-black"
                     />
                     <span>M.</span>
@@ -32,7 +29,7 @@ export const GenderSelection: React.FC<GenderSelectionProps> = ({
                         name="gender"
                         value="Mme"
                         checked={value === "Mme"}
-                        onChange={(e) => onChange(e.target.value)}
+                        onChange={e => onChange(e.target.value)}
                         className="w-4 h-4 rounded-full border border-black"
                     />
                     <span>Mme</span>

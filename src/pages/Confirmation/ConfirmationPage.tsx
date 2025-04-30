@@ -1,13 +1,8 @@
-import React from 'react';
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
-import CheckCircleIcon from '../../assets/Confirmation/CheckCircleIcon.tsx';
-import PrinterIcon from '../../assets/Confirmation/PrinterIcon.tsx';
-import DownloadIcon from '../../assets/Confirmation/DownloadIcon.tsx';
-import CalendarIcon from '../../assets/Confirmation/CalendarIcon.tsx';
-import EmailIcon from '../../assets/Confirmation/EmailIcon.tsx';
-import HelpIcon from '../../assets/Payment/HelpIcon.tsx';
-import Button from '../../components/common/Button';
+import React from "react";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import Button from "../../components/common/Button";
+import {IconCalendarWeekFilled, IconCheck, IconMail, IconHelp, IconDownload, IconPrinter} from "@tabler/icons-react";
 
 interface ConfirmationPageProps {
     // These props could be passed through navigation or a global context
@@ -21,11 +16,11 @@ interface ConfirmationPageProps {
 
 const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
     reservationDetails = {
-        outboundRef: 'RF789456',
-        returnRef: 'RF789457',
-        passengerName: 'Tran Louis',
-        email: 'louis.tran@gmail.com'
-    }
+        outboundRef: "RF789456",
+        returnRef: "RF789457",
+        passengerName: "Tran Louis",
+        email: "louis.tran@gmail.com",
+    },
 }) => {
     return (
         <div className="min-h-screen bg-background flex flex-col">
@@ -35,7 +30,7 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
                     <div className="bg-white rounded-lg p-8 shadow-sm border border-borderContainer flex flex-col items-center">
                         {/* Confirmation icon and title */}
                         <div className="flex flex-col items-center mb-8 text-center">
-                            <CheckCircleIcon />
+                            <IconCheck className="text-primary rounded-full bg-primary/20 p-1" size="48" />
                             <h1 className="text-2xl font-semibold text-textPrimary mt-4">Réservation confirmée !</h1>
                             <p className="text-textSecondary mt-2">Les détails de votre commande vous ont été envoyés par mail</p>
                         </div>
@@ -74,34 +69,26 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
 
                         {/* Action buttons */}
                         <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
-                            <Button
-                                variant="primary"
-                                className="flex items-center justify-center"
-                                icon={<PrinterIcon className="w-5 h-5" />}
-                            >
+                            <Button variant="primary" className="flex items-center justify-center" icon={<IconPrinter className="text-white" />}>
                                 Imprimer le ticket
                             </Button>
-                            <Button
-                                variant="outline"
-                                className="flex items-center justify-center"
-                                icon={<DownloadIcon className="w-5 h-5" />}
-                            >
+                            <Button variant="outline" className="flex items-center justify-center" icon={<IconDownload className="text-textSecondary" />}>
                                 Télécharger le PDF
                             </Button>
                         </div>
 
                         {/* Additional links */}
                         <div className="flex flex-wrap gap-6 text-sm text-primary justify-center">
-                            <button className="flex items-center hover:underline">
-                                <CalendarIcon className="w-5 h-5 mr-2" />
+                            <button className="flex gap-1.5 items-center hover:underline">
+                                <IconCalendarWeekFilled className="text-primary" size="20" />
                                 Ajouter au calendrier
                             </button>
-                            <button className="flex items-center hover:underline">
-                                <EmailIcon className="w-5 h-5 mr-2" />
+                            <button className="flex gap-1.5 items-center hover:underline">
+                                <IconMail className="text-primary" size="20" />
                                 Renvoyer la confirmation
                             </button>
-                            <button className="flex items-center hover:underline">
-                                <HelpIcon className="w-5 h-5 mr-2" />
+                            <button className="flex gap-1.5 items-center hover:underline">
+                                <IconHelp className="text-primary" size="20" />
                                 Besoin d'aide ?
                             </button>
                         </div>

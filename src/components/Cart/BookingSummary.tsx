@@ -1,7 +1,7 @@
 "use client";
-import { TripCard } from "./TripCard";
-import { OptionsSection } from "./OptionsSection";
-import { PricingSummary } from "./PricingSummary";
+import {TripCard} from "./TripCard";
+import {OptionsSection} from "./OptionsSection";
+import {PricingSummary} from "./PricingSummary";
 import Buttons from "./Buttons.tsx";
 
 export default function BookingSummary() {
@@ -14,14 +14,9 @@ export default function BookingSummary() {
     };
     return (
         <>
-            <link
-                href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-                rel="stylesheet"
-            />
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
             <main className="flex flex-col gap-6 pl-19 pt-10 pb-24 mx-auto w-[1000px]">
-                <h1 className="text-4xl font-bold leading-snug text-gray-900">
-                    Récapitulatif de votre réservation
-                </h1>
+                <h1 className="text-4xl font-bold leading-snug text-gray-900">Récapitulatif de votre réservation</h1>
 
                 <TripCard
                     date="20/03/2025"

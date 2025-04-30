@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
-import { TripSection } from "./TripSection";
-import { ActionButtons } from "./ActionButtons";
+import {TripSection} from "./TripSection";
+import {ActionButtons} from "./ActionButtons";
 
 const Departure: React.FC = () => {
     const departureTrips = [
@@ -46,17 +46,9 @@ const Departure: React.FC = () => {
 
     return (
         <main>
-            <TripSection
-                title="Aller"
-                route="Paris → Marseille"
-                trips={departureTrips}
-            />
+            <TripSection title="Aller" route="Paris → Marseille" trips={departureTrips} />
             <div className="mt-8">
-                <TripSection
-                    title="Retour"
-                    route="Marseille → Paris"
-                    trips={returnTrips}
-                />
+                <TripSection title="Retour" route="Marseille → Paris" trips={returnTrips} />
             </div>
             <ActionButtons onCancel={handleCancel} onContinue={handleContinue} />
         </main>

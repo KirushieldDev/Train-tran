@@ -11,8 +11,8 @@ function Calendar() {
                 <Header />
                 <div className="px-4 md:px-40 lg:px-40">
                     <TrainJourneyDisplay />
-                    <CalendarPricing/>
-                    <Departure/>
+                    <CalendarPricing />
+                    <Departure />
                 </div>
                 <Footer />
             </div>

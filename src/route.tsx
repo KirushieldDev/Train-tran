@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Home from "./pages/Home/Home";
-import { AdditionalOptions } from "./pages/AdditionalOptions/AdditionalOptions";
+import {AdditionalOptions} from "./pages/AdditionalOptions/AdditionalOptions";
 import CartPage from "./pages/Cart/CartPage";
 import PersonalInfoForm from "./components/Forms/PersonalInfo/PersonalInfoForm.tsx";
 import ConfirmationPage from "./pages/Confirmation/ConfirmationPage";
