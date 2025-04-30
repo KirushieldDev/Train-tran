@@ -1,7 +1,12 @@
 import AppRoutes from "./route";
+import {CartProvider} from "./context/CartContext.tsx";
 
 function App() {
-    return <AppRoutes />;
+    return (
+        <CartProvider>
+            <AppRoutes />
+        </CartProvider>
+    );
 }
 
 export default App;
