@@ -1,76 +1,65 @@
-import React, { useState } from 'react';
-import { OptionsList } from '../../components/AdditionalOptions/OptionsList';
-import { OrderSummary } from '../../components/AdditionalOptions/OrderSummary';
-import { Option } from '../../components/AdditionalOptions/types';
-import QuietSVG from '../../assets/AdditionalOptions/QuietSVG';
-import PowerSVG from '../../assets/AdditionalOptions/PowerSVG';
-import BaggageSVG from '../../assets/AdditionalOptions/BaggageSVG';
-import SmsSVG from '../../assets/AdditionalOptions/SmsSVG';
-import InsuranceSVG from '../../assets/AdditionalOptions/InsuranceSVG';
+import React, {useState} from "react";
+import {OptionsList} from "../../components/AdditionalOptions/OptionsList";
+import {OrderSummary} from "../../components/AdditionalOptions/OrderSummary";
+import {Option} from "../../components/AdditionalOptions/types";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import {IconVolume3, IconPlug, IconLuggage, IconMessagePause, IconShieldDollar} from "@tabler/icons-react";
 
 export const AdditionalOptions: React.FC = () => {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
     const options: Option[] = [
         {
-            id: 'quiet',
-            name: 'Place tranquille',
-            description: 'Voyagez dans une zone calme et silencieuse',
+            id: "quiet",
+            name: "Place tranquille",
+            description: "Voyagez dans une zone calme et silencieuse",
             price: 5,
-            Icon: QuietSVG
+            Icon: <IconVolume3 className="text-textSecondary" size="16" />,
         },
         {
-            id: 'power',
-            name: 'Prise électrique',
-            description: 'Accès garanti à une prise électrique',
+            id: "power",
+            name: "Prise électrique",
+            description: "Accès garanti à une prise électrique",
             price: 3,
-            Icon: PowerSVG
+            Icon: <IconPlug className="text-textSecondary" size="16" />,
         },
         {
-            id: 'baggage',
-            name: 'Bagage supplémentaire',
-            description: 'Ajoutez un bagage supplémentaire à votre voyage',
+            id: "baggage",
+            name: "Bagage supplémentaire",
+            description: "Ajoutez un bagage supplémentaire à votre voyage",
             price: 15,
-            Icon: BaggageSVG
+            Icon: <IconLuggage className="text-textSecondary" size="16" />,
         },
         {
-            id: 'sms',
-            name: 'Information par SMS',
-            description: 'Recevez des notifications sur votre trajet',
+            id: "sms",
+            name: "Information par SMS",
+            description: "Recevez des notifications sur votre trajet",
             price: 0,
-            Icon: SmsSVG
+            Icon: <IconMessagePause className="text-textSecondary" size="16" />,
         },
         {
-            id: 'insurance',
-            name: 'Garantie annulation',
+            id: "insurance",
+            name: "Garantie annulation",
             description: "Protection en cas d'annulation ou de perturbation",
             price: 10,
-            Icon: InsuranceSVG
-        }
+            Icon: <IconShieldDollar className="text-textSecondary" size="16" />,
+        },
     ];
 
     const basePrice = 45;
-    const totalPrice = basePrice + options
-        .filter(opt => selectedOptions.includes(opt.id))
-        .reduce((sum, opt) => sum + opt.price, 0);
+    const totalPrice = basePrice + options.filter(opt => selectedOptions.includes(opt.id)).reduce((sum, opt) => sum + opt.price, 0);
 
     const handleOptionChange = (optionId: string) => {
-        setSelectedOptions(prev =>
-            prev.includes(optionId)
-                ? prev.filter(id => id !== optionId)
-                : [...prev, optionId]
-        );
+        setSelectedOptions(prev => (prev.includes(optionId) ? prev.filter(id => id !== optionId) : [...prev, optionId]));
     };
 
     const handleContinue = () => {
-        console.log('Continue with selected options:', selectedOptions);
+        console.log("Continue with selected options:", selectedOptions);
         window.location.href = "/panier";
     };
 
-    const selectedOptionDetails = options
-        .filter(opt => selectedOptions.includes(opt.id));
+    const selectedOptionDetails = options.filter(opt => selectedOptions.includes(opt.id));
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
@@ -81,11 +70,7 @@ export const AdditionalOptions: React.FC = () => {
                     <div className="flex flex-col md:flex-row gap-8 md:gap-32 justify-between items-start">
                         <div className="w-full md:w-[480px]">
                             <div className="bg-white rounded-lg p-6 shadow-sm border border-borderContainer">
-                                <OptionsList
-                                    options={options}
-                                    selectedOptions={selectedOptions}
-                                    onOptionToggle={handleOptionChange}
-                                />
+                                <OptionsList options={options} selectedOptions={selectedOptions} onOptionToggle={handleOptionChange} />
                             </div>
                         </div>
                         <div className="w-full md:w-[384px]">

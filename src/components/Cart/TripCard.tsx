@@ -1,5 +1,5 @@
 import React from "react";
-import Arrow from "../../assets/Cart/Arrow.tsx";
+import {IconArrowRight} from "@tabler/icons-react";
 
 interface TripCardProps {
     date: string;
@@ -12,16 +12,7 @@ interface TripCardProps {
     title: string;
 }
 
-export const TripCard: React.FC<TripCardProps> = ({
-                                                      date,
-                                                      departureCity,
-                                                      departureTime,
-                                                      arrivalCity,
-                                                      arrivalTime,
-                                                      price,
-                                                      passengers,
-                                                      title,
-                                                  }) => {
+export const TripCard: React.FC<TripCardProps> = ({date, departureCity, departureTime, arrivalCity, arrivalTime, price, passengers, title}) => {
     return (
         <article className="p-6 bg-white rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
             <h2 className="mb-4 text-lg text-gray-700">
@@ -33,7 +24,7 @@ export const TripCard: React.FC<TripCardProps> = ({
                         <div className="text-base text-gray-800">{departureCity}</div>
                         <time className="text-sm text-gray-500">{departureTime}</time>
                     </div>
-                    <Arrow />
+                    <IconArrowRight className="text-primary" size="20" />
                     <div className="flex flex-col gap-1">
                         <div className="text-base text-gray-800">{arrivalCity}</div>
                         <time className="text-sm text-gray-500">{arrivalTime}</time>
