@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, {createContext, useContext, useState, ReactNode} from "react";
 
 // Types for journey segments (aller / retour)
 export interface Option {
@@ -47,7 +47,7 @@ export interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Provider component
-export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const [tickets, setTickets] = useState<Ticket[]>([]);
 
     const addTicket = (ticket: Ticket) => {
@@ -62,18 +62,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setTickets([]);
     };
 
-    return (
-        <CartContext.Provider value={{ tickets, addTicket, removeTicket, clearCart }}>
-            {children}
-        </CartContext.Provider>
-    );
+    return <CartContext.Provider value={{tickets, addTicket, removeTicket, clearCart}}>{children}</CartContext.Provider>;
 };
 
 // Custom hook to use the cart context
 export const useCart = (): CartContextType => {
     const context = useContext(CartContext);
     if (!context) {
-        throw new Error('useCart must be used within a CartProvider');
+        throw new Error("useCart must be used within a CartProvider");
     }
     return context;
 };

@@ -2,7 +2,6 @@ import React from "react";
 import {OptionCardProps} from "./types";
 
 export const OptionCard: React.FC<OptionCardProps> = ({option, isSelected, onToggle}) => {
-
     return (
         <div className="border border-borderContainer rounded-lg p-4">
             <label className="flex items-start gap-3 cursor-pointer">
