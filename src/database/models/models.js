@@ -11,10 +11,7 @@ const stationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const stopTimeSchema = new mongoose.Schema({
-    arrival_time:      { type: String,  required: true }, // heure locale d'arrivée
-    departure_time:    { type: String,  required: true }, // heure locale de départ
     drop_off_allowed:  { type: Boolean, required: true }, // autorise le déposement
-    headsign:          { type: String,  required: true },
     pickup_allowed:    { type: Boolean, required: true }, // autorise le ramassage
     skipped_stop:      { type: Boolean, required: true }, // passage sans arrêt
     stop_point:        { type: String,  required: true }, // identifiant de la gare

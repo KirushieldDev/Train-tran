@@ -69,10 +69,7 @@ async function fetchAndStoreJourneys(pageSize = 1000) {
     const docs = vjs
         .map(vj => {
             const stopTimes = (vj.stop_times || []).map(sd => ({
-                arrival_time: sd.arrival_time,
-                departure_time: sd.departure_time,
                 drop_off_allowed: sd.drop_off_allowed,
-                headsign: sd.headsign,
                 pickup_allowed: sd.pickup_allowed,
                 skipped_stop: sd.skipped_stop,
                 stop_point: sd.stop_point.id,
