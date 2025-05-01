@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {useState} from "react";
 import PersonalInfoForm from "@traintran/components/Forms/PersonalInfo/PersonalInfoForm";
 import LoginAdherentForm from "@traintran/components/Forms/PersonalInfo/LoginAdherentForm";
 import Header from "@traintran/components/Header/Header";
@@ -13,9 +13,7 @@ export default function Home() {
         <>
             <Header />
             <div className="w-full flex justify-center items-center bg-background h-full py-8">
-                {showLogin ?
-                    <LoginAdherentForm setShowLogin={setShowLogin} />
-                    : <PersonalInfoForm setShowLogin={setShowLogin} />}
+                {showLogin ? <LoginAdherentForm setShowLogin={setShowLogin} /> : <PersonalInfoForm setShowLogin={setShowLogin} />}
             </div>
             <Footer />
         </>

@@ -88,10 +88,7 @@ export default function FormLoginAdherent(props: LoginAdherentFormProps) {
 
             <div className="flex flex-col justify-center items-center py-px mt-7 w-full text-sm text-center">
                 <p className="self-center leading-none text-textSecondary">Pas encore adhérent ?</p>
-                <button
-                    onClick={() => props.setShowLogin(false)}
-                    type="button"
-                    className="my-2 font-medium text-primary">
+                <button onClick={() => props.setShowLogin(false)} type="button" className="my-2 font-medium text-primary">
                     S'inscrire et voir nos offres d'abonnement
                 </button>
             </div>
