@@ -19,7 +19,7 @@
             }
         ],
         "paths": {
-            "@word-finder/*": ["./src/*"]
+            "@traintran/*": ["./src/*"]
         },
         "outDir": "build/dist",
         "rootDir": "src"
