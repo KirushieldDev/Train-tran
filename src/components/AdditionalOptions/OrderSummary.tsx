@@ -1,6 +1,6 @@
 import React from "react";
-import {OrderSummaryProps} from "./types";
-import Button from "../common/Button";
+import {OrderSummaryProps} from "@traintran/components/AdditionalOptions/types";
+import Button from "@traintran/components/common/Button";
 
 export const OrderSummary: React.FC<OrderSummaryProps> = ({basePrice, selectedOptions, totalPrice, onContinue, showButton = true}) => {
     return (

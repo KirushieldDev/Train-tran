@@ -1,11 +1,11 @@
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
-import {Option} from "../../components/AdditionalOptions/types";
-import {OrderSummary} from "../../components/AdditionalOptions/OrderSummary";
-import Button from "../../components/common/Button";
+import {Option} from "@traintran/components/AdditionalOptions/types";
 import {IconCreditCard, IconHelp, IconLock, IconShieldCheck} from "@tabler/icons-react";
+import Header from "@traintran/components/Header/Header";
+import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
+import Footer from "@traintran/components/Footer/Footer";
+import Button from "@traintran/components/common/Button";
 
-const PaymentPage = () => {
+export default function Home() {
     // Mock data for the order summary
     const basePrice = 45;
     const baggage: Option = {
@@ -126,6 +126,4 @@ const PaymentPage = () => {
             <Footer />
         </div>
     );
-};
-
-export default PaymentPage;
+}

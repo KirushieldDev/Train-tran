@@ -1,13 +1,13 @@
 "use client";
 
-import * as React from "react";
-import {FormInput} from "../../Inputs/Form/FormInput";
-import {GenderSelection} from "../../Inputs/Form/GenderSelection";
-import {FormButton} from "../../Inputs/Form/FormButton";
+import React, {useState} from "react";
 import {IconMailFilled, IconMailOpenedFilled, IconPhone} from "@tabler/icons-react";
+import {GenderSelection} from "@traintran/components/Inputs/Form/GenderSelection";
+import {FormInput} from "@traintran/components/Inputs/Form/FormInput";
+import {FormButton} from "@traintran/components/Inputs/Form/FormButton";
 
 const PersonalInfoForm: React.FC = () => {
-    const [formData, setFormData] = React.useState({
+    const [formData, setFormData] = useState({
         gender: "",
         lastName: "",
         firstName: "",
@@ -33,10 +33,10 @@ const PersonalInfoForm: React.FC = () => {
         <form
             onSubmit={handleSubmit}
             className="flex flex-col justify-center p-8 max-w-2xl bg-white rounded-xl shadow-[0px_1px_2px_rgba(0,0,0,0.05)] max-md:px-5">
-            <header className="flex flex-col justify-center w-full leading-none max-md:max-w-full">
+            <div className="flex flex-col justify-center w-full leading-none max-md:max-w-full">
                 <h1 className="text-2xl font-semibold text-textPrimary max-md:max-w-full">Informations Personnelles</h1>
                 <p className="mt-3.5 text-base text-textSecondary max-md:max-w-full">Veuillez renseigner vos informations</p>
-            </header>
+            </div>
 
             <div className="mt-8 w-full max-md:max-w-full">
                 <GenderSelection value={formData.gender} onChange={value => handleInputChange("gender", value)} />

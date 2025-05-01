@@ -1,4 +1,6 @@
-import * as React from "react";
+"use client";
+
+import React from "react";
 
 interface FormButtonProps {
     children: React.ReactNode;
@@ -12,7 +14,7 @@ export const FormButton: React.FC<FormButtonProps> = ({children, onClick, type =
         <button
             type={type}
             onClick={onClick}
-            className={`w-full px-4 py-3 bg-primary text-white text-base font-medium rounded-lg hover:bg-primary/80 transition-colors ${className}`}>
+            className={`w-full px-4 py-3 bg-primary text-white text-base font-medium rounded-lg hover:bg-primaryDark transition-colors ${className}`}>
             {children}
         </button>
     );

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {TimeDisplay} from "./TimeDisplay";
 import {JourneyIndicator} from "./JourneyIndicator";
 import TrainSVG from "../../../assets/Calendar/TrainSVG.tsx";
@@ -22,7 +22,7 @@ export const TripCard: React.FC<TripCardProps> = ({departureTime, arrivalTime, p
                     <TimeDisplay time={arrivalTime} label="Arrivée" />
                 </div>
                 <div className="self-stretch my-auto text-right w-[60px]">
-                    <p className="px-1.5 pt-0.5 pb-3 text-xl font-semibold text-emerald-600 whitespace-nowrap">{price}</p>
+                    <p className="px-1.5 pt-0.5 pb-3 text-xl font-semibold text-primary whitespace-nowrap">{price}</p>
                     <p className="px-1 pt-px pb-2.5 text-sm text-gray-500">{duration}</p>
                 </div>
             </div>

@@ -1,8 +1,7 @@
-"use client";
-import {CalendarHeader} from "./CalendarHeader";
-import {WeekDayLabels} from "./WeekDayLabels";
-import {DateCell} from "./DateCell";
-import {PricingSummary} from "./PricingSummary";
+import {CalendarHeader} from "@traintran/components/Calendar/Calendar/CalendarHeader";
+import {WeekDayLabels} from "@traintran/components/Calendar/Calendar/WeekDayLabels";
+import {DateCell} from "@traintran/components/Calendar/Calendar/DateCell";
+import {PricingSummary} from "@traintran/components/Calendar/Calendar/PricingSummary";
 
 export default function CalendarPricing() {
     return (

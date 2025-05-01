@@ -1,13 +1,17 @@
-import React, {useState} from "react";
-import {OptionsList} from "../../components/AdditionalOptions/OptionsList";
-import {OrderSummary} from "../../components/AdditionalOptions/OrderSummary";
-import {Option} from "../../components/AdditionalOptions/types";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
-import {IconVolume3, IconPlug, IconLuggage, IconMessagePause, IconShieldDollar} from "@tabler/icons-react";
+"use client";
 
-export const AdditionalOptions: React.FC = () => {
+import {useState} from "react";
+import {Option} from "@traintran/components/AdditionalOptions/types";
+import {IconLuggage, IconMessagePause, IconPlug, IconShieldDollar, IconVolume3} from "@tabler/icons-react";
+import Header from "@traintran/components/Header/Header";
+import {OptionsList} from "@traintran/components/AdditionalOptions/OptionsList";
+import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
+import Footer from "@traintran/components/Footer/Footer";
+import {useRouter} from "next/navigation";
+
+export default function Home() {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+    const router = useRouter();
 
     const options: Option[] = [
         {
@@ -56,7 +60,7 @@ export const AdditionalOptions: React.FC = () => {
 
     const handleContinue = () => {
         console.log("Continue with selected options:", selectedOptions);
-        window.location.href = "/panier";
+        router.push("/panier");
     };
 
     const selectedOptionDetails = options.filter(opt => selectedOptions.includes(opt.id));
@@ -89,4 +93,4 @@ export const AdditionalOptions: React.FC = () => {
             <Footer />
         </div>
     );
-};
+}

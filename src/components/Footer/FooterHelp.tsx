@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 export const FooterHelp: React.FC = () => {
     return (
@@ -6,19 +7,19 @@ export const FooterHelp: React.FC = () => {
             <h2 className="text-base font-semibold leading-4 text-gray-800 text-start ">Aide</h2>
             <ul className="flex flex-col gap-2">
                 <li>
-                    <a href="#faq" className="text-base leading-4 text-gray-600">
+                    <Link href="#faq" className="text-base leading-4 text-textSecondary">
                         FAQ
-                    </a>
+                    </Link>
                 </li>
                 <li>
-                    <a href="#contact" className="text-base leading-4 text-gray-600">
+                    <Link href="#contact" className="text-base leading-4 text-textSecondary">
                         Contact
-                    </a>
+                    </Link>
                 </li>
                 <li>
-                    <a href="#support" className="text-base leading-4 text-gray-600">
+                    <Link href="#support" className="text-base leading-4 text-textSecondary">
                         Support
-                    </a>
+                    </Link>
                 </li>
             </ul>
         </nav>

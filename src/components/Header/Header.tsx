@@ -1,8 +1,7 @@
-"use client";
-import * as React from "react";
-import Logo from "../../assets/Header/Logo.tsx";
-import {NavigationLinks} from "./NavigationLinks.tsx";
+import React from "react";
 import {IconUser} from "@tabler/icons-react";
+import Logo from "@traintran/assets/Header/Logo";
+import {NavigationLinks} from "@traintran/components/Header/NavigationLinks";
 
 export const Header: React.FC = () => {
     return (

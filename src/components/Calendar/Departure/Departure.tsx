@@ -1,9 +1,13 @@
 "use client";
-import * as React from "react";
-import {TripSection} from "./TripSection";
-import {ActionButtons} from "./ActionButtons";
+
+import React from "react";
+import {useRouter} from "next/navigation";
+import {TripSection} from "@traintran/components/Calendar/Departure/TripSection";
+import {ActionButtons} from "@traintran/components/Calendar/Departure/ActionButtons";
 
 const Departure: React.FC = () => {
+    const router = useRouter();
+
     const departureTrips = [
         {
             departureTime: "08:00",
@@ -36,12 +40,12 @@ const Departure: React.FC = () => {
 
     const handleCancel = () => {
         // Handle cancel action
-        window.location.href = "/";
+        router.push("/");
     };
 
     const handleContinue = () => {
         // Handle continue booking action
-        window.location.href = "/options";
+        router.push("/options");
     };
 
     return (

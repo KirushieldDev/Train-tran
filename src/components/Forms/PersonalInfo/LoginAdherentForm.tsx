@@ -1,11 +1,12 @@
 "use client";
-import * as React from "react";
-import {FormInput} from "../../Inputs/Form/FormInput";
-import {FormButton} from "../../Inputs/Form/FormButton.tsx";
+
+import React, {useState} from "react";
 import {IconUser, IconLockPassword} from "@tabler/icons-react";
+import {FormInput} from "@traintran/components/Inputs/Form/FormInput";
+import {FormButton} from "@traintran/components/Inputs/Form/FormButton";
 
 function FormLoginAdherent() {
-    const [formData, setFormData] = React.useState({
+    const [formData, setFormData] = useState({
         identifiant: "",
         password: "",
         rememberMe: false,
@@ -26,10 +27,10 @@ function FormLoginAdherent() {
 
     return (
         <section className="overflow-hidden p-8 max-w-md bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.1)]">
-            <header className="px-7 py-1 w-full leading-none text-center">
+            <div className="px-7 py-1 w-full leading-none text-center">
                 <h1 className="text-2xl font-semibold text-textPrimary">Espace Adhérents</h1>
                 <p className="mt-3 text-base text-textSecondary">Connectez-vous pour accéder à vos avantages</p>
-            </header>
+            </div>
 
             <form onSubmit={handleSubmit} className="mt-7 w-full">
                 <div className="w-full">
@@ -82,7 +83,7 @@ function FormLoginAdherent() {
             </form>
 
             <footer className="flex flex-col py-px mt-7 w-full text-sm text-center">
-                <p className="self-center leading-none text-gray-600">Pas encore adhérent ?</p>
+                <p className="self-center leading-none text-textSecondary">Pas encore adhérent ?</p>
                 <button type="button" className="px-16 py-1.5 mt-2 font-medium text-primary">
                     Découvrez nos offres d'abonnement
                 </button>
