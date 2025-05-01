@@ -6,12 +6,11 @@ import Footer from "@traintran/components/Footer/Footer";
 import {CalendrierProps} from "@traintran/app/calendrier/props";
 
 export default async function Home(props: CalendrierProps) {
-    // const [searchParams] = await Promise.all([props.searchParams]);
     return (
         <>
             <Header />
             <div className="px-4 md:px-40 lg:px-40">
-                <TrainJourneyDisplay searchParams={props.searchParams} />
+                <TrainJourneyDisplay {...props} />
                 <CalendarPricing />
                 <Departure />
             </div>
