@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function SearchSection() {
     return (
         <section className="flex relative flex-col justify-center px-20 py-16 min-h-[573px] ">
-            <Image src={"/Background.svg"} alt={"Background SVG"} width={150} height={100} className="object-cover absolute inset-0 size-full" />
+            <Image src={"/Background.jpg"} alt={"Background SVG"} width={4000} height={3000} className="object-cover absolute inset-0 size-full" />
             <div className="flex relative flex-col w-full ">
                 <div className="flex flex-col items-center w-full leading-none text-center text-white ">
                     <h1 className="text-4xl font-bold ">Trouvez votre train idéal</h1>

@@ -4,11 +4,16 @@ import React, {useState} from "react";
 import {FormInput} from "@traintran/components/Home/Form/FormInput";
 import TrainSVG from "@traintran/assets/Home/TrainSVG";
 import {SearchButton} from "@traintran/components/Home/Form/SearchButton";
+import {useRouter} from "next/navigation";
 
 export const SearchForm: React.FC = () => {
     const [stations, setStations] = useState<string[]>([]);
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
+
+    const [departureDate, setDepartureDate] = useState(new Date().toISOString().split("T")[0]);
+    const [returnDate, setReturnDate] = useState("");
+    const router = useRouter();
 
     React.useEffect(() => {
         fetch("/api/stations-name")
@@ -25,11 +30,17 @@ export const SearchForm: React.FC = () => {
         return stations.filter(n => n.toLowerCase().startsWith(lower));
     };
 
+    const onSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.push(`/calendrier?departure=${encodeURIComponent(from)}&arrival=${encodeURIComponent(to)}&departure_date=${encodeURIComponent(departureDate)}${returnDate ? `&return_date=${encodeURIComponent(returnDate)}` : ""}`)
+    }
+
     return (
-        <form className="flex flex-col items-center w-full" action={"/calendrier"}>
+        <form onSubmit={onSubmit} className="flex flex-col items-center w-full">
             <div className="flex flex-wrap gap-6 items-start w-full">
                 <FormInput
                     label="Gare de départ"
+                    name="departure"
                     placeholder="Saisissez une gare de départ"
                     icon={<TrainSVG />}
                     required
@@ -39,6 +50,7 @@ export const SearchForm: React.FC = () => {
                 />
                 <FormInput
                     label="Gare d'arrivée"
+                    name="arrival"
                     placeholder="Saisissez une gare d'arrivée"
                     icon={<TrainSVG />}
                     required
@@ -46,8 +58,24 @@ export const SearchForm: React.FC = () => {
                     onChange={e => setTo(e.currentTarget.value)}
                     suggestions={filter(to)}
                 />
-                <FormInput label="Date de départ" placeholder="mm/dd/yyyy" type="date" required autocompleteToday />
-                <FormInput label="Date de retour" placeholder="mm/dd/yyyy" type="date" />
+                <FormInput
+                    label="Date de départ"
+                    name="departure_date"
+                    placeholder="mm/dd/yyyy"
+                    type="date"
+                    required
+                    autocompleteToday
+                    value={departureDate}
+                    onChange={e => setDepartureDate(e.currentTarget.value)}
+                />
+                <FormInput
+                    label="Date de retour"
+                    name="return_date"
+                    placeholder="mm/dd/yyyy"
+                    type="date"
+                    value={returnDate}
+                    onChange={e => setReturnDate(e.currentTarget.value)}
+                />
             </div>
             <SearchButton />
         </form>

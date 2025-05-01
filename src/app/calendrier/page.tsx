@@ -3,8 +3,10 @@ import TrainJourneyDisplay from "@traintran/components/Calendar/Destination/Trai
 import CalendarPricing from "@traintran/components/Calendar/Calendar/CalendarPricing";
 import Departure from "@traintran/components/Calendar/Departure/Departure";
 import Footer from "@traintran/components/Footer/Footer";
+import {CalendrierProps} from "@traintran/app/calendrier/props";
 
-export default function Home() {
+export default async function Home(props: CalendrierProps) {
+    const [searchParams] = await Promise.all([props.searchParams]);
     return (
         <>
             <Header />
