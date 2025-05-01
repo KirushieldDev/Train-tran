@@ -6,7 +6,11 @@ import {GenderSelection} from "@traintran/components/Inputs/Form/GenderSelection
 import {FormInput} from "@traintran/components/Inputs/Form/FormInput";
 import {FormButton} from "@traintran/components/Inputs/Form/FormButton";
 
-const PersonalInfoForm: React.FC = () => {
+type PersonalInfoFormProps = {
+    setShowLogin: (val: boolean) => void;
+}
+
+export default function PersonalInfoForm(props: PersonalInfoFormProps) {
     const [formData, setFormData] = useState({
         gender: "",
         lastName: "",
@@ -87,8 +91,15 @@ const PersonalInfoForm: React.FC = () => {
                     <FormButton type="submit">Continuer</FormButton>
                 </div>
             </div>
+            <div className="flex justify-center items-center gap-4 py-px mt-4 w-full text-sm text-center">
+                <p className="self-center leading-none text-textSecondary">Adhérent ?</p>
+                <button
+                    onClick={() => props.setShowLogin(true)}
+                    type="button"
+                    className="my-2 font-medium text-primary">
+                    Se connecter
+                </button>
+            </div>
         </form>
     );
 };
-
-export default PersonalInfoForm;

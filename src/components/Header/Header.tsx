@@ -2,8 +2,9 @@ import React from "react";
 import {IconUser} from "@tabler/icons-react";
 import Logo from "@traintran/assets/Header/Logo";
 import {NavigationLinks} from "@traintran/components/Header/NavigationLinks";
+import Link from "next/link";
 
-export const Header: React.FC = () => {
+export default function Header() {
     return (
         <header className="flex flex-col items-start px-20 py-0 bg-white border-0 shadow-sm">
             <nav className="flex justify-between items-center px-0 py-2.5 w-full">
@@ -11,10 +12,10 @@ export const Header: React.FC = () => {
                     <Logo />
                     <NavigationLinks />
                 </div>
-                <IconUser className="text-textSecondary" size="26" />
+                <Link href="/login">
+                    <IconUser className="text-textSecondary" size="26" />
+                </Link>
             </nav>
         </header>
     );
 };
-
-export default Header;

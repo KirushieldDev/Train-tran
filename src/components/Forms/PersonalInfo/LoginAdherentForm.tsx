@@ -5,7 +5,11 @@ import {IconUser, IconLockPassword} from "@tabler/icons-react";
 import {FormInput} from "@traintran/components/Inputs/Form/FormInput";
 import {FormButton} from "@traintran/components/Inputs/Form/FormButton";
 
-function FormLoginAdherent() {
+type LoginAdherentFormProps = {
+    setShowLogin: (val: boolean) => void;
+};
+
+export default function FormLoginAdherent(props: LoginAdherentFormProps) {
     const [formData, setFormData] = useState({
         identifiant: "",
         password: "",
@@ -82,14 +86,15 @@ function FormLoginAdherent() {
                 </div>
             </form>
 
-            <footer className="flex flex-col py-px mt-7 w-full text-sm text-center">
+            <div className="flex flex-col justify-center items-center py-px mt-7 w-full text-sm text-center">
                 <p className="self-center leading-none text-textSecondary">Pas encore adhérent ?</p>
-                <button type="button" className="px-16 py-1.5 mt-2 font-medium text-primary">
-                    Découvrez nos offres d'abonnement
+                <button
+                    onClick={() => props.setShowLogin(false)}
+                    type="button"
+                    className="my-2 font-medium text-primary">
+                    S'inscrire et voir nos offres d'abonnement
                 </button>
-            </footer>
+            </div>
         </section>
     );
 }
-
-export default FormLoginAdherent;
