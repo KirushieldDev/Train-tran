@@ -1,12 +1,16 @@
 "use client";
 
 import React from "react";
-import {useRouter} from "next/navigation";
-import {TripSection} from "@traintran/components/Calendar/Departure/TripSection";
+import {useRouter, useSearchParams} from "next/navigation";
+import TripSection from "@traintran/components/Calendar/Departure/TripSection";
 import {ActionButtons} from "@traintran/components/Calendar/Departure/ActionButtons";
 
-const Departure: React.FC = () => {
+export default function Departure() {
+    const searchParams = useSearchParams();
     const router = useRouter();
+
+    const departure = searchParams.get("departure") ?? "";
+    const arrival = searchParams.get("arrival") ?? "";
 
     const departureTrips = [
         {
@@ -49,14 +53,12 @@ const Departure: React.FC = () => {
     };
 
     return (
-        <main>
-            <TripSection title="Aller" route="Paris → Marseille" trips={departureTrips} />
-            <div className="mt-8">
-                <TripSection title="Retour" route="Marseille → Paris" trips={returnTrips} />
-            </div>
+        <div>
+            <TripSection title="Aller" station1={departure} station2={arrival} trips={departureTrips} />
+            {searchParams.get("return_date") && (
+                <TripSection title="Retour" station1={arrival} station2={departure} trips={returnTrips} />
+            )}
             <ActionButtons onCancel={handleCancel} onContinue={handleContinue} />
-        </main>
+        </div>
     );
 };
-
-export default Departure;

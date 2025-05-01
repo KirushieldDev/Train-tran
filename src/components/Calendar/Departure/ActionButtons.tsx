@@ -1,4 +1,5 @@
 import React from "react";
+import Button from "@traintran/components/common/Button";
 
 interface ActionButtonsProps {
     onCancel: () => void;
@@ -8,12 +9,12 @@ interface ActionButtonsProps {
 export const ActionButtons: React.FC<ActionButtonsProps> = ({onCancel, onContinue}) => {
     return (
         <div className="flex flex-wrap gap-2.5 justify-center mt-8 mb-10 w-full text-base text-center max-md:max-w-full">
-            <button onClick={onCancel} className="gap-2.5 self-stretch py-2.5 h-full text-textSecondary whitespace-nowrap bg-gray-100 rounded-lg w-[200px]">
+            <Button onClick={onCancel} variant="outline" size="lg">
                 Annuler
-            </button>
-            <button onClick={onContinue} className="gap-2.5 self-stretch py-3 my-auto font-semibold text-white bg-primary rounded-lg w-[200px]">
+            </Button>
+            <Button onClick={onContinue} variant="secondary" size="lg">
                 Continuer la commande
-            </button>
+            </Button>
         </div>
     );
 };
