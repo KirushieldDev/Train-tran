@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import TrainSVG from "../../../assets/Calendar/TrainSVG.tsx";
-import {IconEdit} from "@tabler/icons-react";
+import TrainSVG from "../../assets/Calendar/TrainSVG.tsx";
+import { IconEdit } from "@tabler/icons-react";
 
 export const TrainJourneyDisplay: React.FC = () => {
     return (

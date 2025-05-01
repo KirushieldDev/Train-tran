@@ -5,7 +5,7 @@ import CartPage from "./pages/Cart/CartPage";
 import PersonalInfoForm from "./components/Forms/PersonalInfo/PersonalInfoForm.tsx";
 import ConfirmationPage from "./pages/Confirmation/ConfirmationPage";
 import PaymentPage from "./pages/Payment/PaymentPage";
-import Calendar from "./pages/Calendar/Calendar.tsx";
+import Calendar from "./pages/Calendar/CalendarPage.tsx";
 
 const AppRoutes = () => {
     return (
