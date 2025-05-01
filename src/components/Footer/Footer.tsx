@@ -1,7 +1,7 @@
-import * as React from "react";
-import {FooterLogo} from "./FooterLogo";
-import {FooterHelp} from "./FooterHelp";
-import {FooterCopyright} from "./FooterCopyright";
+import React from "react";
+import {FooterLogo} from "@traintran/components/Footer/FooterLogo";
+import {FooterHelp} from "@traintran/components/Footer/FooterHelp";
+import {FooterCopyright} from "@traintran/components/Footer/FooterCopyright";
 
 export const Footer: React.FC = () => {
     return (

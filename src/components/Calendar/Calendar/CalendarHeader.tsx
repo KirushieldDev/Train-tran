@@ -6,7 +6,7 @@ interface CalendarHeaderProps {
 
 export function CalendarHeader({month}: CalendarHeaderProps) {
     return (
-        <header className="flex justify-between items-center w-full">
+        <div className="flex justify-between items-center w-full">
             <h1 className="text-xl font-bold text-black">{month}</h1>
             <nav className="flex gap-2">
                 {/* Flèche gauche (précédent) */}
@@ -18,6 +18,6 @@ export function CalendarHeader({month}: CalendarHeaderProps) {
                     <IconArrowRight className="text-textSecondary" />
                 </button>
             </nav>
-        </header>
+        </div>
     );
 }

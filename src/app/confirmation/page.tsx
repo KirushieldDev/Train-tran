@@ -1,27 +1,16 @@
-import React from "react";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
-import Button from "../../components/common/Button";
-import {IconCalendarWeekFilled, IconCheck, IconMail, IconHelp, IconDownload, IconPrinter} from "@tabler/icons-react";
+import Header from "@traintran/components/Header/Header";
+import {IconCalendarWeekFilled, IconCheck, IconDownload, IconHelp, IconMail, IconPrinter} from "@tabler/icons-react";
+import Button from "@traintran/components/common/Button";
+import Footer from "@traintran/components/Footer/Footer";
 
-interface ConfirmationPageProps {
-    // These props could be passed through navigation or a global context
-    reservationDetails?: {
-        outboundRef: string;
-        returnRef?: string;
-        passengerName: string;
-        email: string;
-    };
-}
-
-const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
-    reservationDetails = {
+export default function Home() {
+    const reservationDetails = {
         outboundRef: "RF789456",
         returnRef: "RF789457",
         passengerName: "Tran Louis",
         email: "louis.tran@gmail.com",
-    },
-}) => {
+    };
+
     return (
         <div className="min-h-screen bg-background flex flex-col">
             <Header />
@@ -98,6 +87,4 @@ const ConfirmationPage: React.FC<ConfirmationPageProps> = ({
             <Footer />
         </div>
     );
-};
-
-export default ConfirmationPage;
+}

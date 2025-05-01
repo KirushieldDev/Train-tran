@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import TrainSVG from "../../../assets/Calendar/TrainSVG.tsx";
 import {IconEdit} from "@tabler/icons-react";
+import TrainSVG from "@traintran/assets/Calendar/TrainSVG";
 
 export const TrainJourneyDisplay: React.FC = () => {
     return (
@@ -16,7 +16,7 @@ export const TrainJourneyDisplay: React.FC = () => {
                 </div>
                 <button className="flex gap-2 items-center cursor-pointer max-sm:justify-end max-sm:w-full" aria-label="Modifier le trajet">
                     <IconEdit className="text-primary" size="16" />
-                    <span className="text-base text-emerald-600">Modifier</span>
+                    <span className="text-base text-primary">Modifier</span>
                 </button>
             </div>
         </article>

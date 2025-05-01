@@ -1,5 +1,5 @@
 import React from "react";
-import Logo from "../../assets/Header/Logo.tsx";
+import Logo from "@traintran/assets/Header/Logo";
 
 export const FooterLogo: React.FC = () => {
     return (

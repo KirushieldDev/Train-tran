@@ -1,6 +1,6 @@
 import React from "react";
-import {OptionCard} from "./OptionCard";
-import {OptionsListProps} from "./types";
+import {OptionsListProps} from "@traintran/components/AdditionalOptions/types";
+import {OptionCard} from "@traintran/components/AdditionalOptions/OptionCard";
 
 export const OptionsList: React.FC<OptionsListProps> = ({options, selectedOptions, onOptionToggle}) => {
     return (

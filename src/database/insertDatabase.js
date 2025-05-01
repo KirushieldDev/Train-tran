@@ -1,18 +1,17 @@
 import mongoose from "mongoose";
 import axios from "axios";
-import {database_url_connect, sncfApiToken, sncfApiBaseUrl} from "./credentials.js";
-import {Station, Journey} from "./models/models.js";
+import {Journey, Station} from "./models/models.js";
 
 async function fetchAndStoreStations(pageSize = 1000) {
     let startPage = 0;
     const authHeader = {
-        Authorization: "Basic " + Buffer.from(`${sncfApiToken}:`).toString("base64"),
+        Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64"),
     };
     let totalInserted = 0;
 
     while (true) {
         console.log(`Récupération gare, page ${startPage}...`);
-        const url = `${sncfApiBaseUrl}/stop_areas?count=${pageSize}&start_page=${startPage}`;
+        const url = `${process.env.SNCF_API_URL}/stop_areas?count=${pageSize}&start_page=${startPage}`;
         const res = await axios.get(url, {headers: authHeader});
         const stopAreas = res.data.stop_areas || [];
         if (stopAreas.length === 0) break;
@@ -50,13 +49,13 @@ async function fetchAndStoreStations(pageSize = 1000) {
 async function fetchAndStoreJourneys(pageSize = 1000) {
     let startPage = 0;
     const authHeader = {
-        Authorization: "Basic " + Buffer.from(`${sncfApiToken}:`).toString("base64"),
+        Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64"),
     };
     let totalInserted = 0;
 
     while (true) {
         console.log(`Récupération trajet, page ${startPage}...`);
-        const url = `${sncfApiBaseUrl}/vehicle_journeys?count=${pageSize}&start_page=${startPage}`;
+        const url = `${process.env.SNCF_API_URL}/vehicle_journeys?count=${pageSize}&start_page=${startPage}`;
         const {data} = await axios.get(url, {headers: authHeader});
         const vjs = data.vehicle_journeys || [];
         if (vjs.length === 0) break;
@@ -114,7 +113,7 @@ async function fetchAndStoreJourneys(pageSize = 1000) {
 }
 
 async function run() {
-    await mongoose.connect(database_url_connect, {dbName: "traintran"});
+    await mongoose.connect(process.env.DB_URL, {dbName: "traintran"});
     console.log("Connecté à TrainTran.");
 
     try {
