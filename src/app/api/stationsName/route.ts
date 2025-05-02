@@ -9,7 +9,7 @@ export async function GET() {
         const names = docs.map(s => s.name);
         return NextResponse.json(names);
     } catch (error) {
-        console.error("Erreur /api/stations-name", error);
+        console.error("Erreur /api/stationsName", error);
         return NextResponse.json({message: "Erreur serveur lors du chargement des gares"}, {status: 500});
     }
 }
