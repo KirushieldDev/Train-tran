@@ -1,7 +1,7 @@
 import React from "react";
 import { TimeDisplay } from "./TimeDisplay";
 import { JourneyIndicator } from "./JourneyIndicator";
-import TrainSVG from "../../../assets/Calendar/TrainSVG";
+import TrainSVG from "@traintran/assets/Calendar/TrainSVG";
 
 interface TripCardProps {
     departureTime: string;
