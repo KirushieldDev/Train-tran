@@ -10,6 +10,7 @@ export interface IAccount extends Document {
     salt: string;
     createdAt: Date;
     updatedAt: Date;
+    lastLogin: Date;
 }
 
 const accountSchema = new Schema<IAccount>(
@@ -21,6 +22,7 @@ const accountSchema = new Schema<IAccount>(
         email: {type: String, required: true, unique: true},
         hash: {type: String, required: true},
         salt: {type: String, required: true},
+        lastLogin: {type: Date, required: true, default: new Date()},
     },
     {timestamps: true},
 );

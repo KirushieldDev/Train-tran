@@ -17,7 +17,8 @@ export const GenderSelection: React.FC<GenderSelectionProps> = ({value, onChange
                         value="M"
                         checked={value === "M"}
                         onChange={e => onChange(e.target.value)}
-                        className="w-4 h-4 rounded-full border border-black"
+                        required
+                        className="w-4 h-4 rounded-full border"
                     />
                     <span>M.</span>
                 </label>
@@ -28,7 +29,8 @@ export const GenderSelection: React.FC<GenderSelectionProps> = ({value, onChange
                         value="Mme"
                         checked={value === "Mme"}
                         onChange={e => onChange(e.target.value)}
-                        className="w-4 h-4 rounded-full border border-black"
+                        required
+                        className="w-4 h-4 rounded-full border"
                     />
                     <span>Mme</span>
                 </label>

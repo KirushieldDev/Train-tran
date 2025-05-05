@@ -1,17 +1,17 @@
 "use client";
 
-import React, {useState} from "react";
-import {IconMailFilled, IconLockPassword, IconPhone} from "@tabler/icons-react";
-import {GenderSelection} from "@traintran/components/Inputs/Form/GenderSelection";
+import React, {FormEvent, useState} from "react";
+import {useRouter} from "next/navigation";
 import {FormInput} from "@traintran/components/Inputs/Form/FormInput";
 import {FormButton} from "@traintran/components/Inputs/Form/FormButton";
-import {useRouter} from "next/navigation";
+import {IconMailFilled, IconLockPassword, IconPhone} from "@tabler/icons-react";
+import {GenderSelection} from "@traintran/components/Inputs/Form/GenderSelection";
 
 type PersonalInfoFormProps = {
     setShowLogin: (val: boolean) => void;
 };
 
-interface PersonalInfo {
+interface FormData {
     gender: string;
     lastName: string;
     firstName: string;
@@ -23,7 +23,7 @@ interface PersonalInfo {
 
 export default function PersonalInfoForm(props: PersonalInfoFormProps) {
     const router = useRouter();
-    const [formData, setFormData] = useState<PersonalInfo>({
+    const [data, setData] = useState<FormData>({
         gender: "",
         lastName: "",
         firstName: "",
@@ -33,65 +33,56 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
         confirmPassword: "",
     });
 
-    const arrayBufferToHex = (buf: ArrayBuffer): string =>
-        Array.from(new Uint8Array(buf))
-            .map(b => b.toString(16).padStart(2, "0"))
-            .join("");
-
-    const hashPassword = async (password: string, saltHex: string): Promise<string> => {
-        const encoder = new TextEncoder();
-        const passwordKey = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
-        const salt = Uint8Array.from(saltHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16)));
-        const bits = await crypto.subtle.deriveBits(
-            {
-                name: "PBKDF2",
-                salt,
-                iterations: 10000,
-                hash: "SHA-512",
-            },
-            passwordKey,
-            64 * 8,
-        );
-        return arrayBufferToHex(bits);
+    const handleChange = (field: keyof FormData, value: string) => {
+        setData(prev => ({...prev, [field]: value}));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        const {gender, lastName, firstName, mobile, email, password, confirmPassword} = formData;
-        if (password !== confirmPassword) {
+        if (data.password !== data.confirmPassword) {
             alert("Les mots de passe ne correspondent pas");
             return;
         }
 
-        // générer un salt aléatoire
+        // 1) Générer un salt aléatoire (16 bytes) et le transformer en hex
         const saltBytes = crypto.getRandomValues(new Uint8Array(16));
-        const saltHex = arrayBufferToHex(saltBytes.buffer);
-        const hash = await hashPassword(password, saltHex);
+        const saltHex = Array.from(saltBytes)
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
 
-        const payload = {gender, lastName, firstName, mobile, email, salt: saltHex, hash};
+        // 2) Concaténer salt + password dans un seul buffer
+        const encoder = new TextEncoder();
+        const saltedPassword = encoder.encode(saltHex + data.password);
 
-        try {
-            const res = await fetch("/api/register", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(payload),
-            });
-            if (!res.ok) {
-                const err = await res.json();
-                alert(err.error || "Erreur inscription");
-            }
-            router.push("/");
-        } catch (err) {
-            console.error(err);
-            alert((err as Error).message);
+        // 3) Dériver un hash via PBKDF2(SHA-512, 10000 itérations, 64 bytes)
+        const key = await crypto.subtle.importKey("raw", saltedPassword, {name: "PBKDF2"}, false, ["deriveBits"]);
+        const bits = await crypto.subtle.deriveBits({name: "PBKDF2", salt: saltBytes, iterations: 10000, hash: "SHA-512"}, key, 64 * 8);
+        const hashHex = Array.from(new Uint8Array(bits))
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+
+        // 4) N’envoyer que saltHex et hashHex
+        const payload = {
+            gender: data.gender,
+            lastName: data.lastName,
+            firstName: data.firstName,
+            mobile: data.mobile,
+            email: data.email,
+            salt: saltHex,
+            hash: hashHex,
+        };
+
+        const res = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload),
+        });
+
+        if (res.ok) router.push("/");
+        else {
+            const err = await res.json();
+            alert(err.error || "Erreur inscription");
         }
-    };
-
-    const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value,
-        }));
     };
 
     return (
@@ -104,20 +95,14 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             </div>
 
             <div className="mt-8 w-full max-md:max-w-full">
-                <GenderSelection value={formData.gender} onChange={value => handleInputChange("gender", value)} />
+                <GenderSelection value={data.gender} onChange={value => handleChange("gender", value)} />
 
                 <div className="flex flex-wrap gap-6 justify-between items-center mt-3.5 w-full">
                     <div className="self-stretch my-auto min-w-60 w-[292px]">
-                        <FormInput label="Nom" name="lastName" value={formData.lastName} onChange={value => handleInputChange("lastName", value)} required />
+                        <FormInput label="Nom" name="lastName" value={data.lastName} onChange={value => handleChange("lastName", value)} required />
                     </div>
                     <div className="self-stretch my-auto min-w-60 w-[292px]">
-                        <FormInput
-                            label="Prénom"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={value => handleInputChange("firstName", value)}
-                            required
-                        />
+                        <FormInput label="Prénom" name="firstName" value={data.firstName} onChange={value => handleChange("firstName", value)} required />
                     </div>
                 </div>
 
@@ -127,8 +112,8 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
                         name="mobile"
                         type="tel"
                         icon={<IconPhone className="text-textSecondary" size="18" />}
-                        value={formData.mobile}
-                        onChange={value => handleInputChange("mobile", value)}
+                        value={data.mobile}
+                        onChange={value => handleChange("mobile", value)}
                         required
                     />
                 </div>
@@ -139,8 +124,8 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
                         name="email"
                         type="email"
                         icon={<IconMailFilled className="text-textSecondary" size="18" />}
-                        value={formData.email}
-                        onChange={value => handleInputChange("email", value)}
+                        value={data.email}
+                        onChange={value => handleChange("email", value)}
                         required
                     />
                 </div>
@@ -151,8 +136,8 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
                         name="password"
                         type="password"
                         icon={<IconLockPassword className="text-textSecondary" size="18" />}
-                        value={formData.password}
-                        onChange={value => handleInputChange("password", value)}
+                        value={data.password}
+                        onChange={value => handleChange("password", value)}
                         required
                     />
                 </div>
@@ -163,8 +148,8 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
                         name="confirmPassword"
                         type="password"
                         icon={<IconLockPassword className="text-textSecondary" size="18" />}
-                        value={formData.confirmPassword}
-                        onChange={value => handleInputChange("confirmPassword", value)}
+                        value={data.confirmPassword}
+                        onChange={value => handleChange("confirmPassword", value)}
                         required
                     />
                 </div>
@@ -174,7 +159,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
                 </div>
             </div>
             <div className="flex justify-center items-center gap-4 py-px mt-4 w-full text-sm text-center">
-                <p className="self-center leading-none text-textSecondary">Adhérent ?</p>
+                <p className="self-center leading-none text-textSecondary">Déjà dhérent ?</p>
                 <button onClick={() => props.setShowLogin(true)} type="button" className="my-2 font-medium text-primary">
                     Se connecter
                 </button>
