@@ -13,12 +13,16 @@
     },
     "dependencies": {
         "@tabler/icons-react": "^3.31.0",
+        "@types/react-datepicker": "^6.2.0",
         "axios": "^1.9.0",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.14.1",
         "next": "15.3.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
+        "react-datepicker": "^8.3.0",
+        "react-dom": "^19.0.0",
+        "next": "15.3.1"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
