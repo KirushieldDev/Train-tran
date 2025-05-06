@@ -1,28 +1,59 @@
 "use client";
 
-import React, {useState} from "react";
+import React, {FormEvent, useState} from "react";
+import {useRouter} from "next/navigation";
 import {IconUser, IconLockPassword} from "@tabler/icons-react";
 import {FormInput} from "@traintran/components/Inputs/Form/FormInput";
 import {FormButton} from "@traintran/components/Inputs/Form/FormButton";
 
-function FormLoginAdherent() {
-    const [formData, setFormData] = useState({
-        identifiant: "",
-        password: "",
-        rememberMe: false,
-    });
+type LoginAdherentFormProps = {
+    setShowLogin: (val: boolean) => void;
+};
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Handle login logic here
-        console.log("Form submitted:", formData);
+interface LoginData {
+    email: string;
+    password: string;
+}
+
+export default function FormLoginAdherent(props: LoginAdherentFormProps) {
+    const router = useRouter();
+    const [login, setLogin] = useState<LoginData>({email: "", password: ""});
+
+    const handleChange = (field: keyof LoginData, val: string) => {
+        setLogin(prev => ({...prev, [field]: val}));
     };
 
-    const handleInputChange = (field: string, value: string | boolean) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value,
-        }));
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        // récupérer le salt du serveur
+        const saltRes = await fetch(`/api/auth/loginSalt?email=${encodeURIComponent(login.email)}`);
+        if (!saltRes.ok) {
+            alert("Identifiants invalides");
+            return;
+        }
+        const {salt} = (await saltRes.json()) as {salt: string};
+
+        // concaténation + dérivation PBKDF2 identique à l'inscription
+        const saltBytes = new Uint8Array(salt.match(/.{2}/g)!.map(h => parseInt(h, 16)));
+        const encoder = new TextEncoder();
+        const saltedPwd = encoder.encode(salt + login.password);
+        const key = await crypto.subtle.importKey("raw", saltedPwd, {name: "PBKDF2"}, false, ["deriveBits"]);
+        const bits = await crypto.subtle.deriveBits({name: "PBKDF2", salt: saltBytes, iterations: 10000, hash: "SHA-512"}, key, 64 * 8);
+        const hashHex = Array.from(new Uint8Array(bits))
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+
+        const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email: login.email, hash: hashHex}),
+        });
+
+        if (res.ok) router.push("/");
+        else {
+            const err = await res.json();
+            alert(err.error || "Erreur connexion");
+        }
     };
 
     return (
@@ -36,11 +67,13 @@ function FormLoginAdherent() {
                 <div className="w-full">
                     <div className="mt-2 w-full">
                         <FormInput
-                            label="Identifiant"
-                            placeholder={"Votre identifiant"}
-                            value={formData.identifiant}
+                            label="Email"
+                            name="email"
+                            type="email"
+                            placeholder={"Votre email"}
+                            value={login.email}
                             icon={<IconUser className="text-textSecondary" size="18" />}
-                            onChange={value => handleInputChange("identifiant", value)}
+                            onChange={value => handleChange("email", value)}
                             required
                         />
                     </div>
@@ -50,24 +83,20 @@ function FormLoginAdherent() {
                     <div className="mt-2 w-full">
                         <FormInput
                             label="Mot de passe"
-                            placeholder={"Votre mot de passe"}
-                            value={formData.password}
-                            icon={<IconLockPassword className="text-textSecondary" size="18" />}
-                            onChange={value => handleInputChange("password", value)}
+                            name="password"
                             type="password"
+                            placeholder={"Votre mot de passe"}
+                            value={login.password}
+                            icon={<IconLockPassword className="text-textSecondary" size="18" />}
+                            onChange={value => handleChange("password", value)}
+                            required
                         />
                     </div>
                 </div>
 
                 <div className="flex gap-5 justify-between mt-6 w-full text-sm">
                     <div className="flex gap-2">
-                        <input
-                            type="checkbox"
-                            checked={formData.rememberMe}
-                            onChange={() => handleInputChange("rememberMe", !formData.rememberMe)}
-                            className="mt-1"
-                            id="remember-me"
-                        />
+                        <input type="checkbox" className="mt-1" id="remember-me" />
                         <label htmlFor="remember-me" className="py-1.5 cursor-pointer">
                             Se souvenir de moi
                         </label>
@@ -82,14 +111,12 @@ function FormLoginAdherent() {
                 </div>
             </form>
 
-            <footer className="flex flex-col py-px mt-7 w-full text-sm text-center">
+            <div className="flex flex-col justify-center items-center py-px mt-7 w-full text-sm text-center">
                 <p className="self-center leading-none text-textSecondary">Pas encore adhérent ?</p>
-                <button type="button" className="px-16 py-1.5 mt-2 font-medium text-primary">
-                    Découvrez nos offres d'abonnement
+                <button onClick={() => props.setShowLogin(false)} type="button" className="my-2 font-medium text-primary">
+                    S'inscrire et voir nos offres d'abonnement
                 </button>
-            </footer>
+            </div>
         </section>
     );
 }
-
-export default FormLoginAdherent;
