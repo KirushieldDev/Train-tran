@@ -4,5 +4,5 @@ export type CalendrierProps = {
         arrival: string;
         departure_date: string;
         return_date: string;
-    }>
+    }>;
 };

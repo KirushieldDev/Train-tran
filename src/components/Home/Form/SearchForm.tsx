@@ -32,8 +32,10 @@ export const SearchForm: React.FC = () => {
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.push(`/calendrier?departure=${encodeURIComponent(from)}&arrival=${encodeURIComponent(to)}&departure_date=${encodeURIComponent(departureDate)}${returnDate ? `&return_date=${encodeURIComponent(returnDate)}` : ""}`)
-    }
+        router.push(
+            `/calendrier?departure=${encodeURIComponent(from)}&arrival=${encodeURIComponent(to)}&departure_date=${encodeURIComponent(departureDate)}${returnDate ? `&return_date=${encodeURIComponent(returnDate)}` : ""}`,
+        );
+    };
 
     return (
         <form onSubmit={onSubmit} className="flex flex-col items-center w-full">

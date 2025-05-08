@@ -37,4 +37,4 @@ export default function TripSection(props: TripSectionProps) {
             </div>
         </section>
     );
-};
+}

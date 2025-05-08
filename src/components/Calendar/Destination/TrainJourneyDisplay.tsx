@@ -4,17 +4,17 @@ import React from "react";
 import {IconArrowRight, IconEdit} from "@tabler/icons-react";
 import TrainSVG from "@traintran/assets/Calendar/TrainSVG";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import {useSearchParams} from "next/navigation";
 
 export default function TrainJourneyDisplay() {
     const searchParams = useSearchParams();
 
     // Use the given searchParams from props
-    const departure = searchParams?.get('departure');
-    const arrival = searchParams?.get('arrival');
-    const departure_date = searchParams?.get('departure_date');
-    const return_date = searchParams?.get('return_date') || '';
-    
+    const departure = searchParams?.get("departure");
+    const arrival = searchParams?.get("arrival");
+    const departure_date = searchParams?.get("departure_date");
+    const return_date = searchParams?.get("return_date") || "";
+
     return (
         <article className="flex flex-col gap-2.5 items-start p-6 bg-white rounded-lg shadow-sm mt-5">
             <div className="flex justify-between items-center w-full">
