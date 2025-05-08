@@ -1,28 +1,20 @@
-import {ReactNode} from "react";
-
-export interface Option {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    Icon?: ReactNode;
-}
+import {Option, OptionID} from "@traintran/lib/options";
 
 export interface OptionCardProps {
     option: Option;
     isSelected: boolean;
-    onToggle: (id: string) => void;
+    onToggle: (id: OptionID) => void;
 }
 
 export interface OptionsListProps {
     options: Option[];
-    selectedOptions: string[];
-    onOptionToggle: (id: string) => void;
+    selectedOptions: OptionID[];
+    onOptionToggle: (id: OptionID) => void;
 }
 
 export interface OrderSummaryProps {
     basePrice: number;
-    selectedOptions: Option[];
+    selectedOptions: OptionID[];
     totalPrice: number;
     onContinue?: () => void;
     showButton?: boolean;

@@ -1,6 +1,5 @@
 "use client";
 
-import {Option} from "@traintran/components/AdditionalOptions/types";
 import {IconCreditCard, IconHelp, IconLock, IconShieldCheck} from "@tabler/icons-react";
 import Header from "@traintran/components/Header/Header";
 import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
@@ -8,7 +7,8 @@ import Footer from "@traintran/components/Footer/Footer";
 import Button from "@traintran/components/common/Button";
 import {useCart} from "@traintran/context/CartContext";
 import {useRouter} from "next/navigation";
-import React, { FormEvent } from "react";
+import React, {FormEvent} from "react";
+import getOptionById, {OptionID} from "@traintran/lib/options";
 
 export default function Home() {
     const cart = useCart();
@@ -16,38 +16,32 @@ export default function Home() {
 
     // Mock data for the order summary
     const basePrice = 45;
-    const baggage: Option = {
-        id: "baggage",
-        name: "Bagage supplémentaire",
-        description: "Un bagage supplémentaire de 20kg max",
-        price: 15,
-    };
 
-    const selectedOptions = [baggage];
-    const totalPrice = basePrice + baggage.price;
+    const selectedOptions = [OptionID.Baggage];
+    const totalPrice = basePrice + selectedOptions.map(opt_id => (getOptionById(opt_id)?.price || 0) as number).reduce((sum, opt) => sum + opt, 0);
 
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
-        const tickets = cart.getAllTicketsAsProps();
+        const tickets = cart.getAllPagesGroupedByTicket();
         const recipientEmail = cart.infoBuyer?.ordererEmail;
         if (!recipientEmail) {
             alert("Veuillez renseigner votre email avant de payer.");
             return;
         }
         try {
-            const res = await fetch("/api/sendTickets", {
+            const res = await fetch("/api/send-tickets", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tickets, recipientEmail }),
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({tickets, recipientEmail}),
             });
             if (!res.ok) {
-                const { error } = await res.json();
+                const {error} = await res.json();
                 throw new Error(error || "Erreur lors de l'envoi des billets");
             }
             router.push("/confirmation");
         } catch (err) {
             console.error(err);
-            alert("Impossible d'envoyer les billets. Veuillez réessayer plus tard.");
+            alert(err + "Impossible d'envoyer les billets. Veuillez réessayer plus tard.");
         }
     }
 
@@ -84,7 +78,7 @@ export default function Home() {
                             <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label htmlFor="expiryDate" className="text-sm font-medium text-gray-700 mb-1">
-                                        Date d'expiration
+                                        Date d&apos;expiration
                                     </label>
                                     <input
                                         type="text"
@@ -127,13 +121,7 @@ export default function Home() {
                                 />
                             </div>
 
-                            <Button
-                                type="submit"
-                                variant="primary"
-                                size="lg"
-                                fullWidth
-                                icon={<IconLock className="text-white" size="18" />}
-                            >
+                            <Button type="submit" variant="primary" size="lg" fullWidth icon={<IconLock className="text-white" size="18" />}>
                                 Payer maintenant
                             </Button>
                         </form>
@@ -143,12 +131,7 @@ export default function Home() {
                         <div className="flex flex-col items-center md:items-start">
                             <div className="w-96">
                                 <div className="bg-white rounded-lg p-6 shadow-sm">
-                                    <OrderSummary
-                                        basePrice={basePrice}
-                                        selectedOptions={selectedOptions}
-                                        totalPrice={totalPrice}
-                                        showButton={false}
-                                    />
+                                    <OrderSummary basePrice={basePrice} selectedOptions={selectedOptions} totalPrice={totalPrice} showButton={false} />
 
                                     <div className="mt-4 pt-4 flex gap-2 items-center justify-center border-t border-gray-200">
                                         <IconShieldCheck className="text-primary" size="20" />

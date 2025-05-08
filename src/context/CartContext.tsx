@@ -1,20 +1,15 @@
-"use client"
+"use client";
 
-import React, {createContext, useContext, useState, ReactNode, useRef, useEffect} from "react";
-import { TrainTicketProps } from "@traintran/components/Mail/TrainTicket";
-
-// Types for journey segments (aller / retour)
-export interface Option {
-    name: string;
-    price: number;
-}
+import React, {createContext, ReactNode, useContext, useEffect, useRef, useState} from "react";
+import {TrainTicketPDFProps} from "@traintran/components/Mail/TrainTicketPDF";
+import getOptionById, {Option, OptionID, optionsList} from "@traintran/lib/options";
 
 export interface JourneySegment {
     departureStation: string;
     arrivalStation: string;
     departureTime: string; // ISO string or any date representation
     arrivalTime: string;
-    options: Option[];
+    options: Set<OptionID>;
 }
 
 // Types for passenger and order info
@@ -47,16 +42,17 @@ export interface CartContextType {
     infoBuyer?: OrderInfo;
     setInfoBuyer: (info: OrderInfo) => void;
     // helper to transform a single ticket into mail props
-    getTicketAsProps: (ticket: Ticket) => TrainTicketProps;
+    buildPropsFromSegment: (segment: JourneySegment, passenger: Passenger, orderInfo: OrderInfo) => TrainTicketPDFProps;
+    buildPagesForTicket: (ticket: Ticket) => TrainTicketPDFProps[];
     // helper to transform all tickets in the cart into mail props array
-    getAllTicketsAsProps: () => TrainTicketProps[];
+    getAllPagesGroupedByTicket: () => TrainTicketPDFProps[][];
 }
 
 // Create context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Provider component
-export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [infoBuyer, setInfoBuyer] = useState<OrderInfo>();
     const ticketsRef = useRef(tickets);
@@ -72,7 +68,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 arrivalStation: "Lyon",
                 departureTime: new Date().toISOString(),
                 arrivalTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // +2h
-                options: [{ name: "Standard", price: 79 }],
+                options: new Set([OptionID.Quiet, OptionID.Sms, OptionID.Insurance, OptionID.Baggage]),
             },
             // optional return segment
             return: {
@@ -80,16 +76,17 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 arrivalStation: "Paris",
                 departureTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // next day
                 arrivalTime: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(), // +2h after return depart
-                options: [{ name: "Standard", price: 79 }],
+                options: new Set([OptionID.Sms]),
             },
             passengers: [
-                { firstName: "Test", lastName: "User" }
+                {firstName: "Pierre", lastName: "Dupont"},
+                {firstName: "Marie", lastName: "Dupont"},
             ],
             orderInfo: {
                 orderNumber: "TEST-0001",
-                ordererFirstName: "Test",
-                ordererLastName: "User",
-                ordererEmail: "tellealexis@gmail.com",
+                ordererFirstName: "Pierre",
+                ordererLastName: "Dupont",
+                ordererEmail: "julien.synaeve@gmail.com",
             },
         };
         addTicket(testTicket);
@@ -97,11 +94,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, []);
 
     const addTicket = (ticket: Ticket) => {
-        setTickets((prev) => [...prev, ticket]);
+        setTickets(prev => [...prev, ticket]);
     };
 
     const removeTicket = (orderNumber: string) => {
-        setTickets((prev) => prev.filter((t) => t.orderInfo.orderNumber !== orderNumber));
+        setTickets(prev => prev.filter(t => t.orderInfo.orderNumber !== orderNumber));
     };
 
     const clearCart = () => {
@@ -109,40 +106,58 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     /**
-     * Transform a Ticket into the TrainTicketProps expected by the Mail component.
+     * Transform a Ticket into the TrainTicketPDFProps expected by the Mail component.
      * Uses the outbound segment and the first passenger; assigns car and seat randomly.
      */
-    const getTicketAsProps = (ticket: Ticket): TrainTicketProps => {
-        const { departureStation, arrivalStation, departureTime, arrivalTime } = ticket.outbound;
+    const buildPropsFromSegment = (segment: JourneySegment, passenger: Passenger, orderInfo: OrderInfo): TrainTicketPDFProps => {
+        const {departureStation, arrivalStation, departureTime, arrivalTime, options} = segment;
+        // on récupère les objets Option à partir des IDs
+        const resolvedOptions = Array.from(options)
+            .map(id => getOptionById(id))
+            .filter((opt): opt is Option => !!opt);
 
         // Extract date portion (YYYY-MM-DD) from ISO string
         const date = departureTime.split("T")[0];
-
-        // For simplicity, handle only the first passenger per ticket
-        const passenger = ticket.passengers[0];
 
         // Randomly assign car (1-10) and seat (1-100)
         const carNumber = (Math.floor(Math.random() * 10) + 1).toString();
         const seatNumber = (Math.floor(Math.random() * 100) + 1).toString();
 
         return {
+            ordererFirstName: orderInfo.ordererFirstName,
+            ordererLastName: orderInfo.ordererLastName,
+            passengerFirstName: passenger.firstName,
+            passengerLastName: passenger.lastName,
             departureStation,
             arrivalStation,
             departureTime,
             arrivalTime,
             date,
-            firstName: passenger.firstName,
-            lastName: passenger.lastName,
             carNumber,
             seatNumber,
+            options: resolvedOptions,
         };
     };
 
     /**
-     * Transform all tickets in the cart into an array of TrainTicketProps
+     * 1 ticket → X pages (passagers × segments)
      */
-    const getAllTicketsAsProps = (): TrainTicketProps[] => {
-        return ticketsRef.current.map(getTicketAsProps);
+    const buildPagesForTicket = (ticket: Ticket): TrainTicketPDFProps[] => {
+        const {outbound, return: retour, passengers, orderInfo} = ticket;
+
+        return passengers.flatMap(passenger => {
+            // page aller
+            const pages = [buildPropsFromSegment(outbound, passenger, orderInfo)];
+            // page retour si présente
+            if (retour) {
+                pages.push(buildPropsFromSegment(retour, passenger, orderInfo));
+            }
+            return pages;
+        });
+    };
+
+    const getAllPagesGroupedByTicket = (): TrainTicketPDFProps[][] => {
+        return ticketsRef.current.map(buildPagesForTicket);
     };
 
     return (
@@ -154,10 +169,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 clearCart,
                 infoBuyer,
                 setInfoBuyer,
-                getTicketAsProps,
-                getAllTicketsAsProps,
-            }}
-        >
+                buildPropsFromSegment,
+                buildPagesForTicket,
+                getAllPagesGroupedByTicket,
+            }}>
             {children}
         </CartContext.Provider>
     );

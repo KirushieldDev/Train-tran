@@ -1,6 +1,7 @@
 import React from "react";
 import {OrderSummaryProps} from "@traintran/components/AdditionalOptions/types";
 import Button from "@traintran/components/common/Button";
+import getOptionById from "@traintran/lib/options";
 
 export const OrderSummary: React.FC<OrderSummaryProps> = ({basePrice, selectedOptions, totalPrice, onContinue, showButton = true}) => {
     return (
@@ -11,12 +12,15 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({basePrice, selectedOp
                     <span>Billet de base</span>
                     <span className="font-medium">{basePrice}€</span>
                 </div>
-                {selectedOptions.map(option => (
-                    <div key={option.id} className="flex justify-between text-primary">
-                        <span>{option.name}</span>
-                        <span className="font-medium">{option.price === 0 ? "Gratuit" : `+${option.price}€`}</span>
-                    </div>
-                ))}
+                {selectedOptions.map((opt_id, i) => {
+                    const option = getOptionById(opt_id);
+                    return (
+                        <div key={i} className="flex justify-between text-primary">
+                            <span>{option?.name}</span>
+                            <span className="font-medium">{option?.price === 0 ? "Gratuit" : `+${option?.price}€`}</span>
+                        </div>
+                    );
+                })}
                 <div className="border-t border-borderContainer pt-3 mt-4">
                     <div className="flex justify-between font-semibold text-textPrimary">
                         <span className="text-lg">Total</span>
