@@ -19,3 +19,22 @@ export function calculatePrice(
     const raw = baseFare + distanceKm * ratePerKm;
     return Math.round(raw * 100) / 100; // arrondi à 2 décimales
 }
+
+export function calculatePriceWithDayAdjustment(
+    distanceKm: number,
+    dayOfWeek: string, 
+    baseFare = 5, 
+    ratePerKm = 0.12, 
+): number {
+    let raw = baseFare + distanceKm * ratePerKm;
+
+    if (dayOfWeek === "Sunday" || dayOfWeek === "Saturday") {
+        raw *= 1.2;
+    } else {
+        if (dayOfWeek === "Wednesday") {
+            raw *= 0.95;
+        }
+    }
+
+    return Math.round(raw * 100) / 100; 
+}
