@@ -1,37 +1,61 @@
-import {Option} from "@traintran/components/AdditionalOptions/types";
+"use client";
+
 import {IconCreditCard, IconHelp, IconLock, IconShieldCheck} from "@tabler/icons-react";
 import Header from "@traintran/components/Header/Header";
 import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
 import Footer from "@traintran/components/Footer/Footer";
 import Button from "@traintran/components/common/Button";
+import {useCart} from "@traintran/context/CartContext";
+import {useRouter} from "next/navigation";
+import React, {FormEvent} from "react";
+import getOptionById, {OptionID} from "@traintran/lib/options";
 
 export default function Home() {
+    const cart = useCart();
+    const router = useRouter();
+
     // Mock data for the order summary
     const basePrice = 45;
-    const baggage: Option = {
-        id: "baggage",
-        name: "Bagage supplémentaire",
-        description: "Un bagage supplémentaire de 20kg max",
-        price: 15,
-    };
 
-    const selectedOptions = [baggage];
-    const totalPrice = basePrice + baggage.price;
+    const selectedOptions = [OptionID.Baggage];
+    const totalPrice = basePrice + selectedOptions.map(opt_id => (getOptionById(opt_id)?.price || 0) as number).reduce((sum, opt) => sum + opt, 0);
+
+    async function handleSubmit(e: FormEvent) {
+        e.preventDefault();
+        const tickets = cart.getAllPagesGroupedByTicket();
+        const recipientEmail = cart.infoBuyer?.ordererEmail;
+        if (!recipientEmail) {
+            alert("Veuillez renseigner votre email avant de payer.");
+            return;
+        }
+        try {
+            const res = await fetch("/api/send-tickets", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({tickets, recipientEmail}),
+            });
+            if (!res.ok) {
+                const {error} = await res.json();
+                throw new Error(error || "Erreur lors de l'envoi des billets");
+            }
+            router.push("/confirmation");
+        } catch (err) {
+            console.error(err);
+            alert(err + "Impossible d'envoyer les billets. Veuillez réessayer plus tard.");
+        }
+    }
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
-            {/* Reusing Header component */}
             <Header />
 
-            {/* Main Content */}
             <main className="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    {/* Payment Form Section */}
                     <div className="md:col-span-7 bg-white p-6 rounded-lg shadow-sm">
                         <h1 className="text-xl font-semibold text-gray-900 mb-1">Paiement sécurisé</h1>
                         <p className="text-sm text-gray-600 mb-5">Veuillez saisir vos informations de paiement</p>
 
-                        <form action="/confirmation">
+                        <form onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <label htmlFor="cardNumber" className="text-sm font-medium text-gray-700 mb-1">
                                     Numéro de carte
@@ -54,7 +78,7 @@ export default function Home() {
                             <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label htmlFor="expiryDate" className="text-sm font-medium text-gray-700 mb-1">
-                                        Date d'expiration
+                                        Date d&apos;expiration
                                     </label>
                                     <input
                                         type="text"
@@ -103,14 +127,12 @@ export default function Home() {
                         </form>
                     </div>
 
-                    {/* Order Summary Section - Using the standard OrderSummary component */}
                     <div className="md:col-span-5">
                         <div className="flex flex-col items-center md:items-start">
                             <div className="w-96">
                                 <div className="bg-white rounded-lg p-6 shadow-sm">
                                     <OrderSummary basePrice={basePrice} selectedOptions={selectedOptions} totalPrice={totalPrice} showButton={false} />
 
-                                    {/* SSL Security message */}
                                     <div className="mt-4 pt-4 flex gap-2 items-center justify-center border-t border-gray-200">
                                         <IconShieldCheck className="text-primary" size="20" />
                                         <span className="text-[#059669] text-sm">Paiement sécurisé par cryptage SSL</span>
@@ -122,7 +144,6 @@ export default function Home() {
                 </div>
             </main>
 
-            {/* Reusing Footer component */}
             <Footer />
         </div>
     );

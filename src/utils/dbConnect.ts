@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import mongoose, {Mongoose} from "mongoose";
 
 interface MongooseCache {
