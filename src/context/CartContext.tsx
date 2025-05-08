@@ -2,17 +2,17 @@
 
 import React, {createContext, ReactNode, useContext, useEffect, useRef, useState} from "react";
 import {TrainTicketPDFProps} from "@traintran/components/Mail/TrainTicketPDF";
-import getOptionById, {Option, OptionID, optionsList} from "@traintran/lib/options";
+import getOptionById, {Option, OptionID} from "@traintran/lib/options";
 
 export interface JourneySegment {
     departureStation: string;
     arrivalStation: string;
-    departureTime: string; // ISO string or any date representation
+    departureTime: string; // String de la date au format ISO
     arrivalTime: string;
     options: Set<OptionID>;
 }
 
-// Types for passenger and order info
+// Types pour le passager et les informations de commande
 export interface Passenger {
     firstName: string;
     lastName: string;
@@ -25,15 +25,16 @@ export interface OrderInfo {
     ordererEmail: string;
 }
 
-// Ticket contains an outbound segment and an optional return segment
+// Le ticket contient un segment aller et un segment retour optionnel
 export interface Ticket {
     outbound: JourneySegment;
     return?: JourneySegment;
     passengers: Passenger[];
     orderInfo: OrderInfo;
+    basePrice: number;
 }
 
-// Context value interface
+// Valeurs du contexte
 export interface CartContextType {
     tickets: Ticket[];
     addTicket: (ticket: Ticket) => void;
@@ -41,14 +42,15 @@ export interface CartContextType {
     clearCart: () => void;
     infoBuyer?: OrderInfo;
     setInfoBuyer: (info: OrderInfo) => void;
-    // helper to transform a single ticket into mail props
+    toggleOptionForAllTickets: (optionId: OptionID, add: boolean) => void;
+    // Helper pour transformer un ticket en props pour le PDF
     buildPropsFromSegment: (segment: JourneySegment, passenger: Passenger, orderInfo: OrderInfo) => TrainTicketPDFProps;
     buildPagesForTicket: (ticket: Ticket) => TrainTicketPDFProps[];
-    // helper to transform all tickets in the cart into mail props array
+    // Helper pour obtenir toutes les pages groupées par ticket
     getAllPagesGroupedByTicket: () => TrainTicketPDFProps[][];
 }
 
-// Create context
+// Création context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Provider component
@@ -88,6 +90,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 ordererLastName: "Dupont",
                 ordererEmail: "julien.synaeve@gmail.com",
             },
+            basePrice: 120,
         };
         addTicket(testTicket);
         setInfoBuyer(testTicket.orderInfo);
@@ -105,9 +108,28 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
         setTickets([]);
     };
 
+    const toggleOptionForAllTickets = (optionId: OptionID, add: boolean) => {
+        setTickets(prev =>
+            prev.map(ticket => {
+                const updateSeg = (seg: JourneySegment) => {
+                    const has = seg.options.has(optionId);
+                    const newSet = new Set(seg.options);
+                    if (add && !has) newSet.add(optionId);
+                    if (!add && has) newSet.delete(optionId);
+                    return {...seg, options: newSet};
+                };
+                return {
+                    ...ticket,
+                    outbound: updateSeg(ticket.outbound),
+                    return: ticket.return ? updateSeg(ticket.return) : undefined,
+                };
+            }),
+        );
+    };
+
     /**
-     * Transform a Ticket into the TrainTicketPDFProps expected by the Mail component.
-     * Uses the outbound segment and the first passenger; assigns car and seat randomly.
+     * Transforme un ticket en props pour le composent mail.
+     * Utilise le segment aller et le premier passager; assigne aléatoirement la voiture et le siège.
      */
     const buildPropsFromSegment = (segment: JourneySegment, passenger: Passenger, orderInfo: OrderInfo): TrainTicketPDFProps => {
         const {departureStation, arrivalStation, departureTime, arrivalTime, options} = segment;
@@ -116,10 +138,10 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
             .map(id => getOptionById(id))
             .filter((opt): opt is Option => !!opt);
 
-        // Extract date portion (YYYY-MM-DD) from ISO string
+        // Extraction de la date au format YYYY-MM-DD
         const date = departureTime.split("T")[0];
 
-        // Randomly assign car (1-10) and seat (1-100)
+        // Assigne aléatoirement la voiture (1-10) et le siège (1-100)
         const carNumber = (Math.floor(Math.random() * 10) + 1).toString();
         const seatNumber = (Math.floor(Math.random() * 100) + 1).toString();
 
@@ -169,6 +191,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 clearCart,
                 infoBuyer,
                 setInfoBuyer,
+                toggleOptionForAllTickets,
                 buildPropsFromSegment,
                 buildPagesForTicket,
                 getAllPagesGroupedByTicket,
@@ -178,7 +201,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     );
 };
 
-// Custom hook to use the cart context
+// Hook pour utiliser le contexte
 export const useCart = (): CartContextType => {
     const context = useContext(CartContext);
     if (!context) {

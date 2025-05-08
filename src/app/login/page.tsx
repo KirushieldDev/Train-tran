@@ -21,7 +21,7 @@ export default function Home() {
     }, []);
 
     const handleLogout = async () => {
-        await fetch("/api/auth/logout", { method: "POST" });
+        await fetch("/api/auth/logout", {method: "POST"});
         setIsLogged(false);
         setShowLogin(true);
         router.refresh();
@@ -34,10 +34,7 @@ export default function Home() {
             <Header />
             <div className="w-full flex justify-center items-center bg-background h-full py-8">
                 {isLogged ? (
-                    <button
-                        onClick={handleLogout}
-                        className="px-6 py-3 bg-red-500 text-white rounded"
-                    >
+                    <button onClick={handleLogout} className="px-6 py-3 bg-red-500 text-white rounded">
                         Se déconnecter
                     </button>
                 ) : showLogin ? (

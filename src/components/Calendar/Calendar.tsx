@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import { fr } from 'date-fns/locale';
-import { format } from 'date-fns';
-import 'react-datepicker/dist/react-datepicker.css';
-import '@traintran/style/calendar.css';
+import React, {useState} from "react";
+import DatePicker from "react-datepicker";
+import {fr} from "date-fns/locale";
+import {format} from "date-fns";
+import "react-datepicker/dist/react-datepicker.css";
+import "@traintran/style/calendar.css";
 
 export interface Journey {
     id: string;
@@ -24,7 +24,7 @@ interface CalendarProps {
     availableDates?: DateWithJourneys[];
 }
 
-const Calendar: React.FC<CalendarProps> = ({ onChange, availableDates = [] }) => {
+const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = []}) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
     const handleDateChange = (date: Date | null) => {
@@ -39,8 +39,8 @@ const Calendar: React.FC<CalendarProps> = ({ onChange, availableDates = [] }) =>
     const getJourneysForDate = (date: Date | null): Journey[] => {
         if (!date) return [];
 
-        const dateStr = format(date, 'yyyy-MM-dd');
-        const dateData = availableDates.find(item => format(item.date, 'yyyy-MM-dd') === dateStr);
+        const dateStr = format(date, "yyyy-MM-dd");
+        const dateData = availableDates.find(item => format(item.date, "yyyy-MM-dd") === dateStr);
         return dateData?.journeys || [];
     };
 
@@ -71,9 +71,7 @@ const Calendar: React.FC<CalendarProps> = ({ onChange, availableDates = [] }) =>
                     <div className="day-cell">
                         <div className="day-content">
                             <span className="day-number">{day}</span>
-                            {hasJourneys && (
-                                <span className="day-price">{minPrice}€</span>
-                            )}
+                            {hasJourneys && <span className="day-price">{minPrice}€</span>}
                         </div>
                     </div>
                 );
