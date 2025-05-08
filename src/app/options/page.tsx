@@ -6,7 +6,7 @@ import {OptionsList} from "@traintran/components/AdditionalOptions/OptionsList";
 import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
 import Footer from "@traintran/components/Footer/Footer";
 import {useRouter} from "next/navigation";
-import getOptionById, {OptionID, optionsList} from "@traintran/lib/options";
+import getOptionById, {OptionID} from "@traintran/lib/options";
 
 export default function Home() {
     const [selectedOptions, setSelectedOptions] = useState<OptionID[]>([]);
@@ -33,7 +33,7 @@ export default function Home() {
                     <div className="flex flex-col md:flex-row gap-8 md:gap-32 justify-between items-start">
                         <div className="w-full md:w-[480px]">
                             <div className="bg-white rounded-lg p-6 shadow-sm border border-borderContainer">
-                                <OptionsList options={optionsList} selectedOptions={selectedOptions} onOptionToggle={handleOptionChange} />
+                                <OptionsList selectedOptions={selectedOptions} onOptionToggle={handleOptionChange} />
                             </div>
                         </div>
                         <div className="w-full md:w-[384px]">

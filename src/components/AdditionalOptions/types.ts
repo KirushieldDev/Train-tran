@@ -7,7 +7,6 @@ export interface OptionCardProps {
 }
 
 export interface OptionsListProps {
-    options: Option[];
     selectedOptions: OptionID[];
     onOptionToggle: (id: OptionID) => void;
 }
