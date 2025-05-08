@@ -1,44 +1,75 @@
 "use client";
 
-import {useState} from "react";
+import { useEffect, useRef, useState } from "react";
+import { OptionID, optionsList } from "@traintran/lib/options";
 import Header from "@traintran/components/Header/Header";
-import {OptionsList} from "@traintran/components/AdditionalOptions/OptionsList";
-import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
+import { OptionsList } from "@traintran/components/AdditionalOptions/OptionsList";
+import { OrderSummary } from "@traintran/components/AdditionalOptions/OrderSummary";
 import Footer from "@traintran/components/Footer/Footer";
-import {useRouter} from "next/navigation";
-import getOptionById, {OptionID} from "@traintran/lib/options";
+import { useRouter } from "next/navigation";
+import { useCart } from "@traintran/context/CartContext";
 
 export default function Home() {
+    const { tickets, toggleOptionForAllTickets } = useCart();
     const [selectedOptions, setSelectedOptions] = useState<OptionID[]>([]);
+    const prevRef = useRef<OptionID[]>([]);
     const router = useRouter();
 
-    const basePrice = 45;
-    const totalPrice = basePrice + selectedOptions.map(opt_id => (getOptionById(opt_id)?.price || 0) as number).reduce((sum, opt) => sum + opt, 0);
+    // Propagation des toggles au contexte
+    useEffect(() => {
+        const prev = prevRef.current;
+        optionsList.forEach(opt => {
+            const was = prev.includes(opt.id);
+            const is = selectedOptions.includes(opt.id);
+            if (!was && is) toggleOptionForAllTickets(opt.id, true);
+            if (was && !is) toggleOptionForAllTickets(opt.id, false);
+        });
+        prevRef.current = selectedOptions;
+    }, [selectedOptions, toggleOptionForAllTickets]);
 
-    const handleOptionChange = (optionId: OptionID) => {
-        setSelectedOptions(prev => (prev.includes(optionId) ? prev.filter(id => id !== optionId) : [...prev, optionId]));
-    };
+    const handleOptionChange = (id: OptionID) =>
+        setSelectedOptions(prev =>
+            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        );
 
-    const handleContinue = () => {
-        console.log("Continue with selected options:", selectedOptions);
-        router.push("/panier");
-    };
+    // Calculs de prix
+    const totalPassengers = tickets.reduce((sum, t) => sum + t.passengers.length, 0);
+    const basePrice = tickets.reduce((sum, t) => sum + t.basePrice, 0);
+    const optionsTotal = selectedOptions.reduce((sum, id) => {
+        const opt = optionsList.find(o => o.id === id)!;
+        return sum + opt.price;
+    }, 0);
+    const totalPrice = basePrice * totalPassengers + optionsTotal * totalPassengers;
+
+    const handleContinue = () => router.push("/panier");
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="min-h-screen flex flex-col bg-background">
             <Header />
             <main className="flex-grow">
-                <div className="max-w-[1024px] mx-auto px-4 py-8">
-                    <h1 className="text-2xl font-semibold text-textPrimary mb-6">Options supplémentaires</h1>
-                    <div className="flex flex-col md:flex-row gap-8 md:gap-32 justify-between items-start">
+                <div className="mx-auto max-w-[1024px] px-4 py-8">
+                    <h1 className="mb-6 text-2xl font-semibold text-textPrimary">
+                        Options supplémentaires
+                    </h1>
+                    <div className="flex flex-col gap-8 md:flex-row md:gap-32">
+                        {/* Sélecteur d’options */}
                         <div className="w-full md:w-[480px]">
-                            <div className="bg-white rounded-lg p-6 shadow-sm border border-borderContainer">
-                                <OptionsList selectedOptions={selectedOptions} onOptionToggle={handleOptionChange} />
+                            <div className="rounded-lg border border-borderContainer bg-white p-6 shadow-sm">
+                                <OptionsList
+                                    selectedOptions={selectedOptions}
+                                    onOptionToggle={handleOptionChange}
+                                />
                             </div>
                         </div>
+                        {/* Récapitulatif */}
                         <div className="w-full md:w-[384px]">
-                            <div className="bg-white rounded-lg p-6 shadow-sm border border-borderContainer sticky top-4">
-                                <OrderSummary basePrice={basePrice} selectedOptions={selectedOptions} totalPrice={totalPrice} onContinue={handleContinue} />
+                            <div className="sticky top-4 rounded-lg border border-borderContainer bg-white p-6 shadow-sm">
+                                <OrderSummary
+                                    basePrice={basePrice}
+                                    selectedOptions={selectedOptions}
+                                    totalPrice={totalPrice}
+                                    onContinue={handleContinue}
+                                />
                             </div>
                         </div>
                     </div>
