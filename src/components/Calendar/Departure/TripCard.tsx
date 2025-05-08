@@ -1,7 +1,7 @@
 import React from "react";
-import {TimeDisplay} from "./TimeDisplay";
-import {JourneyIndicator} from "./JourneyIndicator";
-import TrainSVG from "../../../assets/Calendar/TrainSVG.tsx";
+import { TimeDisplay } from "./TimeDisplay";
+import { JourneyIndicator } from "./JourneyIndicator";
+import TrainSVG from "@traintran/assets/Calendar/TrainSVG";
 
 interface TripCardProps {
     departureTime: string;
@@ -10,7 +10,7 @@ interface TripCardProps {
     duration: string;
 }
 
-export const TripCard: React.FC<TripCardProps> = ({departureTime, arrivalTime, price, duration}) => {
+export const TripCard: React.FC<TripCardProps> = ({ departureTime, arrivalTime, price, duration }) => {
     return (
         <article className="flex flex-col justify-center p-4 w-full bg-white rounded-lg border border-solid max-md:max-w-full">
             <div className="flex flex-wrap gap-10 justify-between items-center w-full max-md:max-w-full">

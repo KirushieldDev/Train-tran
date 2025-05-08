@@ -4,7 +4,6 @@ import React, {useState} from "react";
 
 interface FormInputProps {
     label: string;
-    name: string;
     placeholder: string;
     icon?: React.ReactNode;
     type?: string;
@@ -17,7 +16,6 @@ interface FormInputProps {
 
 export const FormInput: React.FC<FormInputProps> = ({
     label,
-    name,
     placeholder,
     icon,
     type = "text",
@@ -34,30 +32,24 @@ export const FormInput: React.FC<FormInputProps> = ({
 
     const selectSuggestion = (s: string) => {
         if (onChange) {
-            // Simule un event pour la valeur
-            const syntheticEvent = {
-                target: { value: s },
-                currentTarget: { value: s },
-            } as React.ChangeEvent<HTMLInputElement>;
-            onChange(syntheticEvent);
+            const event = {target: { value: s },} as React.ChangeEvent<HTMLInputElement>;
+            onChange(event);
         }
         setOpen(false);
     };
 
-    const inputProps = type === "date" ? (autocompleteToday ? {defaultValue: today} : {}) : {value, onFocus: () => setOpen(true), onBlur};
+    const inputProps = type === "date" ? (autocompleteToday ? {defaultValue: today} : {}) : {value, onChange, onFocus: () => setOpen(true), onBlur};
 
     return (
         <div className="flex flex-col grow shrink min-w-60 w-[323px]">
             <label className="gap-2.5 self-start text-sm font-medium text-center text-gray-700">{label}</label>
-            <div className="flex relative justify-between items-start mt-2 w-full min-h-[55px]">
+            <div className="flex relative justify-between items-start mt-2 w-full min-h-[55px] rounded-lg focus-within:ring-2 focus-within:ring-primary">
                 <input
                     type={type}
-                    name={name}
                     placeholder={placeholder}
                     required={required}
-                    onChange={onChange}
                     {...inputProps}
-                    className={`z-0 flex-1 shrink self-stretch my-auto text-base leading-6 placeholder:text-gray-400 text-textPrimary bg-white rounded-lg border border-gray-300 border-solid basis-0 min-w-60 w-[231px] min-h-[55px] ${icon ? "pl-12" : "pl-4"}`}
+                    className={`z-0 flex-1 shrink self-stretch my-auto text-base leading-6 placeholder:text-gray-400 text-textPrimary bg-white rounded-lg border border-gray-300 border-solid basis-0 min-w-60 w-[231px] min-h-[55px] ${icon ? "pl-12" : "pl-4"} focus:outline-none`}
                 />
                 {icon && (
                     <div className="flex overflow-hidden absolute left-5 z-0 justify-center items-center self-start w-3.5 h-4 bottom-[20px] min-h-4">

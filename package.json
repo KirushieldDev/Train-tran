@@ -13,25 +13,29 @@
     },
     "dependencies": {
         "@tabler/icons-react": "^3.31.0",
+        "@types/react-datepicker": "^6.2.0",
         "axios": "^1.9.0",
+        "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.14.1",
+        "next": "15.3.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "next": "15.3.1"
+        "react-datepicker": "^8.3.0"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
-        "typescript": "^5",
+        "@types/jsonwebtoken": "^9.0.9",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",
-        "postcss": "^8",
-        "tailwindcss": "^3.4.1",
         "eslint": "^9",
         "eslint-config-next": "15.3.1",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-prettier": "^5.2.1",
+        "postcss": "^8",
         "prettier": "^3.5.3",
-        "rimraf": "^6.0.1"
+        "rimraf": "^6.0.1",
+        "tailwindcss": "^3.4.1",
+        "typescript": "^5"
     }
 }

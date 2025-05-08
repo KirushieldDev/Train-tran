@@ -1,0 +1,198 @@
+.calendar-container {
+    font-family: "Inter", sans-serif;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.custom-calendar {
+    width: 100%;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.react-datepicker__month-container {
+    width: 100%;
+}
+
+.react-datepicker__month {
+    margin: 0;
+    padding: 0;
+}
+
+.react-datepicker__week {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.react-datepicker__day {
+    margin: 0;
+    width: calc(100% / 7);
+    height: auto;
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s ease;
+    padding: 4px 0;
+    border-radius: 8px;
+}
+
+.react-datepicker__day:hover {
+    background-color: white;
+    color: #10b981;
+    box-shadow: inset 0 0 0 1px #10b981;
+    border-radius: 8px;
+}
+
+.react-datepicker__day--selected {
+    background-color: #10b981 !important;
+    color: white !important;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.react-datepicker__day--selected .day-cell,
+.react-datepicker__day--selected .day-content {
+    width: 100%;
+}
+
+.react-datepicker__day--keyboard-selected {
+    background-color: white;
+    color: #10b981;
+    border: 1px solid #10b981;
+    border-radius: 8px;
+}
+
+.react-datepicker__header {
+    background-color: white;
+    border-bottom: none;
+    padding-top: 0;
+}
+
+.react-datepicker__day-names {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.react-datepicker__day-name {
+    width: calc(100% / 7);
+    margin: 0;
+    text-align: center;
+    color: #6b7280;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.react-datepicker__current-month {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #111827;
+    text-transform: capitalize;
+}
+
+.react-datepicker__navigation {
+    top: 16px;
+}
+
+.day-cell {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.day-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    height: 100%;
+}
+
+.day-number {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.day-price {
+    font-size: 0.7rem;
+    color: #10b981;
+    font-weight: 600;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    display: block;
+    line-height: 1;
+}
+
+.react-datepicker__day--selected .day-price {
+    color: white !important;
+}
+
+.selected-journeys {
+    margin-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 16px;
+}
+
+.journeys-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #111827;
+}
+
+.journeys-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.journey-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.journey-item:hover {
+    background-color: #f0f9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.journey-times {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.departure-time,
+.arrival-time {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.time-separator {
+    color: #6b7280;
+}
+
+.journey-price {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #10b981;
+}
