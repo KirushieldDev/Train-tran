@@ -1,17 +1,11 @@
 import React from "react";
 import Button from "@traintran/components/common/Button";
 import getOptionById from "@traintran/lib/options";
-import { OrderSummaryProps } from "@traintran/components/AdditionalOptions/types";
-import { useCart } from "@traintran/context/CartContext";
+import {OrderSummaryProps} from "@traintran/components/AdditionalOptions/types";
+import {useCart} from "@traintran/context/CartContext";
 
-export const OrderSummary: React.FC<OrderSummaryProps> = ({
-                                                              basePrice,
-                                                              selectedOptions,
-                                                              totalPrice,
-                                                              onContinue,
-                                                              showButton = true
-                                                          }) => {
-    const { tickets } = useCart();
+export const OrderSummary: React.FC<OrderSummaryProps> = ({basePrice, selectedOptions, totalPrice, onContinue, showButton = true}) => {
+    const {tickets} = useCart();
 
     const passengerCount = tickets.reduce((sum, t) => sum + t.passengers.length, 0);
 
@@ -32,9 +26,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
                     return (
                         <div key={i} className="flex justify-between text-primary">
                             <span>{option.name}</span>
-                            <span className="font-medium">
-                {option.price === 0 ? "Gratuit" : `+${option.price}€`}
-              </span>
+                            <span className="font-medium">{option.price === 0 ? "Gratuit" : `+${option.price}€`}</span>
                         </div>
                     );
                 })}
@@ -55,13 +47,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
             </div>
 
             {showButton && onContinue && (
-                <Button
-                    onClick={onContinue}
-                    variant="secondary"
-                    fullWidth
-                    className="mt-8"
-                    size="lg"
-                >
+                <Button onClick={onContinue} variant="secondary" fullWidth className="mt-8" size="lg">
                     Continuer
                 </Button>
             )}

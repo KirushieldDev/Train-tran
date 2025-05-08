@@ -109,22 +109,23 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     };
 
     const toggleOptionForAllTickets = (optionId: OptionID, add: boolean) => {
-        setTickets(prev => prev.map(ticket => {
-            const updateSeg = (seg: JourneySegment) => {
-                const has = seg.options.has(optionId);
-                const newSet = new Set(seg.options);
-                if (add && !has) newSet.add(optionId);
-                if (!add && has) newSet.delete(optionId);
-                return { ...seg, options: newSet };
-            };
-            return {
-                ...ticket,
-                outbound: updateSeg(ticket.outbound),
-                return: ticket.return ? updateSeg(ticket.return) : undefined
-            };
-        }));
+        setTickets(prev =>
+            prev.map(ticket => {
+                const updateSeg = (seg: JourneySegment) => {
+                    const has = seg.options.has(optionId);
+                    const newSet = new Set(seg.options);
+                    if (add && !has) newSet.add(optionId);
+                    if (!add && has) newSet.delete(optionId);
+                    return {...seg, options: newSet};
+                };
+                return {
+                    ...ticket,
+                    outbound: updateSeg(ticket.outbound),
+                    return: ticket.return ? updateSeg(ticket.return) : undefined,
+                };
+            }),
+        );
     };
-
 
     /**
      * Transforme un ticket en props pour le composent mail.

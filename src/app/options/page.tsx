@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { OptionID, optionsList } from "@traintran/lib/options";
+import {useEffect, useRef, useState} from "react";
+import {OptionID, optionsList} from "@traintran/lib/options";
 import Header from "@traintran/components/Header/Header";
-import { OptionsList } from "@traintran/components/AdditionalOptions/OptionsList";
-import { OrderSummary } from "@traintran/components/AdditionalOptions/OrderSummary";
+import {OptionsList} from "@traintran/components/AdditionalOptions/OptionsList";
+import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
 import Footer from "@traintran/components/Footer/Footer";
-import { useRouter } from "next/navigation";
-import { useCart } from "@traintran/context/CartContext";
+import {useRouter} from "next/navigation";
+import {useCart} from "@traintran/context/CartContext";
 
 export default function Home() {
-    const { tickets, toggleOptionForAllTickets } = useCart();
+    const {tickets, toggleOptionForAllTickets} = useCart();
     const [selectedOptions, setSelectedOptions] = useState<OptionID[]>([]);
     const prevRef = useRef<OptionID[]>([]);
     const router = useRouter();
@@ -27,10 +27,7 @@ export default function Home() {
         prevRef.current = selectedOptions;
     }, [selectedOptions, toggleOptionForAllTickets]);
 
-    const handleOptionChange = (id: OptionID) =>
-        setSelectedOptions(prev =>
-            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-        );
+    const handleOptionChange = (id: OptionID) => setSelectedOptions(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
 
     // Calculs de prix
     const totalPassengers = tickets.reduce((sum, t) => sum + t.passengers.length, 0);
@@ -48,28 +45,18 @@ export default function Home() {
             <Header />
             <main className="flex-grow">
                 <div className="mx-auto max-w-[1024px] px-4 py-8">
-                    <h1 className="mb-6 text-2xl font-semibold text-textPrimary">
-                        Options supplémentaires
-                    </h1>
+                    <h1 className="mb-6 text-2xl font-semibold text-textPrimary">Options supplémentaires</h1>
                     <div className="flex flex-col gap-8 md:flex-row md:gap-32">
                         {/* Sélecteur d’options */}
                         <div className="w-full md:w-[480px]">
                             <div className="rounded-lg border border-borderContainer bg-white p-6 shadow-sm">
-                                <OptionsList
-                                    selectedOptions={selectedOptions}
-                                    onOptionToggle={handleOptionChange}
-                                />
+                                <OptionsList selectedOptions={selectedOptions} onOptionToggle={handleOptionChange} />
                             </div>
                         </div>
                         {/* Récapitulatif */}
                         <div className="w-full md:w-[384px]">
                             <div className="sticky top-4 rounded-lg border border-borderContainer bg-white p-6 shadow-sm">
-                                <OrderSummary
-                                    basePrice={basePrice}
-                                    selectedOptions={selectedOptions}
-                                    totalPrice={totalPrice}
-                                    onContinue={handleContinue}
-                                />
+                                <OrderSummary basePrice={basePrice} selectedOptions={selectedOptions} totalPrice={totalPrice} onContinue={handleContinue} />
                             </div>
                         </div>
                     </div>
