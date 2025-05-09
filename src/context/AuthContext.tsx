@@ -22,10 +22,8 @@ export interface UserInfo {
 // Shape du contexte d'authentification
 interface AuthContextType {
     user: UserInfo | null;
-    sessionToken?: string;
     loading: boolean;
     login: (email: string, passwordHash: string, remember: boolean) => Promise<void>;
-    checkIfLogin: () => Promise<boolean>;
     logout: () => void;
     register: (data: {firstName: string; lastName: string; gender: UserGender; mobile: string; email: string; password: string}) => Promise<void>;
 }
@@ -35,7 +33,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const router = useRouter();
     const [user, setUser] = useState<UserInfo | null>(null);
-    const [sessionToken, setSessionToken] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState(true);
 
     // Helper : appelle l'API pour obtenir le salt hexadécimal
@@ -75,29 +72,10 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
         // Si pas de remember, garder le token persistant sur la session actuelle seulement
         if (!remember && data.token) {
             sessionStorage.setItem(STORAGE_SESSION_TOKEN, data.token);
-            setSessionToken(data.token);
         }
         await loadSession();
         setLoading(false);
         router.push("/");
-    };
-
-    const checkIfLogin = async () => {
-        const storedToken = typeof window !== "undefined" ? sessionStorage.getItem(STORAGE_SESSION_TOKEN) || undefined : undefined;
-        if (storedToken && !sessionToken) {
-            setSessionToken(storedToken);
-        }
-        const headers: Record<string, string> = {};
-        headers["Authorization"] = `Bearer ${sessionToken}`;
-        const res = await fetch("/api/auth/session", {headers});
-        if (!res.ok) {
-            await logout();
-            return false;
-        }
-        const {user: u} = (await res.json()) as {user: UserInfo | null};
-        setUser(u);
-        setLoading(false);
-        return true;
     };
 
     // Helper pour dériver salt+hash
@@ -138,13 +116,16 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
         setLoading(false);
     };
 
+    const cleanClientData = () => {
+        localStorage.removeItem(STORAGE_LOCAL_CART!);
+        sessionStorage.removeItem(STORAGE_SESSION_TOKEN);
+        setUser(null);
+    }
+
     // Méthode de logout : supprime cookie et contexte
     const logout = async () => {
         await fetch("/api/auth/logout", {method: "POST"});
-        localStorage.removeItem(STORAGE_LOCAL_CART!);
-        sessionStorage.removeItem(STORAGE_SESSION_TOKEN);
-        setSessionToken(undefined);
-        setUser(null);
+        cleanClientData();
         router.push("/login");
     };
 
@@ -158,9 +139,12 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 headers["Authorization"] = `Bearer ${storedToken}`;
             }
             const res = await fetch("/api/auth/session", {headers});
-            if (!res.ok) alert("Pas d\'utilisateur authentifié");
-            const {user: u} = await res.json();
-            setUser(u);
+            const data = await res.json() as {ok: boolean, user: UserInfo | null};
+            if (!data.ok) {
+                cleanClientData();
+                return;
+            }
+            setUser(data.user);
         } catch {
             setUser(null);
         } finally {
@@ -180,7 +164,6 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 loading,
                 login,
                 logout,
-                checkIfLogin,
                 register,
             }}>
             {children}
