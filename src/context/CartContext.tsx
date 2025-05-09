@@ -204,7 +204,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
             headers["Authorization"] = `Bearer ${token}`;
         }
         // sinon le cookie httpOnly sera renvoyé automatiquement
-        const res = await fetch("/api/send-tickets", {
+        const res = await fetch("/api/cart/send-tickets", {
             method: "POST",
             headers: headers,
             body: JSON.stringify({tickets: pages}),

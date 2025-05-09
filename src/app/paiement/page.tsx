@@ -8,8 +8,10 @@ import Button from "@traintran/components/common/Button";
 import {useCart} from "@traintran/context/CartContext";
 import React, {FormEvent} from "react";
 import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
+import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
 
 export default function Home() {
+    useRequireAuth();
     const {purchaseCart} = useCart();
     const {selectedOptions} = useOptionsSync();
 
