@@ -40,8 +40,6 @@ export interface CartContextType {
     addTicket: (ticket: Ticket) => void;
     removeTicket: (orderNumber: string) => void;
     clearCart: () => void;
-    infoBuyer?: OrderInfo;
-    setInfoBuyer: (info: OrderInfo) => void;
     toggleOptionForAllTickets: (optionId: OptionID, add: boolean) => void;
     // Helper pour transformer un ticket en props pour le PDF
     buildPropsFromSegment: (segment: JourneySegment, passenger: Passenger, orderInfo: OrderInfo) => TrainTicketPDFProps;
@@ -56,7 +54,6 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 // Provider component
 export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const [tickets, setTickets] = useState<Ticket[]>([]);
-    const [infoBuyer, setInfoBuyer] = useState<OrderInfo>();
     const ticketsRef = useRef(tickets);
 
     useEffect(() => {
@@ -93,7 +90,6 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
             basePrice: 120,
         };
         addTicket(testTicket);
-        setInfoBuyer(testTicket.orderInfo);
     }, []);
 
     const addTicket = (ticket: Ticket) => {
@@ -189,8 +185,6 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 addTicket,
                 removeTicket,
                 clearCart,
-                infoBuyer,
-                setInfoBuyer,
                 toggleOptionForAllTickets,
                 buildPropsFromSegment,
                 buildPagesForTicket,

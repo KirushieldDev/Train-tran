@@ -41,7 +41,7 @@ export default function Home() {
             router.push("/confirmation");
         } catch (err) {
             console.error(err);
-            alert(err + "Impossible d'envoyer les billets. Veuillez réessayer plus tard.");
+            alert("Impossible d'envoyer les billets. Veuillez réessayer plus tard.");
         }
     }
 
