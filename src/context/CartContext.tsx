@@ -1,73 +1,84 @@
 "use client";
 
 import React, {createContext, ReactNode, useContext, useEffect, useRef, useState} from "react";
-import {TrainTicketPDFProps} from "@traintran/components/Mail/TrainTicketPDF";
+import {useAuth} from "./AuthContext";
 import getOptionById, {Option, OptionID} from "@traintran/lib/options";
+import {TrainTicketPDFProps} from "@traintran/components/Mail/TrainTicketPDF";
+import {useRouter} from "next/navigation";
 
+const STORAGE_LOCAL_CART = process.env.NEXT_PUBLIC_STORAGE_LOCAL_CART!;
+const STORAGE_SESSION_TOKEN = process.env.NEXT_PUBLIC_STORAGE_SESSION_TOKEN!;
+
+/** Segment d’un trajet */
 export interface JourneySegment {
     departureStation: string;
     arrivalStation: string;
     departureTime: string; // String de la date au format ISO
-    arrivalTime: string;
-    options: Set<OptionID>;
+    arrivalTime: string; // ISO
 }
 
-// Types pour le passager et les informations de commande
+/** Un passager */
 export interface Passenger {
     firstName: string;
     lastName: string;
+    age: number;
 }
 
-export interface OrderInfo {
-    orderNumber?: string;
-    ordererFirstName: string;
-    ordererLastName: string;
-    ordererEmail: string;
-}
-
-// Le ticket contient un segment aller et un segment retour optionnel
+/** Un ticket complet (aller + éventuel retour) */
 export interface Ticket {
     outbound: JourneySegment;
     return?: JourneySegment;
     passengers: Passenger[];
-    orderInfo: OrderInfo;
+    options: Set<OptionID>;
     basePrice: number;
 }
 
-// Valeurs du contexte
-export interface CartContextType {
-    tickets: Ticket[];
-    addTicket: (ticket: Ticket) => void;
-    removeTicket: (orderNumber: string) => void;
+interface CartContextType {
+    /** Le ticket en cours (panier) */
+    cartTicket: Ticket | null;
+    setCartTicket: (ticket: Ticket) => void;
     clearCart: () => void;
-    toggleOptionForAllTickets: (optionId: OptionID, add: boolean) => void;
-    // Helper pour transformer un ticket en props pour le PDF
-    buildPropsFromSegment: (segment: JourneySegment, passenger: Passenger, orderInfo: OrderInfo) => TrainTicketPDFProps;
-    buildPagesForTicket: (ticket: Ticket) => TrainTicketPDFProps[];
+    loadingCart: boolean;
+    // options
+    addOption: (optionId: OptionID) => void;
+    removeOption: (optionId: OptionID) => void;
+    toggleOption: (optionId: OptionID) => void;
+    // Calcul du prix total
+    getTotalPrice: () => number;
     // Helper pour obtenir toutes les pages groupées par ticket
-    getAllPagesGroupedByTicket: () => TrainTicketPDFProps[][];
+    getAllPages: () => TrainTicketPDFProps[];
+    // paiement
+    purchaseCart: () => Promise<void>;
 }
 
-// Création context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Provider component
 export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
-    const [tickets, setTickets] = useState<Ticket[]>([]);
-    const ticketsRef = useRef(tickets);
+    const {user} = useAuth();
+    const router = useRouter();
+    const [cartTicket, setCartTicketRaw] = useState<Ticket | null>(null);
+    const [loadingCart, setLoadingCart] = useState(true);
+    const initialized = useRef(false);
 
+    // Hydrater depuis localStorage
     useEffect(() => {
-        ticketsRef.current = tickets;
-    }, [tickets]);
+        if (initialized.current) return;
+        const raw = localStorage.getItem(STORAGE_LOCAL_CART);
+        if (raw) {
+            try {
+                // Ré-instancier les Set pour options
+                const obj = JSON.parse(raw) as Ticket;
+                obj.options = new Set(obj.options);
+                setCartTicketRaw(obj);
+            } catch {}
+        }
 
-    useEffect(() => {
         const testTicket: Ticket = {
             outbound: {
                 departureStation: "Paris",
                 arrivalStation: "Lyon",
                 departureTime: new Date().toISOString(),
                 arrivalTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // +2h
-                options: new Set([OptionID.Quiet, OptionID.Sms, OptionID.Insurance, OptionID.Baggage]),
             },
             // optional return segment
             return: {
@@ -75,131 +86,158 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 arrivalStation: "Paris",
                 departureTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // next day
                 arrivalTime: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(), // +2h after return depart
-                options: new Set([OptionID.Sms]),
             },
             passengers: [
-                {firstName: "Pierre", lastName: "Dupont"},
-                {firstName: "Marie", lastName: "Dupont"},
+                {firstName: "Pierre", lastName: "Dupont", age: 45},
+                {firstName: "Marie", lastName: "Dupont", age: 56},
             ],
-            orderInfo: {
-                orderNumber: "TEST-0001",
-                ordererFirstName: "Pierre",
-                ordererLastName: "Dupont",
-                ordererEmail: "julien.synaeve@gmail.com",
-            },
+            options: new Set([OptionID.Quiet, OptionID.Insurance, OptionID.Baggage]),
             basePrice: 120,
         };
-        addTicket(testTicket);
+        setCartTicket(testTicket);
+
+        initialized.current = true;
+        setLoadingCart(false);
     }, []);
 
-    const addTicket = (ticket: Ticket) => {
-        setTickets(prev => [...prev, ticket]);
+    // Persistance dans localStorage
+    useEffect(() => {
+        if (!initialized.current) return;
+        if (cartTicket) {
+            // convertir Set en array pour le JSON
+            const toStore = {
+                ...cartTicket,
+                outbound: {...cartTicket.outbound},
+                return: cartTicket.return ? {...cartTicket.return} : undefined,
+            };
+            localStorage.setItem(STORAGE_LOCAL_CART, JSON.stringify(toStore));
+        } else {
+            localStorage.removeItem(STORAGE_LOCAL_CART);
+        }
+    }, [cartTicket]);
+
+    // wrapper pour ré-instancier Set automatiquement
+    const setCartTicket = (ticket: Ticket) => {
+        ticket.options = new Set(ticket.options);
+        setCartTicketRaw(ticket);
     };
 
-    const removeTicket = (orderNumber: string) => {
-        setTickets(prev => prev.filter(t => t.orderInfo.orderNumber !== orderNumber));
+    const clearCart = () => setCartTicketRaw(null);
+
+    const addOption = (optionId: OptionID) => {
+        if (!cartTicket) return;
+        const opts = new Set(cartTicket.options);
+        opts.add(optionId);
+        setCartTicketRaw({...cartTicket, options: opts});
     };
 
-    const clearCart = () => {
-        setTickets([]);
+    const removeOption = (optionId: OptionID) => {
+        if (!cartTicket) return;
+        const opts = new Set(cartTicket.options);
+        opts.delete(optionId);
+        setCartTicketRaw({...cartTicket, options: opts});
     };
 
-    const toggleOptionForAllTickets = (optionId: OptionID, add: boolean) => {
-        setTickets(prev =>
-            prev.map(ticket => {
-                const updateSeg = (seg: JourneySegment) => {
-                    const has = seg.options.has(optionId);
-                    const newSet = new Set(seg.options);
-                    if (add && !has) newSet.add(optionId);
-                    if (!add && has) newSet.delete(optionId);
-                    return {...seg, options: newSet};
-                };
-                return {
-                    ...ticket,
-                    outbound: updateSeg(ticket.outbound),
-                    return: ticket.return ? updateSeg(ticket.return) : undefined,
-                };
-            }),
-        );
+    const toggleOption = (optionId: OptionID) => {
+        if (!cartTicket) return;
+        const opts = new Set(cartTicket.options);
+        if (opts.has(optionId)) opts.delete(optionId);
+        else opts.add(optionId);
+        setCartTicketRaw({...cartTicket, options: opts});
     };
 
-    /**
-     * Transforme un ticket en props pour le composent mail.
-     * Utilise le segment aller et le premier passager; assigne aléatoirement la voiture et le siège.
-     */
-    const buildPropsFromSegment = (segment: JourneySegment, passenger: Passenger, orderInfo: OrderInfo): TrainTicketPDFProps => {
-        const {departureStation, arrivalStation, departureTime, arrivalTime, options} = segment;
+    // Transforme un segment + passager en props PDF en injectant orderer depuis user
+    const buildPropsForPassenger = (ticket: Ticket, passenger: Passenger): TrainTicketPDFProps => {
+        if (!user) throw new Error("Utilisateur non connecté");
         // on récupère les objets Option à partir des IDs
-        const resolvedOptions = Array.from(options)
+        const resolvedOptions: Option[] = Array.from(ticket.options)
             .map(id => getOptionById(id))
-            .filter((opt): opt is Option => !!opt);
-
-        // Extraction de la date au format YYYY-MM-DD
-        const date = departureTime.split("T")[0];
+            .filter((o): o is Option => !!o);
 
         // Assigne aléatoirement la voiture (1-10) et le siège (1-100)
         const carNumber = (Math.floor(Math.random() * 10) + 1).toString();
         const seatNumber = (Math.floor(Math.random() * 100) + 1).toString();
 
         return {
-            ordererFirstName: orderInfo.ordererFirstName,
-            ordererLastName: orderInfo.ordererLastName,
+            ordererFirstName: user.firstName,
+            ordererLastName: user.lastName,
             passengerFirstName: passenger.firstName,
             passengerLastName: passenger.lastName,
-            departureStation,
-            arrivalStation,
-            departureTime,
-            arrivalTime,
-            date,
+            journeySegment: ticket.outbound,
             carNumber,
             seatNumber,
             options: resolvedOptions,
         };
     };
 
-    /**
-     * 1 ticket → X pages (passagers × segments)
-     */
-    const buildPagesForTicket = (ticket: Ticket): TrainTicketPDFProps[] => {
-        const {outbound, return: retour, passengers, orderInfo} = ticket;
-
-        return passengers.flatMap(passenger => {
-            // page aller
-            const pages = [buildPropsFromSegment(outbound, passenger, orderInfo)];
-            // page retour si présente
-            if (retour) {
-                pages.push(buildPropsFromSegment(retour, passenger, orderInfo));
-            }
-            return pages;
-        });
+    // Pour chaque ticket, une page par passager et par segment
+    const getAllPages = (): TrainTicketPDFProps[] => {
+        if (!cartTicket) return [];
+        return cartTicket.passengers.flatMap(
+            p =>
+                [
+                    buildPropsForPassenger(cartTicket, p),
+                    cartTicket.return ? buildPropsForPassenger({...cartTicket, outbound: cartTicket.return}, p) : undefined,
+                ].filter(Boolean) as TrainTicketPDFProps[],
+        );
     };
 
-    const getAllPagesGroupedByTicket = (): TrainTicketPDFProps[][] => {
-        return ticketsRef.current.map(buildPagesForTicket);
+    // Calcule le prix total
+    const getTotalPrice = (): number => {
+        if (!cartTicket) return 0;
+        let total = cartTicket.basePrice * (cartTicket.return ? 2 : 1);
+        cartTicket.options.forEach(optId => {
+            const opt = getOptionById(optId);
+            if (opt) total += opt.price * cartTicket.passengers.length * (cartTicket.return ? 2 : 1);
+        });
+        return total;
+    };
+
+    // Envoie les tickets par mail via l'API
+    const purchaseCart = async (): Promise<void> => {
+        if (!user || !cartTicket) throw new Error("Pas de ticket en cours");
+        const pages = getAllPages();
+        // récupère le token de session (pour remember=false) ou laisser le cookie faire son boulot
+        const token = sessionStorage.getItem(STORAGE_SESSION_TOKEN);
+        const headers: Record<string, string> = {"Content-Type": "application/json"};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        // sinon le cookie httpOnly sera renvoyé automatiquement
+        const res = await fetch("/api/send-tickets", {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({tickets: pages}),
+        });
+        if (!res.ok) {
+            const {error} = await res.json();
+            throw new Error(error || "Échec de l'envoi des billets");
+        } else {
+            router.push("/confirmation");
+        }
     };
 
     return (
         <CartContext.Provider
             value={{
-                tickets,
-                addTicket,
-                removeTicket,
+                cartTicket,
+                setCartTicket,
                 clearCart,
-                toggleOptionForAllTickets,
-                buildPropsFromSegment,
-                buildPagesForTicket,
-                getAllPagesGroupedByTicket,
+                loadingCart,
+                addOption,
+                removeOption,
+                toggleOption,
+                getTotalPrice,
+                getAllPages: getAllPages,
+                purchaseCart,
             }}>
             {children}
         </CartContext.Provider>
     );
 };
 
-// Hook pour utiliser le contexte
 export const useCart = (): CartContextType => {
-    const context = useContext(CartContext);
-    if (!context) {
-        throw new Error("useCart must be used within a CartProvider");
-    }
-    return context;
+    const ctx = useContext(CartContext);
+    if (!ctx) throw new Error("useCart doit être utilisé dans CartProvider");
+    return ctx;
 };

@@ -3,6 +3,10 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
 
+const STORAGE_COOKIE_AUTH = process.env.NEXT_PUBLIC_STORAGE_COOKIE_AUTH!;
+const STORAGE_LOCAL_CART = process.env.NEXT_PUBLIC_STORAGE_LOCAL_CART!;
+const STORAGE_SESSION_TOKEN = process.env.NEXT_PUBLIC_STORAGE_SESSION_TOKEN!;
+
 // Types représentant les informations utilisateur
 export type UserGender = "M" | "Mme";
 
@@ -34,8 +38,6 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const [sessionToken, setSessionToken] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState(true);
 
-    const ssTokenName = process.env.STORAGE_SESSION_TOKEN!;
-
     // Helper : appelle l'API pour obtenir le salt hexadécimal
     const getLoginSalt = async (email: string): Promise<string> => {
         const res = await fetch(`/api/auth/loginSalt?email=${encodeURIComponent(email)}`);
@@ -58,7 +60,6 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
     // Méthode de login : appelle l'API et gère le cookie/token
     const login = async (email: string, password: string, remember: boolean = false) => {
-        setLoading(true);
         // 1) récupérer le salt
         const salt = await getLoginSalt(email);
         // 2) dériver le hash
@@ -73,7 +74,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
         if (!res.ok) throw new Error(data.error || "Échec de la connexion");
         // Si pas de remember, garder le token persistant sur la session actuelle seulement
         if (!remember && data.token) {
-            sessionStorage.setItem(ssTokenName, data.token);
+            sessionStorage.setItem(STORAGE_SESSION_TOKEN, data.token);
             setSessionToken(data.token);
         }
         await loadSession();
@@ -82,15 +83,17 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     };
 
     const checkIfLogin = async () => {
-        setLoading(true);
-        const storedToken = typeof window !== "undefined" ? sessionStorage.getItem(ssTokenName) || undefined : undefined;
+        const storedToken = typeof window !== "undefined" ? sessionStorage.getItem(STORAGE_SESSION_TOKEN) || undefined : undefined;
         if (storedToken && !sessionToken) {
             setSessionToken(storedToken);
         }
         const headers: Record<string, string> = {};
         headers["Authorization"] = `Bearer ${sessionToken}`;
         const res = await fetch("/api/auth/session", {headers});
-        if (!res.ok) return false;
+        if (!res.ok) {
+            await logout();
+            return false;
+        }
         const {user: u} = (await res.json()) as {user: UserInfo | null};
         setUser(u);
         setLoading(false);
@@ -118,7 +121,6 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
     // Méthode d'inscription : appelle API
     const register = async (data: {firstName: string; lastName: string; gender: UserGender; mobile: string; email: string; password: string}) => {
-        setLoading(true);
         // 1) dériver salt+hash
         const {salt, hash} = await deriveSaltAndHash(data.password);
         // 2) appeler l'API register
@@ -139,20 +141,19 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     // Méthode de logout : supprime cookie et contexte
     const logout = async () => {
         await fetch("/api/auth/logout", {method: "POST"});
-        localStorage.removeItem(process.env.STORAGE_COOKIE_AUTH!);
-        sessionStorage.removeItem(ssTokenName);
+        localStorage.removeItem(STORAGE_LOCAL_CART!);
+        sessionStorage.removeItem(STORAGE_SESSION_TOKEN);
         setSessionToken(undefined);
         setUser(null);
         router.push("/login");
     };
 
     const loadSession = async () => {
-        setLoading(true);
         // récupérer le token en mémoire de navigation si présent
-        const storedToken = typeof window !== "undefined" ? sessionStorage.getItem(ssTokenName) || undefined : undefined;
+        const storedToken = typeof window !== "undefined" ? sessionStorage.getItem(STORAGE_SESSION_TOKEN) || undefined : undefined;
         try {
             const headers: Record<string, string> = {};
-            if (!document.cookie.includes(process.env.STORAGE_COOKIE_AUTH!) && storedToken) {
+            if (!document.cookie.includes(STORAGE_COOKIE_AUTH) && storedToken) {
                 // pas de cookie persistent : on tente le token en mémoire
                 headers["Authorization"] = `Bearer ${storedToken}`;
             }

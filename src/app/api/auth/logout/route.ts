@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
 
-const STORAGE_COOKIE_AUTH = process.env.STORAGE_COOKIE_AUTH!;
+const STORAGE_COOKIE_AUTH = process.env.NEXT_PUBLIC_STORAGE_COOKIE_AUTH!;
 
 export async function POST() {
     const res = NextResponse.json({success: true});

@@ -4,7 +4,7 @@ import {Account} from "@traintran/database/models/account";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
-const STORAGE_COOKIE_AUTH = process.env.STORAGE_COOKIE_AUTH as string;
+const STORAGE_COOKIE_AUTH = process.env.NEXT_PUBLIC_STORAGE_COOKIE_AUTH as string;
 
 export async function POST(req: Request) {
     await dbConnect();
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         return NextResponse.json({error: "Identifiants invalides"}, {status: 401});
     }
     await Account.updateOne({email}, {$set: {lastLogin: new Date()}});
-    const token = jwt.sign({sub: user._id, email: user.email}, JWT_SECRET, {expiresIn: "30m"});
+    const token = jwt.sign({sub: user._id, email: user.email}, JWT_SECRET, {expiresIn: "7d"});
     const res = NextResponse.json({success: true, token});
     if (remember) {
         const cookieOpts = {
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             path: "/",
-            maxAge: 60 * 60 * 24 * 30,
+            maxAge: 60 * 60 * 24 * 7,
         };
         res.cookies.set(cookieOpts);
     }
