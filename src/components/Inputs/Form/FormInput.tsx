@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import PhoneInput from 'react-phone-number-input'
+import PhoneInput from "react-phone-number-input";
 
 interface FormInputProps {
     label: string;
@@ -30,7 +30,7 @@ export const FormInput: React.FC<FormInputProps> = ({label, name, placeholder, t
                             name={name}
                             value={value}
                             limitMaxLength={true}
-                            onChange={(val) => onChange?.(val || "")}
+                            onChange={val => onChange?.(val || "")}
                             className={`w-full px-3 py-2.5 bg-transparent rounded-lg focus:outline-none ${className}`}
                         />
                     ) : (

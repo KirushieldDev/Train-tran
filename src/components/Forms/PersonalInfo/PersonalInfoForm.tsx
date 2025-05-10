@@ -132,11 +132,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
                 </div>
 
                 {/* Affichage de l’erreur si besoin */}
-                {errorMsg && (
-                    <p className="mt-4 text-sm text-red-600">
-                        {errorMsg}
-                    </p>
-                )}
+                {errorMsg && <p className="mt-4 text-sm text-red-600">{errorMsg}</p>}
 
                 <div className="mt-3.5">
                     <FormButton type="submit">S'inscrire</FormButton>
