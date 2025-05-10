@@ -6,7 +6,7 @@ import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary
 import Footer from "@traintran/components/Footer/Footer";
 import Button from "@traintran/components/common/Button";
 import {useCart} from "@traintran/context/CartContext";
-import React, {FormEvent} from "react";
+import React, {ChangeEvent, FormEvent, useState} from "react";
 import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
 import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
 
@@ -14,6 +14,23 @@ export default function Home() {
     useRequireAuth();
     const {purchaseCart} = useCart();
     const {selectedOptions} = useOptionsSync();
+    const [cardNumber, setCardNumber] = useState("");
+    const [expiry, setExpiry] = useState("");
+
+    const formatCard = (value: string) => {
+        const digits = value.replace(/\D/g, "").slice(0, 16);
+        return digits.replace(/(.{4})/g, "$1 ").trim();
+    };
+
+    const handleCardChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setCardNumber(formatCard(e.target.value));
+    };
+
+    const handleExpiryChange = (e: ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value.replace(/\D/g, "").slice(0, 4);
+        if (val.length > 2) val = val.slice(0, 2) + "/" + val.slice(2);
+        setExpiry(val);
+    };
 
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
@@ -40,8 +57,9 @@ export default function Home() {
                                         type="text"
                                         id="cardNumber"
                                         placeholder="1234 5678 9012 3456"
+                                        value={cardNumber}
+                                        onChange={handleCardChange}
                                         maxLength={19}
-                                        pattern="[0-9\s]{13,19}"
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-gray-700"
                                     />
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -58,9 +76,10 @@ export default function Home() {
                                     <input
                                         type="text"
                                         id="expiryDate"
-                                        placeholder="MM/AA"
+                                        placeholder="mm/aa"
+                                        value={expiry}
+                                        onChange={handleExpiryChange}
                                         maxLength={5}
-                                        pattern="(0[1-9]|1[0-2])\/[0-9]{2}"
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-gray-700"
                                     />
                                 </div>

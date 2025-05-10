@@ -1,3 +1,5 @@
+"use client";
+
 import Header from "@traintran/components/Header/Header";
 import {IconCalendarWeekFilled, IconCheck, IconDownload, IconHelp, IconMail, IconPrinter} from "@tabler/icons-react";
 import Button from "@traintran/components/common/Button";

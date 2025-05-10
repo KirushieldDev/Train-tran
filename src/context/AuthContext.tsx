@@ -26,6 +26,7 @@ interface AuthContextType {
     login: (email: string, passwordHash: string, remember: boolean) => Promise<void>;
     logout: () => void;
     register: (data: {firstName: string; lastName: string; gender: UserGender; mobile: string; email: string; password: string}) => Promise<void>;
+    protectedFetch: (path: string, init?: Omit<RequestInit, "headers"> & {headers?: Record<string, string>}) => Promise<Response>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,6 +35,24 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const router = useRouter();
     const [user, setUser] = useState<UserInfo | null>(null);
     const [loading, setLoading] = useState(true);
+
+    /**
+     * Fetch wrapper qui injecte automatiquement
+     * - le header Authorization (Bearer token) si pas de cookie HttpOnly
+     * - le Content-Type JSON
+     */
+    const protectedFetch = async (path: string, init: Omit<RequestInit, "headers"> & {headers?: Record<string, string>} = {}): Promise<Response> => {
+        const headers: Record<string, string> = {
+            "Content-Type": "application/json",
+            ...(init.headers || {}),
+        };
+        // si pas de cookie httpOnly, on ajoute le token en sessionStorage
+        if (typeof window !== "undefined" && !document.cookie.includes(STORAGE_COOKIE_AUTH)) {
+            const tok = sessionStorage.getItem(STORAGE_SESSION_TOKEN);
+            if (tok) headers["Authorization"] = `Bearer ${tok}`;
+        }
+        return fetch(path, {...init, headers});
+    };
 
     // Helper : appelle l'API pour obtenir le salt hexadécimal
     const getLoginSalt = async (email: string): Promise<string> => {
@@ -120,7 +139,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
         localStorage.removeItem(STORAGE_LOCAL_CART!);
         sessionStorage.removeItem(STORAGE_SESSION_TOKEN);
         setUser(null);
-    }
+    };
 
     // Méthode de logout : supprime cookie et contexte
     const logout = async () => {
@@ -130,16 +149,9 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     };
 
     const loadSession = async () => {
-        // récupérer le token en mémoire de navigation si présent
-        const storedToken = typeof window !== "undefined" ? sessionStorage.getItem(STORAGE_SESSION_TOKEN) || undefined : undefined;
         try {
-            const headers: Record<string, string> = {};
-            if (!document.cookie.includes(STORAGE_COOKIE_AUTH) && storedToken) {
-                // pas de cookie persistent : on tente le token en mémoire
-                headers["Authorization"] = `Bearer ${storedToken}`;
-            }
-            const res = await fetch("/api/auth/session", {headers});
-            const data = await res.json() as {ok: boolean, user: UserInfo | null};
+            const res = await protectedFetch("/api/auth/session", {method: "GET"});
+            const data = (await res.json()) as {ok: boolean; user: UserInfo | null};
             if (!data.ok) {
                 cleanClientData();
                 return;
@@ -165,6 +177,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 login,
                 logout,
                 register,
+                protectedFetch,
             }}>
             {children}
         </AuthContext.Provider>

@@ -25,9 +25,10 @@
         "pdf-lib": "^1.17.1",
         "qrcode": "^1.5.4",
         "react": "^19.0.0",
+        "react-datepicker": "^8.3.0",
         "react-dom": "^19.0.0",
-        "react-qr-code": "^2.0.15",
-        "react-datepicker": "^8.3.0"
+        "react-phone-number-input": "^3.4.12",
+        "react-qr-code": "^2.0.15"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",

@@ -32,6 +32,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
         password: "",
         confirmPassword: "",
     });
+    const [errorMsg, setErrorMsg] = useState<string>("");
 
     const handleChange = (field: keyof FormData, value: string) => {
         setData(prev => ({...prev, [field]: value}));
@@ -39,18 +40,26 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (data.password !== data.confirmPassword) {
-            alert("Les mots de passe ne correspondent pas");
+        if (data.password.length < 8) {
+            setErrorMsg("Le mot de passe doit faire au moins 8 caractères.");
             return;
         }
-        await register({
-            firstName: data.firstName,
-            lastName: data.lastName,
-            gender: data.gender,
-            mobile: data.mobile,
-            email: data.email,
-            password: data.password,
-        });
+        if (data.password !== data.confirmPassword) {
+            setErrorMsg("Les mots de passe ne correspondent pas.");
+            return;
+        }
+        try {
+            await register({
+                firstName: data.firstName,
+                lastName: data.lastName,
+                gender: data.gender,
+                mobile: data.mobile,
+                email: data.email,
+                password: data.password,
+            });
+        } catch (err: unknown) {
+            setErrorMsg(err instanceof Error ? err.message : "Erreur lors de l'inscription.");
+        }
     };
 
     return (
@@ -121,6 +130,9 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
                         required
                     />
                 </div>
+
+                {/* Affichage de l’erreur si besoin */}
+                {errorMsg && <p className="mt-4 text-sm text-red-600">{errorMsg}</p>}
 
                 <div className="mt-3.5">
                     <FormButton type="submit">S'inscrire</FormButton>
