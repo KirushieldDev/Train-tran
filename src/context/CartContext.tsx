@@ -7,7 +7,6 @@ import {TrainTicketPDFProps} from "@traintran/components/Mail/TrainTicketPDF";
 import {useRouter} from "next/navigation";
 
 const STORAGE_LOCAL_CART = process.env.NEXT_PUBLIC_STORAGE_LOCAL_CART!;
-const STORAGE_SESSION_TOKEN = process.env.NEXT_PUBLIC_STORAGE_SESSION_TOKEN!;
 
 /** Segment d’un trajet */
 export interface JourneySegment {
@@ -54,7 +53,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
-    const {user} = useAuth();
+    const {user, protectedFetch} = useAuth();
     const router = useRouter();
     const [cartTicket, setCartTicketRaw] = useState<Ticket | null>(null);
     const [loadingCart, setLoadingCart] = useState(true);
@@ -197,16 +196,8 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const purchaseCart = async (): Promise<void> => {
         if (!user || !cartTicket) throw new Error("Pas de ticket en cours");
         const pages = getAllPages();
-        // récupère le token de session (pour remember=false) ou laisser le cookie faire son boulot
-        const token = sessionStorage.getItem(STORAGE_SESSION_TOKEN);
-        const headers: Record<string, string> = {"Content-Type": "application/json"};
-        if (token) {
-            headers["Authorization"] = `Bearer ${token}`;
-        }
-        // sinon le cookie httpOnly sera renvoyé automatiquement
-        const res = await fetch("/api/cart/send-tickets", {
+        const res = await protectedFetch("/api/cart/send-tickets", {
             method: "POST",
-            headers: headers,
             body: JSON.stringify({tickets: pages}),
         });
         if (!res.ok) {

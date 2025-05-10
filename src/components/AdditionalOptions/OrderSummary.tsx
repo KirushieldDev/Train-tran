@@ -56,9 +56,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({selectedOptions, show
             </div>
 
             {showButton && (
-                <button
-                    onClick={() => router.push("/panier")}
-                    className="w-full mt-8 button-base button-variant-primary button-size-lg">
+                <button onClick={() => router.push("/panier")} className="w-full mt-8 button-base button-variant-primary button-size-lg">
                     Continuer
                 </button>
             )}
