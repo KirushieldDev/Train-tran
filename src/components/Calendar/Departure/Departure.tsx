@@ -1,62 +1,56 @@
-"use client";
-
 import React from "react";
-import {useRouter} from "next/navigation";
-import {TripSection} from "@traintran/components/Calendar/Departure/TripSection";
-import {ActionButtons} from "@traintran/components/Calendar/Departure/ActionButtons";
+import {useRouter, useSearchParams} from "next/navigation";
+import TripSection from "@traintran/components/Calendar/Departure/TripSection";
+import {calculatePriceWithDayAdjustment} from "@traintran/utils/travel";
 
-const Departure: React.FC = () => {
+export default function Departure({distanceKm}: {distanceKm: number}) {
+    const searchParams = useSearchParams();
     const router = useRouter();
 
-    const departureTrips = [
-        {
-            departureTime: "08:00",
-            arrivalTime: "11:30",
-            price: "€89",
-            duration: "2h 30m",
-        },
-        {
-            departureTime: "10:30",
-            arrivalTime: "14:00",
-            price: "€91",
-            duration: "2h 30m",
-        },
-    ];
+    const departure = searchParams.get("departure") ?? "";
+    const arrival = searchParams.get("arrival") ?? "";
+    const departDate = searchParams.get("departure_date");
+    const returnDate = searchParams.get("return_date");
 
-    const returnTrips = [
-        {
-            departureTime: "15:00",
-            arrivalTime: "18:30",
-            price: "€82",
-            duration: "2h 30m",
-        },
-        {
-            departureTime: "17:30",
-            arrivalTime: "21:00",
-            price: "€69",
-            duration: "2h 30m",
-        },
-    ];
-
-    const handleCancel = () => {
-        // Handle cancel action
-        router.push("/");
+    // On récupere le jour de la semaine à partir de la date
+    const getDayOfWeek = (dateStr: string) => {
+        const date = new Date(dateStr);
+        // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
+        return date.toLocaleDateString("en-US", {weekday: "long"});
     };
 
-    const handleContinue = () => {
-        // Handle continue booking action
-        router.push("/options");
-    };
+    // Calcul du jour pour chaque trajet
+    const departDay = departDate ? getDayOfWeek(departDate) : getDayOfWeek(new Date().toISOString());
+    const returnDay = returnDate ? getDayOfWeek(returnDate) : departDay;
+
+    const baseTrips = [
+        {departureTime: "08:00", arrivalTime: "11:30", duration: "2h 30m"},
+        {departureTime: "10:30", arrivalTime: "14:00", duration: "2h 30m"},
+    ];
+
+    // On ajoute le prix à chaque trajet en fonction de la distance et du jour
+    const departureTrips = baseTrips.map(trip => {
+        const price = calculatePriceWithDayAdjustment(distanceKm, departDay);
+        return {...trip, price: `€${price}`};
+    });
+
+    const returnTrips = baseTrips.map(trip => {
+        const price = calculatePriceWithDayAdjustment(distanceKm, returnDay);
+        return {...trip, price: `€${price}`};
+    });
 
     return (
-        <main>
-            <TripSection title="Aller" route="Paris → Marseille" trips={departureTrips} />
-            <div className="mt-8">
-                <TripSection title="Retour" route="Marseille → Paris" trips={returnTrips} />
+        <div>
+            <TripSection title="Aller" station1={departure} station2={arrival} trips={departureTrips} />
+            {returnDate && <TripSection title="Retour" station1={arrival} station2={departure} trips={returnTrips} />}
+            <div className="flex flex-wrap gap-2.5 justify-center mt-8 mb-10 w-full text-base text-center max-md:max-w-full">
+                <button onClick={() => router.push("/")} className="button-base button-variant-outline button-size-lg">
+                    Annuler
+                </button>
+                <button onClick={() => router.push("/options")} className="button-base button-variant-secondary button-size-lg">
+                    Continuer la commande
+                </button>
             </div>
-            <ActionButtons onCancel={handleCancel} onContinue={handleContinue} />
-        </main>
+        </div>
     );
-};
-
-export default Departure;
+}

@@ -26,7 +26,7 @@ export async function GET(req: Request) {
                 .lean(),
         ]);
         // Si une des gares n'est pas trouvée, on renvoie une erreur 404
-        if (!gareFrom || !gareTo) {
+        if (!gareFrom || !gareTo || !gareFrom.coord || !gareTo.coord) {
             return NextResponse.json({message: "Au moins une des gares est introuvable"}, {status: 404});
         }
         // On récupère les coordonnées des gares
@@ -37,7 +37,7 @@ export async function GET(req: Request) {
         // On renvoie les coordonnées des gares en JSON
         return NextResponse.json(result);
     } catch (error) {
-        console.error("Erreur /api/stations", error);
+        console.error("Erreur /api/journey/stations-coords", error);
         return NextResponse.json({message: "Erreur serveur"}, {status: 500});
     }
 }

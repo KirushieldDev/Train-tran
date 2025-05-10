@@ -1,11 +1,10 @@
-"use client";
-
 import React, {useState} from "react";
 import DatePicker from "react-datepicker";
 import {fr} from "date-fns/locale";
 import {format} from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
 import "@traintran/style/calendar.css";
+import {calculatePriceWithDayAdjustment} from "@traintran/utils/travel";
 
 export interface Journey {
     id: string;
@@ -22,9 +21,10 @@ export interface DateWithJourneys {
 interface CalendarProps {
     onChange?: (date: Date | null, journeys?: Journey[]) => void;
     availableDates?: DateWithJourneys[];
+    distanceKm: number;
 }
 
-const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = []}) => {
+const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], distanceKm}) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
     const handleDateChange = (date: Date | null) => {
@@ -35,21 +35,18 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = []}) => {
         }
     };
 
-    // Function to get the journeys for a date
+    // On récupere le jour de la semaine à partir de la date
+    const getDayOfWeek = (date: Date): string => {
+        // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
+        return date.toLocaleDateString("en-US", {weekday: "long"});
+    };
+
+    //On récupère les trajets pour la date
     const getJourneysForDate = (date: Date | null): Journey[] => {
         if (!date) return [];
-
         const dateStr = format(date, "yyyy-MM-dd");
         const dateData = availableDates.find(item => format(item.date, "yyyy-MM-dd") === dateStr);
         return dateData?.journeys || [];
-    };
-
-    // Function to get the minimum price for a date
-    const getMinPrice = (date: Date): number | null => {
-        const journeys = getJourneysForDate(date);
-        if (journeys.length === 0) return null;
-
-        return Math.min(...journeys.map(journey => journey.price));
     };
 
     return (
@@ -63,15 +60,14 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = []}) => {
             monthClassName={() => "calendar-month"}
             renderDayContents={(day, date) => {
                 if (!date) return day;
-
-                const minPrice = getMinPrice(date);
-                const hasJourneys = minPrice !== null;
-
+                // ON calcule le prix en fonction de la distance et du jour
+                const dayOfWeek = getDayOfWeek(date);
+                const price = calculatePriceWithDayAdjustment(distanceKm, dayOfWeek);
                 return (
                     <div className="day-cell">
                         <div className="day-content">
                             <span className="day-number">{day}</span>
-                            {hasJourneys && <span className="day-price">{minPrice}€</span>}
+                            <span className="day-price">{price}€</span>
                         </div>
                     </div>
                 );
