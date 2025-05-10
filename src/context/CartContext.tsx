@@ -37,6 +37,10 @@ interface CartContextType {
     setCartTicket: (ticket: Ticket) => void;
     clearCart: () => void;
     loadingCart: boolean;
+    // passagers
+    addPassenger: (p: Passenger) => void;
+    updatePassenger: (index: number, p: Passenger) => void;
+    removePassenger: (index: number) => void;
     // options
     addOption: (optionId: OptionID) => void;
     removeOption: (optionId: OptionID) => void;
@@ -114,6 +118,34 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
     const clearCart = () => setCartTicketRaw(null);
 
+    const addPassenger = (p: Passenger) => {
+        if (!cartTicket) return;
+        setCartTicket({
+            ...cartTicket,
+            passengers: [...cartTicket.passengers, p],
+        });
+    };
+
+    const updatePassenger = (index: number, p: Passenger) => {
+        if (!cartTicket || index < 0) return;
+        const newPassengers = [...cartTicket.passengers];
+        if (index > newPassengers.length) addPassenger(p);
+        else newPassengers[index] = p;
+        setCartTicket({
+            ...cartTicket,
+            passengers: newPassengers,
+        });
+    };
+
+    const removePassenger = (index: number) => {
+        if (!cartTicket) return;
+        const newPassengers = cartTicket.passengers.filter((_, i) => i !== index);
+        setCartTicket({
+            ...cartTicket,
+            passengers: newPassengers,
+        });
+    };
+
     const addOption = (optionId: OptionID) => {
         if (!cartTicket) return;
         if (!cartTicket.options.includes(optionId)) {
@@ -187,6 +219,9 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 setCartTicket,
                 clearCart,
                 loadingCart,
+                addPassenger,
+                updatePassenger,
+                removePassenger,
                 addOption,
                 removeOption,
                 toggleOption,
