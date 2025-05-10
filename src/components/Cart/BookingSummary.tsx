@@ -17,10 +17,10 @@ export default function BookingSummary() {
         const params = new URLSearchParams({
             departure: cartTicket.outbound.departureStation,
             arrival: cartTicket.outbound.arrivalStation,
-            departure_date: (cartTicket.outbound.departureTime).split('T')[0],
+            departure_date: cartTicket.outbound.departureTime.split("T")[0],
         });
         if (cartTicket.inbound) {
-            params.set("return_date", (cartTicket.inbound.arrivalTime).split('T')[0]);
+            params.set("return_date", cartTicket.inbound.arrivalTime.split("T")[0]);
         }
         router.push(`/calendrier?${params.toString()}`);
     };
