@@ -45,6 +45,7 @@ interface CartContextType {
     getTotalPrice: () => number;
     // paiement
     purchaseCart: () => Promise<void>;
+    downloadPdf: (segment: "outbound" | "return") => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -157,6 +158,28 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
         router.push("/confirmation");
     };
 
+    const downloadPdf = async (segment: "outbound" | "return"): Promise<void> => {
+        if (!cartTicket) throw new Error("Aucun ticket en cours");
+        const segLabel = segment === "outbound" ? "aller" : "retour";
+        const filename = `${cartTicket.outbound.departureStation}-${cartTicket.outbound.arrivalStation}-${segLabel}.pdf`;
+
+        const res = await protectedFetch("/api/cart/ticket", {
+            method: "POST",
+            body: JSON.stringify({ticket: cartTicket, segment}),
+        });
+        if (!res.ok) throw new Error("Impossible de charger le PDF");
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <CartContext.Provider
             value={{
@@ -169,6 +192,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 toggleOption,
                 getTotalPrice,
                 purchaseCart,
+                downloadPdf,
             }}>
             {children}
         </CartContext.Provider>

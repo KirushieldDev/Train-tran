@@ -18,6 +18,7 @@ interface LoginData {
 export default function FormLoginAdherent(props: LoginAdherentFormProps) {
     const [loginData, setLogin] = useState<LoginData>({email: "", password: ""});
     const [rememberMe, setRememberMe] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string>("");
     const {login} = useAuth();
 
     const handleChange = (field: keyof LoginData, val: string) => {
@@ -26,7 +27,15 @@ export default function FormLoginAdherent(props: LoginAdherentFormProps) {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        await login(loginData.email, loginData.password, rememberMe);
+        if (loginData.password.length < 8) {
+            setErrorMsg("Le mot de passe doit faire au moins 8 carctères.");
+            return;
+        }
+        try {
+            await login(loginData.email, loginData.password, rememberMe);
+        } catch (err: unknown) {
+            setErrorMsg(err instanceof Error ? err.message : "Erreur de connexion.");
+        }
     };
 
     return (
@@ -78,6 +87,9 @@ export default function FormLoginAdherent(props: LoginAdherentFormProps) {
                         Mot de passe oublié ?
                     </button>
                 </div>
+
+                {/* Affichage de l’erreur si besoin */}
+                {errorMsg && <p className="mt-4 text-sm text-red-600">{errorMsg}</p>}
 
                 <div className="mt-3.5">
                     <FormButton type="submit">Se connecter</FormButton>
