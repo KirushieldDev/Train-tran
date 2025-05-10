@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import DatePicker from "react-datepicker";
 import {fr} from "date-fns/locale";
 import {format} from "date-fns";
@@ -22,10 +22,18 @@ interface CalendarProps {
     onChange?: (date: Date | null, journeys?: Journey[]) => void;
     availableDates?: DateWithJourneys[];
     distanceKm: number;
+    selectedDate?: Date | null;
 }
 
-const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], distanceKm}) => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], distanceKm, selectedDate: propSelectedDate}) => {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(propSelectedDate || new Date());
+
+    // Mettre à jour l'état local si propSelectedDate change
+    useEffect(() => {
+        if (propSelectedDate) {
+            setSelectedDate(propSelectedDate);
+        }
+    }, [propSelectedDate]);
 
     const handleDateChange = (date: Date | null) => {
         setSelectedDate(date);

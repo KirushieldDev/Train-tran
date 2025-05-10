@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useMemo, useEffect, useState} from "react";
-import {useSearchParams} from "next/navigation";
+import {useSearchParams, useRouter} from "next/navigation";
 import Header from "@traintran/components/Header/Header";
 import TrainJourneyDisplay from "@traintran/components/Calendar/Destination/TrainJourneyDisplay";
 import Calendar, {Journey} from "@traintran/components/Calendar/Calendar";
@@ -11,6 +11,14 @@ import journeyData from "@traintran/components/Calendar/journeys.json";
 import {calculateDistance} from "@traintran/utils/travel";
 
 export default function CalendarPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const departure = searchParams.get("departure") ?? "";
+    const arrival = searchParams.get("arrival") ?? "";
+    const departDateParam = searchParams.get("departure_date");
+    const returnDateParam = searchParams.get("return_date");
+
     const availableDates = useMemo(() => {
         return journeyData.journeys.map(item => ({
             date: new Date(item.date),
@@ -19,14 +27,21 @@ export default function CalendarPage() {
     }, []);
 
     const handleDateChange = (date: Date | null, journeys?: Journey[]) => {
+        if (!date) return;
         console.log("Date sélectionnée:", date);
         console.log("Trajets disponibles:", journeys);
+
+        // On formatte la date
+        const isoDate = date.toISOString().split("T")[0];
+        // On récupère les paramètres de la requête
+        const params = new URLSearchParams(Array.from(searchParams.entries()));
+        params.set("departure_date", isoDate);
+        // Mettre à jour departure_date
+        if (returnDateParam) params.set("return_date", returnDateParam);
+
+        // On actualise l'URL
+        router.push(`?${params.toString()}`);
     };
-
-    const searchParams = useSearchParams();
-    const departure = searchParams.get("departure") ?? "";
-    const arrival = searchParams.get("arrival") ?? "";
-
     const [coords, setCoords] = useState<{
         from: {lat: number; lon: number};
         to: {lat: number; lon: number};
@@ -53,9 +68,8 @@ export default function CalendarPage() {
             }
         }
         // si on a les gares de départ et d'arrivée, on appelle l'API
-        if (departure && arrival) {
-            fetchStations();
-        } else {
+        if (departure && arrival) fetchStations();
+        else {
             setError("Paramètres de gare manquants");
             setLoading(false);
         }
@@ -74,7 +88,12 @@ export default function CalendarPage() {
             <div className="px-4 md:px-40 lg:px-40">
                 <TrainJourneyDisplay />
                 <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-                    <Calendar onChange={handleDateChange} availableDates={availableDates} distanceKm={distanceKm} />
+                    <Calendar
+                        onChange={handleDateChange}
+                        availableDates={availableDates}
+                        distanceKm={distanceKm}
+                        selectedDate={departDateParam ? new Date(departDateParam) : null}
+                    />
                 </div>
                 <Departure distanceKm={distanceKm} />
             </div>
