@@ -52,10 +52,7 @@ function buildPropsForPassenger(user: UserInfo, ticket: Ticket, passenger: Passe
     const seatNumber = (Math.floor(Math.random() * 100) + 1).toString();
 
     return {
-        ordererFirstName: user.firstName,
-        ordererLastName: user.lastName,
-        passengerFirstName: passenger.firstName,
-        passengerLastName: passenger.lastName,
+        passenger: passenger,
         journeySegment: ticket.outbound,
         carNumber,
         seatNumber,
