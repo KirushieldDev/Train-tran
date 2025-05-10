@@ -1,19 +1,24 @@
 "use client";
 
 import Header from "@traintran/components/Header/Header";
-import {IconCalendarWeekFilled, IconCheck, IconDownload, IconHelp, IconMail, IconPrinter} from "@tabler/icons-react";
+import {IconCalendarWeekFilled, IconCheck, IconDownload, IconHelp, IconMail} from "@tabler/icons-react";
 import Button from "@traintran/components/common/Button";
 import Footer from "@traintran/components/Footer/Footer";
 import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
+import {useAuth} from "@traintran/context/AuthContext";
+import {useCart} from "@traintran/context/CartContext";
 
 export default function Home() {
     useRequireAuth();
+    const {user} = useAuth();
+    const {cartTicket, downloadPdf} = useCart();
+
     const reservationDetails = {
         outboundRef: "RF789456",
         returnRef: "RF789457",
-        passengerName: "Tran Louis",
-        email: "louis.tran@gmail.com",
     };
+
+    if (!user || !cartTicket) return null;
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
@@ -54,20 +59,46 @@ export default function Home() {
                                     <p className="text-sm text-textSecondary mb-1 mt-4">Email</p>
                                 </div>
                                 <div className="text-left">
-                                    <p className="font-medium text-textPrimary">{reservationDetails.passengerName}</p>
-                                    <p className="font-medium text-textPrimary mt-4">{reservationDetails.email}</p>
+                                    <p className="font-medium text-textPrimary">
+                                        {user?.lastName} {user?.firstName}
+                                    </p>
+                                    <p className="font-medium text-textPrimary mt-4">{user?.email}</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Action buttons */}
-                        <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
-                            <Button variant="primary" className="flex items-center justify-center" icon={<IconPrinter className="text-white" />}>
-                                Imprimer le ticket
-                            </Button>
-                            <Button variant="outline" className="flex items-center justify-center" icon={<IconDownload className="text-textSecondary" />}>
-                                Télécharger le PDF
-                            </Button>
+                        {/* Download tickets */}
+                        <div className="mb-8 w-full max-w-[600px]">
+                            <h2 className="text-xl font-semibold text-textPrimary mb-4 text-left">Billets téléchargeables</h2>
+                            <div className="flex flex-col md:flex-row justify-center items-start gap-8 bg-background p-4 rounded-lg">
+                                <div className="flex flex-col gap-2 items-center">
+                                    <p className="text-sm text-textSecondary">
+                                        {cartTicket.outbound.departureStation} → {cartTicket.outbound.arrivalStation}
+                                    </p>
+                                    <Button
+                                        variant="primary"
+                                        className="flex items-center"
+                                        icon={<IconDownload className="text-white" />}
+                                        onClick={() => downloadPdf("outbound")}>
+                                        Télécharger
+                                    </Button>
+                                </div>
+
+                                {cartTicket.return && (
+                                    <div className="flex flex-col gap-2 items-center">
+                                        <p className="text-sm text-textSecondary">
+                                            {cartTicket.return.departureStation} → {cartTicket.return.arrivalStation}
+                                        </p>
+                                        <Button
+                                            variant="primary"
+                                            className="flex items-center"
+                                            icon={<IconDownload className="text-white" />}
+                                            onClick={() => downloadPdf("return")}>
+                                            Télécharger
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Additional links */}
@@ -78,7 +109,7 @@ export default function Home() {
                             </button>
                             <button className="flex gap-1.5 items-center hover:underline">
                                 <IconMail className="text-primary" size="20" />
-                                Renvoyer la confirmation
+                                Renvoyer le mail
                             </button>
                             <button className="flex gap-1.5 items-center hover:underline">
                                 <IconHelp className="text-primary" size="20" />

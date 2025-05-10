@@ -61,7 +61,7 @@ function buildPropsForPassenger(user: UserInfo, ticket: Ticket, passenger: Passe
 }
 
 // Pour chaque ticket, une page par passager et par segment
-function getAllPages(user: UserInfo, ticket: Ticket): TrainTicketPDFProps[] {
+export function getAllPages(user: UserInfo, ticket: Ticket): TrainTicketPDFProps[] {
     if (!ticket) return [];
     return ticket.passengers.flatMap(
         p =>
@@ -69,6 +69,23 @@ function getAllPages(user: UserInfo, ticket: Ticket): TrainTicketPDFProps[] {
                 Boolean,
             ) as TrainTicketPDFProps[],
     );
+}
+
+// Fonction utilitaire pour générer un buffer PDF à partir d'un array de props
+export async function makePdfBuffer(propsArr: TrainTicketPDFProps[]): Promise<Buffer> {
+    const mergedPdf = await PDFDocument.create();
+    for (const props of propsArr) {
+        const stream = await renderToStream(<TrainTicketPDF {...props} />);
+        const chunks: Uint8Array[] = [];
+        for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+        const buf = Buffer.concat(chunks);
+
+        const donor = await PDFDocument.load(buf);
+        const [page] = await mergedPdf.copyPages(donor, [0]);
+        mergedPdf.addPage(page);
+    }
+    const finalBytes = await mergedPdf.save();
+    return Buffer.from(finalBytes);
 }
 
 async function sendTicketMail(user: UserInfo, tickets: Ticket) {
@@ -86,23 +103,6 @@ async function sendTicketMail(user: UserInfo, tickets: Ticket) {
     // Séparer les pages « aller » et « retour » par index pair/impair
     const outboundPages = ticketPages.filter((_, i) => i % 2 === 0);
     const returnPages = ticketPages.filter((_, i) => i % 2 === 1);
-
-    // Fonction utilitaire pour générer un buffer PDF à partir d'un array de props
-    const makePdfBuffer = async (propsArr: TrainTicketPDFProps[]): Promise<Buffer> => {
-        const mergedPdf = await PDFDocument.create();
-        for (const props of propsArr) {
-            const stream = await renderToStream(<TrainTicketPDF {...props} />);
-            const chunks: Uint8Array[] = [];
-            for await (const chunk of stream) chunks.push(Buffer.from(chunk));
-            const buf = Buffer.concat(chunks);
-
-            const donor = await PDFDocument.load(buf);
-            const [page] = await mergedPdf.copyPages(donor, [0]);
-            mergedPdf.addPage(page);
-        }
-        const finalBytes = await mergedPdf.save();
-        return Buffer.from(finalBytes);
-    };
 
     // Base du nom de fichier
     const journeySegment = outboundPages[0].journeySegment;
