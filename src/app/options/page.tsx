@@ -7,10 +7,9 @@ import OrderSummary from "@traintran/components/AdditionalOptions/OrderSummary";
 import Footer from "@traintran/components/Footer/Footer";
 import {useCart} from "@traintran/context/CartContext";
 import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
-import {useEffect} from "react";
 
 export default function Home() {
-    const {cartTicket, toggleOption, getTotalPrice} = useCart();
+    const {cartTicket, toggleOption} = useCart();
     const {selectedOptions, setSelectedOptions} = useOptionsSync();
 
     // Quand l'utilisateur change une option, on met à jour le contexte
@@ -18,12 +17,6 @@ export default function Home() {
         toggleOption(id);
         setSelectedOptions(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
     };
-
-    useEffect(() => {
-        if (cartTicket) {
-            console.log(cartTicket?.totalPrice, getTotalPrice(cartTicket));
-        }
-    }, [cartTicket]);
 
     if (!cartTicket) return null;
 
