@@ -39,7 +39,12 @@ export const FormInput: React.FC<FormInputProps> = ({
         setOpen(false);
     };
 
-    const inputProps = type === "date" ? (autocompleteToday ? {defaultValue: today} : {}) : {value, onChange, onFocus: () => setOpen(true), onBlur};
+    const inputProps = {
+        value,
+        onChange,
+        onFocus: () => setOpen(true),
+        onBlur,
+    };
 
     return (
         <div className="flex flex-col grow shrink min-w-60 w-[323px]">

@@ -120,7 +120,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
         localStorage.removeItem(STORAGE_LOCAL_CART!);
         sessionStorage.removeItem(STORAGE_SESSION_TOKEN);
         setUser(null);
-    }
+    };
 
     // Méthode de logout : supprime cookie et contexte
     const logout = async () => {
@@ -139,7 +139,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 headers["Authorization"] = `Bearer ${storedToken}`;
             }
             const res = await fetch("/api/auth/session", {headers});
-            const data = await res.json() as {ok: boolean, user: UserInfo | null};
+            const data = (await res.json()) as {ok: boolean; user: UserInfo | null};
             if (!data.ok) {
                 cleanClientData();
                 return;
