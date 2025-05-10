@@ -13,6 +13,9 @@
         "clean-install": "rimraf node_modules package-lock.json .next && npm install"
     },
     "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.0",
+        "@mui/material": "^7.1.0",
         "@react-pdf/renderer": "^4.3.0",
         "@tabler/icons-react": "^3.31.0",
         "@types/react-datepicker": "^6.2.0",
