@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import "react-phone-number-input/style.css";
 
 @tailwind base;
 @tailwind components;
@@ -6,6 +7,12 @@
 
 * {
     font-family: "Inter", sans-serif;
+}
+
+.PhoneInputInput:focus {
+    outline: none;
+    box-shadow: none;
+    border: none;
 }
 
 @layer base {

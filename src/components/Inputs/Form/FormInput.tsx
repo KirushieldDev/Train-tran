@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import PhoneInput from 'react-phone-number-input'
 
 interface FormInputProps {
     label: string;
@@ -21,16 +22,29 @@ export const FormInput: React.FC<FormInputProps> = ({label, name, placeholder, t
             <div className="mt-2">
                 <div className="flex items-center bg-white rounded-lg border border-gray-300 focus-within:ring-2 focus-within:ring-primary">
                     {icon && <div className="pl-2">{icon}</div>}
-                    <input
-                        name={name}
-                        type={type}
-                        placeholder={placeholder}
-                        className={`w-full px-3 py-2.5 bg-transparent rounded-lg focus:outline-none ${className}`}
-                        required={required}
-                        value={value}
-                        onChange={e => onChange?.(e.target.value)}
-                        aria-label={label}
-                    />
+                    {type === "tel" ? (
+                        <PhoneInput
+                            international
+                            defaultCountry="FR"
+                            countryCallingCodeEditable={false}
+                            name={name}
+                            value={value}
+                            limitMaxLength={true}
+                            onChange={(val) => onChange?.(val || "")}
+                            className={`w-full px-3 py-2.5 bg-transparent rounded-lg focus:outline-none ${className}`}
+                        />
+                    ) : (
+                        <input
+                            name={name}
+                            type={type}
+                            placeholder={placeholder}
+                            className={`w-full px-3 py-2.5 bg-transparent rounded-lg focus:outline-none ${className}`}
+                            required={required}
+                            value={value}
+                            onChange={e => onChange?.(e.target.value)}
+                            aria-label={label}
+                        />
+                    )}
                 </div>
             </div>
         </div>
