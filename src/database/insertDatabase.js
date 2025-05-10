@@ -4,7 +4,34 @@ import mongoose from "mongoose";
 import axios from "axios";
 import {Journey, Station} from "./models/models.js";
 
-async function fetchAndStoreStations(pageSize = 1000) {
+/*
+ * Ce script permet de récupérer les gares TGV depuis l'API SNCF
+ */
+async function fetchTGVStationIds() {
+    const authHeader = { Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64") };
+    const tgvIds = new Set();
+    let page = 0;
+
+    while (true) {
+        const url = `${process.env.SNCF_API_URL}/physical_modes/physical_mode:LongDistanceTrain/stop_areas?count=1000&start_page=${page}`;
+        const { data } = await axios.get(url, { headers: authHeader });
+        const sas = data.stop_areas || [];
+        if (!sas.length) break;
+
+        sas.forEach(sa => tgvIds.add(sa.id.split(':')[2])); // On ne garde que l'ID de numérique de la gare
+
+        if (sas.length < 1000) break;
+        page++;
+    }
+
+    console.log(`Identifiées ${tgvIds.size} gares grande vitesse.`);
+    return tgvIds;
+}
+
+/*
+ * Ce script permet de récupérer les détails des gares SNCF depuis l'API SNCF
+ */
+async function fetchAndStoreStations(pageSize = 1000, tgvIds) {
     let startPage = 0;
     const authHeader = {
         Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64"),
@@ -13,14 +40,18 @@ async function fetchAndStoreStations(pageSize = 1000) {
 
     while (true) {
         console.log(`Récupération gare, page ${startPage}...`);
-        const url = `${process.env.SNCF_API_URL}/stop_areas?count=${pageSize}&start_page=${startPage}`;
+        const url = `${process.env.SNCF_API_URL}/physical_modes/physical_mode%3ALongDistanceTrain/stop_areas?count=${pageSize}&start_page=${startPage}`;
         const res = await axios.get(url, {headers: authHeader});
         const stopAreas = res.data.stop_areas || [];
         if (stopAreas.length === 0) break;
 
         // Transformation des données
         const docs = stopAreas
-            .filter(sa => sa?.name)
+            .filter(sa => {
+                // on extrait l'ID numérique « 80153452 » depuis « stop_area:SNCF:80153452 »
+                const areaIdNum = sa.id.split(':')[2];
+                return tgvIds.has(areaIdNum) && sa.name;
+            })
             .map(sa => ({
                 updateOne: {
                     filter: {id_gare: sa.id},
@@ -34,6 +65,7 @@ async function fetchAndStoreStations(pageSize = 1000) {
                 },
             }));
 
+        // Si on a des données à insérer
         if (docs.length) {
             const result = await Station.bulkWrite(docs);
             const inserted = result.upsertedCount + result.modifiedCount;
@@ -41,6 +73,7 @@ async function fetchAndStoreStations(pageSize = 1000) {
             console.log(`Page ${startPage} insérée/modifiée: ${inserted} gares`);
         }
 
+        // Si on a dépassé la page voulue
         if (stopAreas.length < pageSize) break;
         startPage += 1;
     }
@@ -48,7 +81,10 @@ async function fetchAndStoreStations(pageSize = 1000) {
     console.log(`Terminé stations: ${totalInserted} gares traitées.`);
 }
 
-async function fetchAndStoreJourneys(pageSize = 1000) {
+/*
+ * Ce script permet de récupérer les trajets TGV depuis l'API SNCF
+ */
+async function fetchAndStoreJourneys(pageSize = 1000, tgvIds) {
     let startPage = 0;
     const authHeader = {
         Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64"),
@@ -75,6 +111,11 @@ async function fetchAndStoreJourneys(pageSize = 1000) {
                 }));
                 if (!stopTimes.length) return null;
 
+                // Filtrer les trajets qui ne passent pas par les gares TGV
+                const departureStopPoint = stopTimes[0].stop_point;
+                const departureIdNumber = departureStopPoint.split(':')[2];
+                if (!tgvIds.has(departureIdNumber)) return null;
+
                 const cal = vj.calendars?.[0]?.week_pattern || {};
                 return {
                     updateOne: {
@@ -100,6 +141,7 @@ async function fetchAndStoreJourneys(pageSize = 1000) {
             })
             .filter(Boolean);
 
+        // Si on a des données à insérer
         if (docs.length) {
             const result = await Journey.bulkWrite(docs);
             const inserted = result.upsertedCount + result.modifiedCount;
@@ -107,6 +149,7 @@ async function fetchAndStoreJourneys(pageSize = 1000) {
             console.log(`Page ${startPage} insérée/modifiée: ${inserted} trajets`);
         }
 
+        // Si on a dépassé la page voulue
         if (vjs.length < pageSize) break;
         startPage += 1;
     }
@@ -123,15 +166,18 @@ async function run() {
         await Station.deleteMany({});
         await Journey.deleteMany({});
 
+        // Récupération des gares TGV
+        const tgvIds = await fetchTGVStationIds();
+
         console.log("Démarrage import stations...");
         const startStations = Date.now();
-        await fetchAndStoreStations();
+        await fetchAndStoreStations(1000, tgvIds);
         const endStations = Date.now();
         console.log(`Durée import stations: ${(endStations - startStations) / 1000} secondes.`);
 
         console.log("Démarrage import trajets...");
         const startJourneys = Date.now();
-        await fetchAndStoreJourneys();
+        await fetchAndStoreJourneys(1000, tgvIds);
         const endJourneys = Date.now();
         console.log(`Durée import trajets: ${(endJourneys - startJourneys) / 1000} secondes.`);
     } catch (err) {
