@@ -12,7 +12,11 @@ export const OptionCard: React.FC<OptionCardProps> = ({option, isSelected, onTog
                             <span className="font-medium text-textPrimary">{option.name}</span>
                             {option.Icon}
                         </div>
-                        <span className="text-right text-primary">{option.price === 0 ? "Gratuit" : `+${option.price}€`}</span>
+                        {option.price === 0 ? (
+                            <span className="text-right text-primary">Gratuit</span>
+                        ) : (
+                            <span className="text-right text-textSecondary">{option.price}€</span>
+                        )}
                     </div>
                     <p className="text-textSecondary text-sm mt-1">{option.description}</p>
                 </div>

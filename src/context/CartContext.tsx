@@ -25,10 +25,11 @@ export interface Passenger {
 /** Un ticket complet (aller + éventuel retour) */
 export interface Ticket {
     outbound: JourneySegment;
-    return?: JourneySegment;
+    inbound?: JourneySegment;
     passengers: Passenger[];
     options: OptionID[];
     basePrice: number;
+    totalPrice: number;
 }
 
 interface CartContextType {
@@ -41,11 +42,12 @@ interface CartContextType {
     addOption: (optionId: OptionID) => void;
     removeOption: (optionId: OptionID) => void;
     toggleOption: (optionId: OptionID) => void;
-    // Calcul du prix total
-    getTotalPrice: () => number;
+    // Calcul du prix d'un ticket
+    getOptionsPrice: (ticket: Ticket) => number;
+    getTotalPrice: (ticket: Ticket) => number;
     // paiement
     purchaseCart: () => Promise<void>;
-    downloadPdf: (segment: "outbound" | "return") => Promise<void>;
+    downloadPdf: (segment: "outbound" | "inbound") => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -71,15 +73,15 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
         const testTicket: Ticket = {
             outbound: {
-                departureStation: "Paris",
-                arrivalStation: "Lyon",
+                departureStation: "Paris Est",
+                arrivalStation: "Strasbourg",
                 departureTime: new Date().toISOString(),
                 arrivalTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // +2h
             },
             // optional return segment
-            return: {
-                departureStation: "Lyon",
-                arrivalStation: "Paris",
+            inbound: {
+                departureStation: "Strasbourg",
+                arrivalStation: "Paris Est",
                 departureTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // next day
                 arrivalTime: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(), // +2h after return depart
             },
@@ -89,6 +91,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
             ],
             options: [OptionID.Quiet, OptionID.Insurance, OptionID.Baggage],
             basePrice: 120,
+            totalPrice: 0,
         };
         setCartTicket(testTicket);
 
@@ -109,7 +112,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const setCartTicket = (ticket: Ticket) => {
         // supprimer les doublons dans options[]
         const uniqueOpts = Array.from(new Set(ticket.options));
-        setCartTicketRaw({...ticket, options: uniqueOpts});
+        setCartTicketRaw({...ticket, options: uniqueOpts, totalPrice: getTotalPrice(ticket)});
     };
 
     const clearCart = () => setCartTicketRaw(null);
@@ -117,30 +120,37 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const addOption = (optionId: OptionID) => {
         if (!cartTicket) return;
         if (!cartTicket.options.includes(optionId)) {
-            setCartTicketRaw({...cartTicket, options: [...cartTicket.options, optionId]});
+            setCartTicket({...cartTicket, options: [...cartTicket.options, optionId]});
         }
     };
 
     const removeOption = (optionId: OptionID) => {
         if (!cartTicket) return;
-        setCartTicketRaw({...cartTicket, options: cartTicket.options.filter(o => o !== optionId)});
+        setCartTicket({...cartTicket, options: cartTicket.options.filter(o => o !== optionId)});
     };
 
     const toggleOption = (optionId: OptionID) => {
         if (!cartTicket) return;
         const has = cartTicket.options.includes(optionId);
-        setCartTicketRaw({...cartTicket, options: has ? cartTicket.options.filter(o => o !== optionId) : [...cartTicket.options, optionId]});
+        setCartTicket({...cartTicket, options: has ? cartTicket.options.filter(o => o !== optionId) : [...cartTicket.options, optionId]});
+    };
+
+    const getOptionsPrice = (ticket: Ticket) => {
+        let total: number = 0;
+        const trips = ticket.inbound ? 2 : 1;
+        ticket.options.forEach(optId => {
+            const opt = getOptionById(optId);
+            if (opt) total += opt.price * ticket.passengers.length * trips;
+        });
+        return total;
     };
 
     // Calcule le prix total
-    const getTotalPrice = (): number => {
-        if (!cartTicket) return 0;
-        const trips = cartTicket.return ? 2 : 1;
-        let total = cartTicket.basePrice * trips;
-        cartTicket.options.forEach(optId => {
-            const opt = getOptionById(optId);
-            if (opt) total += opt.price * cartTicket.passengers.length * trips;
-        });
+    const getTotalPrice = (ticket: Ticket): number => {
+        if (!ticket) return 0;
+        const trips = ticket.inbound ? 2 : 1;
+        let total = ticket.basePrice * ticket.passengers.length * trips;
+        total += getOptionsPrice(ticket);
         return total;
     };
 
@@ -158,7 +168,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
         router.push("/confirmation");
     };
 
-    const downloadPdf = async (segment: "outbound" | "return"): Promise<void> => {
+    const downloadPdf = async (segment: "outbound" | "inbound"): Promise<void> => {
         if (!cartTicket) throw new Error("Aucun ticket en cours");
         const segLabel = segment === "outbound" ? "aller" : "retour";
         const filename = `${cartTicket.outbound.departureStation}-${cartTicket.outbound.arrivalStation}-${segLabel}.pdf`;
@@ -190,6 +200,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 addOption,
                 removeOption,
                 toggleOption,
+                getOptionsPrice,
                 getTotalPrice,
                 purchaseCart,
                 downloadPdf,

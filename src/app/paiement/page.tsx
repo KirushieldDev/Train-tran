@@ -2,7 +2,7 @@
 
 import {IconCreditCard, IconHelp, IconLock, IconShieldCheck} from "@tabler/icons-react";
 import Header from "@traintran/components/Header/Header";
-import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
+import OrderSummary from "@traintran/components/AdditionalOptions/OrderSummary";
 import Footer from "@traintran/components/Footer/Footer";
 import Button from "@traintran/components/common/Button";
 import {useCart} from "@traintran/context/CartContext";
@@ -12,7 +12,7 @@ import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
 
 export default function Home() {
     useRequireAuth();
-    const {purchaseCart} = useCart();
+    const {cartTicket, purchaseCart} = useCart();
     const {selectedOptions} = useOptionsSync();
     const [cardNumber, setCardNumber] = useState("");
     const [expiry, setExpiry] = useState("");
@@ -36,6 +36,8 @@ export default function Home() {
         e.preventDefault();
         await purchaseCart();
     }
+
+    if (!cartTicket) return null;
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
@@ -125,7 +127,7 @@ export default function Home() {
                         <div className="flex flex-col items-center md:items-start">
                             <div className="w-96">
                                 <div className="bg-white rounded-lg p-6 shadow-sm">
-                                    <OrderSummary selectedOptions={selectedOptions} showButton={false} />
+                                    <OrderSummary ticket={cartTicket} selectedOptions={selectedOptions} showButton={false} reduce />
 
                                     <div className="mt-4 pt-4 flex gap-2 items-center justify-center border-t border-gray-200">
                                         <IconShieldCheck className="text-primary" size="20" />

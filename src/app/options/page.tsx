@@ -3,13 +3,14 @@
 import {OptionID} from "@traintran/lib/options";
 import Header from "@traintran/components/Header/Header";
 import {OptionsList} from "@traintran/components/AdditionalOptions/OptionsList";
-import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
+import OrderSummary from "@traintran/components/AdditionalOptions/OrderSummary";
 import Footer from "@traintran/components/Footer/Footer";
 import {useCart} from "@traintran/context/CartContext";
 import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
+import {useEffect} from "react";
 
 export default function Home() {
-    const {toggleOption} = useCart();
+    const {cartTicket, toggleOption, getTotalPrice} = useCart();
     const {selectedOptions, setSelectedOptions} = useOptionsSync();
 
     // Quand l'utilisateur change une option, on met à jour le contexte
@@ -17,6 +18,14 @@ export default function Home() {
         toggleOption(id);
         setSelectedOptions(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
     };
+
+    useEffect(() => {
+        if (cartTicket) {
+            console.log(cartTicket?.totalPrice, getTotalPrice(cartTicket));
+        }
+    }, [cartTicket]);
+
+    if (!cartTicket) return null;
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
@@ -34,7 +43,7 @@ export default function Home() {
                         {/* Récapitulatif */}
                         <div className="w-full md:w-[384px]">
                             <div className="sticky top-4 rounded-lg border border-borderContainer bg-white p-6 shadow-sm">
-                                <OrderSummary selectedOptions={selectedOptions} />
+                                <OrderSummary ticket={cartTicket} selectedOptions={selectedOptions} showButton />
                             </div>
                         </div>
                     </div>

@@ -16,7 +16,7 @@ export interface IPassenger {
 
 export interface ITicket {
     outbound: IJourneySegment;
-    return?: IJourneySegment;
+    inbound?: IJourneySegment;
     passengers: IPassenger[];
     options: OptionID[]; // on stocke juste les IDs, on lie dynamiquement aux optionsList
     basePrice: number;
@@ -44,7 +44,7 @@ const PassengerSchema = new Schema<IPassenger>(
 const ticketSchema = new Schema<ITicket>(
     {
         outbound: {type: JourneySegmentSchema, required: true},
-        return: {type: JourneySegmentSchema},
+        inbound: {type: JourneySegmentSchema},
         passengers: {type: [PassengerSchema], required: true},
         options: {type: [String], enum: Object.values(OptionID), default: []},
         basePrice: {type: Number, required: true},

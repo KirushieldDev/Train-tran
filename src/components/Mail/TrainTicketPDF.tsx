@@ -6,6 +6,7 @@ import path from "path";
 import {Option} from "@traintran/lib/options";
 import {styles} from "@traintran/style/ticketPDF";
 import {JourneySegment, Passenger} from "@traintran/context/CartContext";
+import {formattedDate, formatDateTime} from "@traintran/utils/travel";
 
 const logoSvg = fs.readFileSync(path.join(process.cwd(), "public", "TrainTran_logo.png"));
 const logoDataUrl = `data:image/png;base64,${logoSvg.toString("base64")}`;
@@ -25,21 +26,6 @@ export default function TrainTicketPDF(props: TrainTicketPDFProps) {
         return await qrcode.toDataURL(JSON.stringify(props));
     }
 
-    const formattedDate = new Date(journeySegment.departureTime.split("T")[0]).toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-    });
-
-    const weekdays = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-    const formatDateTime = (iso: string) => {
-        const d = new Date(iso);
-        const day = weekdays[d.getDay()];
-        const dateStr = d.toLocaleDateString("fr-FR", {day: "2-digit", month: "2-digit", year: "numeric"});
-        const timeStr = d.toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit"});
-        return `le ${day} ${dateStr} à ${timeStr}`;
-    };
-
     return (
         <Document>
             <Page size="A4" style={styles.page}>
@@ -49,7 +35,7 @@ export default function TrainTicketPDF(props: TrainTicketPDFProps) {
                         {/* eslint-disable-next-line jsx-a11y/alt-text */}
                         <Image style={styles.logo} src={logoDataUrl} />
                         <Text style={styles.title}>Billet de train</Text>
-                        <Text style={styles.date}>{formattedDate}</Text>
+                        <Text style={styles.date}>{formattedDate(journeySegment.departureTime)}</Text>
                     </View>
                     <View style={styles.separator} />
 

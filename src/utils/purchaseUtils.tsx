@@ -25,11 +25,11 @@ async function saveTicket(user: UserInfo, rawTicket: Ticket) {
                         departureTime: new Date(rawTicket.outbound.departureTime),
                         arrivalTime: new Date(rawTicket.outbound.arrivalTime),
                     },
-                    return: rawTicket.return
+                    inbound: rawTicket.inbound
                         ? {
-                              ...rawTicket.return,
-                              departureTime: new Date(rawTicket.return.departureTime),
-                              arrivalTime: new Date(rawTicket.return.arrivalTime),
+                              ...rawTicket.inbound,
+                              departureTime: new Date(rawTicket.inbound.departureTime),
+                              arrivalTime: new Date(rawTicket.inbound.arrivalTime),
                           }
                         : undefined,
                     passengers: rawTicket.passengers,
@@ -65,9 +65,10 @@ export function getAllPages(user: UserInfo, ticket: Ticket): TrainTicketPDFProps
     if (!ticket) return [];
     return ticket.passengers.flatMap(
         p =>
-            [buildPropsForPassenger(user, ticket, p), ticket.return ? buildPropsForPassenger(user, {...ticket, outbound: ticket.return}, p) : undefined].filter(
-                Boolean,
-            ) as TrainTicketPDFProps[],
+            [
+                buildPropsForPassenger(user, ticket, p),
+                ticket.inbound ? buildPropsForPassenger(user, {...ticket, outbound: ticket.inbound}, p) : undefined,
+            ].filter(Boolean) as TrainTicketPDFProps[],
     );
 }
 

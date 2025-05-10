@@ -52,3 +52,37 @@ export function calculatePriceWithDayAdjustment(
     // On arrondit le prix à deux décimales
     return Math.round(raw * 100) / 100;
 }
+
+export const weekdays = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+
+/**
+ * Formate la date comme suit : 01/01/1970
+ * @param iso
+ */
+export function formattedDate(iso: string): string {
+    return new Date(iso.split("T")[0]).toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+}
+
+/**
+ * Formate la date comme suit : 20:00
+ * @param iso
+ */
+export function formattedTime(iso: string): string {
+    return new Date(iso.split("T")[0]).toLocaleDateString("fr-FR", {hour: "2-digit", minute: "2-digit"}).split(" ")[1];
+}
+
+/**
+ * Formate la date et l'heure comme suit : lundi 01/01/1970 à 20:00
+ * @param iso
+ */
+export function formatDateTime(iso: string) {
+    const d = new Date(iso);
+    const day = weekdays[d.getDay()];
+    const dateStr = formattedDate(iso);
+    const timeStr = formattedTime(iso);
+    return `${day} ${dateStr} à ${timeStr}`;
+}
