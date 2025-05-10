@@ -1,12 +1,12 @@
 import {NextResponse} from "next/server";
 
-const COOKIE_NAME = process.env.COOKIE_NAME!;
+const STORAGE_COOKIE_AUTH = process.env.NEXT_PUBLIC_STORAGE_COOKIE_AUTH!;
 
 export async function POST() {
     const res = NextResponse.json({success: true});
     // Supprime le cookie en le réinitialisant avec maxAge 0
     res.cookies.set({
-        name: COOKIE_NAME,
+        name: STORAGE_COOKIE_AUTH,
         value: "",
         path: "/",
         maxAge: 0,

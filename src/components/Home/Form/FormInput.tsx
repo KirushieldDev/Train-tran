@@ -32,8 +32,7 @@ export const FormInput: React.FC<FormInputProps> = ({
 
     const selectSuggestion = (s: string) => {
         if (onChange) {
-            // Simule un event pour la valeur
-            onChange({currentTarget: {value: s}} as any);
+            onChange({currentTarget: {value: s}} as React.ChangeEvent<HTMLInputElement>);
         }
         setOpen(false);
     };

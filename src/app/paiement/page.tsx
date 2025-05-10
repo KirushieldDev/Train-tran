@@ -1,37 +1,36 @@
-import {Option} from "@traintran/components/AdditionalOptions/types";
+"use client";
+
 import {IconCreditCard, IconHelp, IconLock, IconShieldCheck} from "@tabler/icons-react";
 import Header from "@traintran/components/Header/Header";
 import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary";
 import Footer from "@traintran/components/Footer/Footer";
 import Button from "@traintran/components/common/Button";
+import {useCart} from "@traintran/context/CartContext";
+import React, {FormEvent} from "react";
+import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
+import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
 
 export default function Home() {
-    // Mock data for the order summary
-    const basePrice = 45;
-    const baggage: Option = {
-        id: "baggage",
-        name: "Bagage supplémentaire",
-        description: "Un bagage supplémentaire de 20kg max",
-        price: 15,
-    };
+    useRequireAuth();
+    const {purchaseCart} = useCart();
+    const {selectedOptions} = useOptionsSync();
 
-    const selectedOptions = [baggage];
-    const totalPrice = basePrice + baggage.price;
+    async function handleSubmit(e: FormEvent) {
+        e.preventDefault();
+        await purchaseCart();
+    }
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
-            {/* Reusing Header component */}
             <Header />
 
-            {/* Main Content */}
             <main className="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    {/* Payment Form Section */}
                     <div className="md:col-span-7 bg-white p-6 rounded-lg shadow-sm">
                         <h1 className="text-xl font-semibold text-gray-900 mb-1">Paiement sécurisé</h1>
                         <p className="text-sm text-gray-600 mb-5">Veuillez saisir vos informations de paiement</p>
 
-                        <form action="/confirmation">
+                        <form onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <label htmlFor="cardNumber" className="text-sm font-medium text-gray-700 mb-1">
                                     Numéro de carte
@@ -54,7 +53,7 @@ export default function Home() {
                             <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label htmlFor="expiryDate" className="text-sm font-medium text-gray-700 mb-1">
-                                        Date d'expiration
+                                        Date d&apos;expiration
                                     </label>
                                     <input
                                         type="text"
@@ -103,14 +102,12 @@ export default function Home() {
                         </form>
                     </div>
 
-                    {/* Order Summary Section - Using the standard OrderSummary component */}
                     <div className="md:col-span-5">
                         <div className="flex flex-col items-center md:items-start">
                             <div className="w-96">
                                 <div className="bg-white rounded-lg p-6 shadow-sm">
-                                    <OrderSummary basePrice={basePrice} selectedOptions={selectedOptions} totalPrice={totalPrice} showButton={false} />
+                                    <OrderSummary selectedOptions={selectedOptions} showButton={false} />
 
-                                    {/* SSL Security message */}
                                     <div className="mt-4 pt-4 flex gap-2 items-center justify-center border-t border-gray-200">
                                         <IconShieldCheck className="text-primary" size="20" />
                                         <span className="text-[#059669] text-sm">Paiement sécurisé par cryptage SSL</span>
@@ -122,7 +119,6 @@ export default function Home() {
                 </div>
             </main>
 
-            {/* Reusing Footer component */}
             <Footer />
         </div>
     );
