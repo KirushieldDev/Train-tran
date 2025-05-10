@@ -12,9 +12,6 @@ export interface OptionsListProps {
 }
 
 export interface OrderSummaryProps {
-    basePrice: number;
     selectedOptions: OptionID[];
-    totalPrice: number;
-    onContinue?: () => void;
     showButton?: boolean;
 }

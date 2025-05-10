@@ -1,18 +1,18 @@
 "use client";
 
 import React, {FormEvent, useState} from "react";
-import {useRouter} from "next/navigation";
 import {FormInput} from "@traintran/components/Inputs/Form/FormInput";
 import {FormButton} from "@traintran/components/Inputs/Form/FormButton";
 import {IconMailFilled, IconLockPassword, IconPhone} from "@tabler/icons-react";
 import {GenderSelection} from "@traintran/components/Inputs/Form/GenderSelection";
+import {useAuth, UserGender} from "@traintran/context/AuthContext";
 
 type PersonalInfoFormProps = {
     setShowLogin: (val: boolean) => void;
 };
 
 interface FormData {
-    gender: string;
+    gender: UserGender;
     lastName: string;
     firstName: string;
     mobile: string;
@@ -22,9 +22,9 @@ interface FormData {
 }
 
 export default function PersonalInfoForm(props: PersonalInfoFormProps) {
-    const router = useRouter();
+    const {register} = useAuth();
     const [data, setData] = useState<FormData>({
-        gender: "",
+        gender: "M",
         lastName: "",
         firstName: "",
         mobile: "",
@@ -43,46 +43,14 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
             alert("Les mots de passe ne correspondent pas");
             return;
         }
-
-        // 1) Générer un salt aléatoire (16 bytes) et le transformer en hex
-        const saltBytes = crypto.getRandomValues(new Uint8Array(16));
-        const saltHex = Array.from(saltBytes)
-            .map(b => b.toString(16).padStart(2, "0"))
-            .join("");
-
-        // 2) Concaténer salt + password dans un seul buffer
-        const encoder = new TextEncoder();
-        const saltedPassword = encoder.encode(saltHex + data.password);
-
-        // 3) Dériver un hash via PBKDF2(SHA-512, 10000 itérations, 64 bytes)
-        const key = await crypto.subtle.importKey("raw", saltedPassword, {name: "PBKDF2"}, false, ["deriveBits"]);
-        const bits = await crypto.subtle.deriveBits({name: "PBKDF2", salt: saltBytes, iterations: 10000, hash: "SHA-512"}, key, 64 * 8);
-        const hashHex = Array.from(new Uint8Array(bits))
-            .map(b => b.toString(16).padStart(2, "0"))
-            .join("");
-
-        // 4) N’envoyer que saltHex et hashHex
-        const payload = {
-            gender: data.gender,
-            lastName: data.lastName,
+        await register({
             firstName: data.firstName,
+            lastName: data.lastName,
+            gender: data.gender,
             mobile: data.mobile,
             email: data.email,
-            salt: saltHex,
-            hash: hashHex,
-        };
-
-        const res = await fetch("/api/auth/register", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload),
+            password: data.password,
         });
-
-        if (res.ok) router.push("/");
-        else {
-            const err = await res.json();
-            alert(err.error || "Erreur inscription");
-        }
     };
 
     return (

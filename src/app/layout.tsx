@@ -2,6 +2,7 @@ import React from "react";
 import type {Metadata} from "next";
 import "@traintran/app/globals.css";
 import {CartProvider} from "@traintran/context/CartContext";
+import {AuthProvider} from "@traintran/context/AuthContext";
 
 export const metadata: Metadata = {
     title: process.env.METADATA_TITLE,
@@ -14,10 +15,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <CartProvider>
-            <html lang="fr">
-                <body>{children}</body>
-            </html>
-        </CartProvider>
+        <AuthProvider>
+            <CartProvider>
+                <html lang="fr">
+                    <body>{children}</body>
+                </html>
+            </CartProvider>
+        </AuthProvider>
     );
 }

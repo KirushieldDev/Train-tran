@@ -2,8 +2,10 @@ import Header from "@traintran/components/Header/Header";
 import {IconCalendarWeekFilled, IconCheck, IconDownload, IconHelp, IconMail, IconPrinter} from "@tabler/icons-react";
 import Button from "@traintran/components/common/Button";
 import Footer from "@traintran/components/Footer/Footer";
+import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
 
 export default function Home() {
+    useRequireAuth();
     const reservationDetails = {
         outboundRef: "RF789456",
         returnRef: "RF789457",

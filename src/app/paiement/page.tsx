@@ -6,43 +6,18 @@ import {OrderSummary} from "@traintran/components/AdditionalOptions/OrderSummary
 import Footer from "@traintran/components/Footer/Footer";
 import Button from "@traintran/components/common/Button";
 import {useCart} from "@traintran/context/CartContext";
-import {useRouter} from "next/navigation";
 import React, {FormEvent} from "react";
-import getOptionById, {OptionID} from "@traintran/lib/options";
+import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
+import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
 
 export default function Home() {
-    const cart = useCart();
-    const router = useRouter();
-
-    // Mock data for the order summary
-    const basePrice = 45;
-
-    const selectedOptions = [OptionID.Baggage];
-    const totalPrice = basePrice + selectedOptions.map(opt_id => (getOptionById(opt_id)?.price || 0) as number).reduce((sum, opt) => sum + opt, 0);
+    useRequireAuth();
+    const {purchaseCart} = useCart();
+    const {selectedOptions} = useOptionsSync();
 
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
-        const tickets = cart.getAllPagesGroupedByTicket();
-        const recipientEmail = cart.infoBuyer?.ordererEmail;
-        if (!recipientEmail) {
-            alert("Veuillez renseigner votre email avant de payer.");
-            return;
-        }
-        try {
-            const res = await fetch("/api/send-tickets", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({tickets, recipientEmail}),
-            });
-            if (!res.ok) {
-                const {error} = await res.json();
-                throw new Error(error || "Erreur lors de l'envoi des billets");
-            }
-            router.push("/confirmation");
-        } catch (err) {
-            console.error(err);
-            alert(err + "Impossible d'envoyer les billets. Veuillez réessayer plus tard.");
-        }
+        await purchaseCart();
     }
 
     return (
@@ -131,7 +106,7 @@ export default function Home() {
                         <div className="flex flex-col items-center md:items-start">
                             <div className="w-96">
                                 <div className="bg-white rounded-lg p-6 shadow-sm">
-                                    <OrderSummary basePrice={basePrice} selectedOptions={selectedOptions} totalPrice={totalPrice} showButton={false} />
+                                    <OrderSummary selectedOptions={selectedOptions} showButton={false} />
 
                                     <div className="mt-4 pt-4 flex gap-2 items-center justify-center border-t border-gray-200">
                                         <IconShieldCheck className="text-primary" size="20" />
