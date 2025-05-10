@@ -5,6 +5,7 @@ import React, {useState} from "react";
 interface FormInputProps {
     label: string;
     placeholder: string;
+    name: string;
     icon?: React.ReactNode;
     type?: string;
     required?: boolean;
@@ -17,6 +18,7 @@ interface FormInputProps {
 export const FormInput: React.FC<FormInputProps> = ({
     label,
     placeholder,
+    name,
     icon,
     type = "text",
     required,
@@ -46,6 +48,7 @@ export const FormInput: React.FC<FormInputProps> = ({
                 <input
                     type={type}
                     placeholder={placeholder}
+                    name={name}
                     required={required}
                     {...inputProps}
                     className={`z-0 flex-1 shrink self-stretch my-auto text-base leading-6 placeholder:text-gray-400 text-textPrimary bg-white rounded-lg border border-gray-300 border-solid basis-0 min-w-60 w-[231px] min-h-[55px] ${icon ? "pl-12" : "pl-4"} focus:outline-none`}

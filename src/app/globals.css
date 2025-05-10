@@ -26,4 +26,26 @@
     .container {
         @apply w-full flex p-4 border border-borderContainer shadow-sm;
     }
+
+    .button-base {
+        @apply inline-flex items-center justify-center font-medium rounded-md transition-colors;
+    }
+    .button-variant-primary {
+        @apply bg-primary text-white hover:bg-primaryDark;
+    }
+    .button-variant-secondary {
+        @apply bg-primary text-white hover:bg-primaryDark;
+    }
+    .button-variant-outline {
+        @apply border border-gray-300 text-textPrimary hover:bg-gray-50;
+    }
+    .button-size-sm {
+        @apply text-xs py-2 px-3;
+    }
+    .button-size-md {
+        @apply text-sm py-2.5 px-4;
+    }
+    .button-size-lg {
+        @apply text-base py-3.5 px-6;
+    }
 }

@@ -4,10 +4,11 @@ import React from "react";
 import getOptionById from "@traintran/lib/options";
 import {OrderSummaryProps} from "@traintran/components/AdditionalOptions/types";
 import {useCart} from "@traintran/context/CartContext";
-import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 export const OrderSummary: React.FC<OrderSummaryProps> = ({selectedOptions, showButton = true}) => {
     const {cartTicket, getTotalPrice} = useCart();
+    const router = useRouter();
 
     if (!cartTicket) {
         return null;
@@ -55,11 +56,11 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({selectedOptions, show
             </div>
 
             {showButton && (
-                <Link
-                    href="/panier"
-                    className="w-full mt-8 inline-flex items-center justify-center font-medium rounded-md transition-colors bg-primary text-white hover:bg-primaryDark text-base py-3.5 px-6">
+                <button
+                    onClick={() => router.push("/panier")}
+                    className="w-full mt-8 button-base button-variant-primary button-size-lg">
                     Continuer
-                </Link>
+                </button>
             )}
         </div>
     );

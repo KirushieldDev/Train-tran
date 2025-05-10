@@ -1,7 +1,6 @@
 import React from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import TripSection from "@traintran/components/Calendar/Departure/TripSection";
-import {ActionButtons} from "@traintran/components/Calendar/Departure/ActionButtons";
 import {calculatePriceWithDayAdjustment} from "@traintran/utils/travel";
 
 export default function Departure({distanceKm}: {distanceKm: number}) {
@@ -44,7 +43,14 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
         <div>
             <TripSection title="Aller" station1={departure} station2={arrival} trips={departureTrips} />
             {returnDate && <TripSection title="Retour" station1={arrival} station2={departure} trips={returnTrips} />}
-            <ActionButtons onCancel={() => router.push("/")} onContinue={() => router.push("/options")} />
+            <div className="flex flex-wrap gap-2.5 justify-center mt-8 mb-10 w-full text-base text-center max-md:max-w-full">
+                <button onClick={() => router.push("/")} className="button-base button-variant-outline button-size-lg">
+                    Annuler
+                </button>
+                <button onClick={() => router.push("/options")} className="button-base button-variant-secondary button-size-lg">
+                    Continuer la commande
+                </button>
+            </div>
         </div>
     );
 }

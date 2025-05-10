@@ -38,7 +38,7 @@ export default function CalendarPage() {
         async function fetchStations() {
             try {
                 // On appelle l'API pour récupérer les coordonnées des gares
-                const res = await fetch(`/api/stations?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`);
+                const res = await fetch(`/api/journey/stations-coords?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`);
                 if (!res.ok) {
                     const data = await res.json();
                     throw new Error(data.message || "Erreur récupération gares");
