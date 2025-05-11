@@ -84,16 +84,16 @@ export default function Home() {
                                     </Button>
                                 </div>
 
-                                {cartTicket.return && (
+                                {cartTicket.inbound && (
                                     <div className="flex flex-col gap-2 items-center">
                                         <p className="text-sm text-textSecondary">
-                                            {cartTicket.return.departureStation} → {cartTicket.return.arrivalStation}
+                                            {cartTicket.inbound.departureStation} → {cartTicket.inbound.arrivalStation}
                                         </p>
                                         <Button
                                             variant="primary"
                                             className="flex items-center"
                                             icon={<IconDownload className="text-white" />}
-                                            onClick={() => downloadPdf("return")}>
+                                            onClick={() => downloadPdf("inbound")}>
                                             Télécharger
                                         </Button>
                                     </div>

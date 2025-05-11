@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     // lire body
     const {ticket, segment} = (await request.json()) as {
         ticket?: Ticket;
-        segment?: "outbound" | "return";
+        segment?: "outbound" | "inbound";
     };
     if (!ticket || !segment) {
         return NextResponse.json({error: "Données invalides"}, {status: 400});

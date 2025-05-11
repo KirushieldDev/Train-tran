@@ -32,9 +32,15 @@ export const SearchForm: React.FC = () => {
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.push(
-            `/calendrier?departure=${encodeURIComponent(from)}&arrival=${encodeURIComponent(to)}&departure_date=${encodeURIComponent(departureDate)}${returnDate ? `&return_date=${encodeURIComponent(returnDate)}` : ""}`,
-        );
+        const params = new URLSearchParams({
+            departure: from,
+            arrival: to,
+            departure_date: departureDate,
+        });
+        if (returnDate) {
+            params.set("return_date", returnDate);
+        }
+        router.push(`/calendrier?${params.toString()}`);
     };
 
     return (
