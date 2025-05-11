@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useMemo, useEffect, useState} from "react";
-import {useSearchParams} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import Header from "@traintran/components/Header/Header";
 import TrainJourneyDisplay from "@traintran/components/Calendar/Destination/TrainJourneyDisplay";
 import Calendar, {Journey} from "@traintran/components/Calendar/Calendar";
@@ -14,6 +14,7 @@ import {useCart} from "@traintran/context/CartContext";
 
 export default function CalendarPage() {
     const {cartTicket} = useCart();
+    const router = useRouter();
     const availableDates = useMemo(() => {
         return journeyData.journeys.map(item => ({
             date: new Date(item.date),
@@ -81,6 +82,14 @@ export default function CalendarPage() {
                     <Calendar onChange={handleDateChange} availableDates={availableDates} distanceKm={distanceKm} />
                 </div>
                 <Departure distanceKm={distanceKm} />
+                <div className="flex flex-wrap gap-2.5 justify-center mt-8 mb-10 w-full text-base text-center max-md:max-w-full">
+                    <button onClick={() => router.push("/")} className="button-base button-variant-outline button-size-lg">
+                        Annuler
+                    </button>
+                    <button onClick={() => router.push("/passagers")} className="button-base button-variant-secondary button-size-lg">
+                        Continuer la commande
+                    </button>
+                </div>
             </div>
             <Footer />
         </>
