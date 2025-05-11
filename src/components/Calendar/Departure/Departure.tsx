@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import TripSection from "@traintran/components/Calendar/Departure/TripSection";
 import {calculatePriceWithDayAdjustment} from "@traintran/utils/travel";
@@ -11,6 +11,11 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
     const arrival = searchParams.get("arrival") ?? "";
     const departDate = searchParams.get("departure_date");
     const returnDate = searchParams.get("return_date");
+    
+    const [departureTrips, setDepartureTrips] = useState<any[]>([]);
+    const [returnTrips, setReturnTrips] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // On récupere le jour de la semaine à partir de la date
     const getDayOfWeek = (dateStr: string) => {
@@ -22,27 +27,160 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
     // Calcul du jour pour chaque trajet
     const departDay = departDate ? getDayOfWeek(departDate) : getDayOfWeek(new Date().toISOString());
     const returnDay = returnDate ? getDayOfWeek(returnDate) : departDay;
-
-    const baseTrips = [
-        {departureTime: "08:00", arrivalTime: "11:30", duration: "2h 30m"},
-        {departureTime: "10:30", arrivalTime: "14:00", duration: "2h 30m"},
-    ];
-
-    // On ajoute le prix à chaque trajet en fonction de la distance et du jour
-    const departureTrips = baseTrips.map(trip => {
-        const price = calculatePriceWithDayAdjustment(distanceKm, departDay);
-        return {...trip, price: `€${price}`};
-    });
-
-    const returnTrips = baseTrips.map(trip => {
-        const price = calculatePriceWithDayAdjustment(distanceKm, returnDay);
-        return {...trip, price: `€${price}`};
-    });
+    
+    // Récupérer les trajets depuis l'API
+    useEffect(() => {
+        const fetchJourneys = async () => {
+            if (!departure || !arrival || !departDate) return;
+            
+            setLoading(true);
+            setError(null);
+            
+            try {
+                // Récupérer les trajets pour le jour de départ
+                const response = await fetch(`/api/journey/trip?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`);
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération des trajets');
+                }
+                
+                const data = await response.json();
+                
+                // Filtrer les trajets pour la date sélectionnée
+                const departJourneys = data.journeys.filter(journey => journey.day === departDate);
+                
+                // Fonctions utilitaires pour formater les horaires et calculer les durées
+                const formatTime = (timeStr: string | undefined): string => {
+                    if (!timeStr) return '';
+                    return `${timeStr.substring(0, 2)}:${timeStr.substring(2, 4)}`;
+                };
+                
+                const calculateDuration = (depTime: string | undefined, arrTime: string | undefined): string => {
+                    if (!depTime || !arrTime) return '';
+                    
+                    const depHours = parseInt(depTime.substring(0, 2));
+                    const depMinutes = parseInt(depTime.substring(2, 4));
+                    const arrHours = parseInt(arrTime.substring(0, 2));
+                    const arrMinutes = parseInt(arrTime.substring(2, 4));
+                    
+                    let durationHours = arrHours - depHours;
+                    let durationMinutes = arrMinutes - depMinutes;
+                    
+                    if (durationMinutes < 0) {
+                        durationHours--;
+                        durationMinutes += 60;
+                    }
+                    
+                    return `${durationHours}h ${durationMinutes}m`;
+                };
+                
+                // Formater les trajets pour l'affichage
+                const formattedDepartTrips = departJourneys.map(journey => {
+                    // Extraire les horaires spécifiques aux gares de départ et d'arrivée
+                    const departureStop = journey.stop_times[journey.fromIndex];
+                    const arrivalStop = journey.stop_times[journey.toIndex];
+                    
+                    const departureTime = formatTime(departureStop?.utc_departure_time);
+                    const arrivalTime = formatTime(arrivalStop?.utc_arrival_time);
+                    
+                    const duration = calculateDuration(
+                        departureStop?.utc_departure_time,
+                        arrivalStop?.utc_arrival_time
+                    );
+                    
+                    // Calculer le prix en fonction de la distance et du jour
+                    const price = calculatePriceWithDayAdjustment(distanceKm, departDay);
+                    
+                    // Ajouter la valeur numérique de l'heure pour le tri
+                    const departureTimeValue = departureStop?.utc_departure_time 
+                        ? parseInt(departureStop.utc_departure_time.substring(0, 4))
+                        : 0;
+                    
+                    return {
+                        id: journey.id_vehicle_journey,
+                        departureTime,
+                        arrivalTime,
+                        duration,
+                        price: `€${price}`,
+                        departureTimeValue
+                    };
+                })
+                // Trier les trajets du plus tôt au plus tard
+                .sort((a, b) => a.departureTimeValue - b.departureTimeValue);
+                
+                setDepartureTrips(formattedDepartTrips);
+                
+                // Si une date de retour est spécifiée, récupérer les trajets pour le retour
+                if (returnDate) {
+                    const returnJourneys = data.journeys.filter(journey => journey.day === returnDate);
+                    
+                    const formattedReturnTrips = returnJourneys.map(journey => {
+                        // Pour le retour, on inverse les indices de départ et d'arrivée
+                        const departureStop = journey.stop_times[journey.toIndex];
+                        const arrivalStop = journey.stop_times[journey.fromIndex];
+                        
+                        const departureTime = formatTime(departureStop?.utc_departure_time);
+                        const arrivalTime = formatTime(arrivalStop?.utc_arrival_time);
+                        
+                        const duration = calculateDuration(
+                            departureStop?.utc_departure_time,
+                            arrivalStop?.utc_arrival_time
+                        );
+                        
+                        const price = calculatePriceWithDayAdjustment(distanceKm, returnDay);
+                        
+                        // Ajouter la valeur numérique de l'heure pour le tri
+                        const departureTimeValue = departureStop?.utc_departure_time 
+                            ? parseInt(departureStop.utc_departure_time.substring(0, 4))
+                            : 0;
+                        
+                        return {
+                            id: journey.id_vehicle_journey,
+                            departureTime,
+                            arrivalTime,
+                            duration,
+                            price: `€${price}`,
+                            departureTimeValue
+                        };
+                    })
+                    .sort((a, b) => a.departureTimeValue - b.departureTimeValue);
+                    
+                    setReturnTrips(formattedReturnTrips);
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des trajets:', error);
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchJourneys();
+    }, [departure, arrival, departDate, returnDate, distanceKm, departDay, returnDay]);
 
     return (
         <div>
-            <TripSection title="Aller" station1={departure} station2={arrival} trips={departureTrips} />
-            {returnDate && <TripSection title="Retour" station1={arrival} station2={departure} trips={returnTrips} />}
+            {loading ? (
+                <div className="text-center py-4">Chargement des trajets...</div>
+            ) : error ? (
+                <div className="text-center py-4 text-red-500">Erreur : {error}</div>
+            ) : (
+                <>
+                    {departureTrips.length > 0 ? (
+                        <TripSection title="Aller" station1={departure} station2={arrival} trips={departureTrips} />
+                    ) : (
+                        <div className="text-center py-4">Aucun trajet disponible pour l'aller à cette date</div>
+                    )}
+                    
+                    {returnDate && (
+                        returnTrips.length > 0 ? (
+                            <TripSection title="Retour" station1={arrival} station2={departure} trips={returnTrips} />
+                        ) : (
+                            <div className="text-center py-4">Aucun trajet disponible pour le retour à cette date</div>
+                        )
+                    )}
+                </>
+            )}
+            
             <div className="flex flex-wrap gap-2.5 justify-center mt-8 mb-10 w-full text-base text-center max-md:max-w-full">
                 <button onClick={() => router.push("/")} className="button-base button-variant-outline button-size-lg">
                     Annuler

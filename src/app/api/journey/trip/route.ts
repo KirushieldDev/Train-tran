@@ -53,6 +53,11 @@ export async function GET(req: Request) {
                     id_vehicle_journey: 1,
                     // Extraire le jour de id_vehicle_journey
                     day: {$arrayElemAt: [{$split: ["$id_vehicle_journey", ":"]}, 2]},
+                    departure: 1,
+                    arrival: 1,
+                    fromIndex: 1,
+                    toIndex: 1,
+                    stop_times: 1,
                 },
             },
         ]);

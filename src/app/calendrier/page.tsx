@@ -1,13 +1,12 @@
 "use client";
 
-import React, {useMemo, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useSearchParams, useRouter} from "next/navigation";
 import Header from "@traintran/components/Header/Header";
 import TrainJourneyDisplay from "@traintran/components/Calendar/Destination/TrainJourneyDisplay";
 import Calendar, {Journey} from "@traintran/components/Calendar/Calendar";
 import Departure from "@traintran/components/Calendar/Departure/Departure";
 import Footer from "@traintran/components/Footer/Footer";
-import journeyData from "@traintran/components/Calendar/journeys.json";
 import {calculateDistance} from "@traintran/utils/travel";
 
 export default function CalendarPage() {
@@ -18,13 +17,6 @@ export default function CalendarPage() {
     const arrival = searchParams.get("arrival") ?? "";
     const departDateParam = searchParams.get("departure_date");
     const returnDateParam = searchParams.get("return_date");
-
-    const availableDates = useMemo(() => {
-        return journeyData.journeys.map(item => ({
-            date: new Date(item.date),
-            journeys: item.journeys,
-        }));
-    }, []);
 
     const handleDateChange = (date: Date | null, journeys?: Journey[]) => {
         if (!date) return;
@@ -90,9 +82,10 @@ export default function CalendarPage() {
                 <div className="bg-white rounded-lg shadow-md p-6 mt-6">
                     <Calendar
                         onChange={handleDateChange}
-                        availableDates={availableDates}
                         distanceKm={distanceKm}
                         selectedDate={departDateParam ? new Date(departDateParam) : null}
+                        departure={departure}
+                        arrival={arrival}
                     />
                 </div>
                 <Departure distanceKm={distanceKm} />
