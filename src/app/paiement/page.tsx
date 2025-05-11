@@ -9,6 +9,7 @@ import {useCart} from "@traintran/context/CartContext";
 import React, {ChangeEvent, FormEvent, useState} from "react";
 import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
 import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
+import ReservationStepper from "@traintran/components/common/ReservationStepper";
 
 export default function Home() {
     useRequireAuth();
@@ -42,6 +43,8 @@ export default function Home() {
     return (
         <div className="min-h-screen bg-background flex flex-col">
             <Header />
+
+            <ReservationStepper ticket={cartTicket} page="paiement" />
 
             <main className="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
