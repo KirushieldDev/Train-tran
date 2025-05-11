@@ -25,7 +25,7 @@ export default function Home() {
     return (
         <div className="min-h-screen bg-background flex flex-col">
             <Header />
-            <ReservationStepper activeStep={5} />
+            <ReservationStepper ticket={cartTicket} page="confirmation" />
             <main className="flex-grow">
                 <div className="max-w-[1024px] mx-auto px-4 py-8">
                     <div className="bg-white rounded-lg p-8 shadow-sm border border-borderContainer flex flex-col items-center">

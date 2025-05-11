@@ -13,7 +13,7 @@ import ReservationStepper from "@traintran/components/common/ReservationStepper"
 
 export default function Home() {
     useRequireAuth();
-    const {purchaseCart} = useCart();
+    const {cartTicket, purchaseCart} = useCart();
     const {selectedOptions} = useOptionsSync();
     const [cardNumber, setCardNumber] = useState("");
     const [expiry, setExpiry] = useState("");
@@ -42,7 +42,7 @@ export default function Home() {
         <div className="min-h-screen bg-background flex flex-col">
             <Header />
 
-            <ReservationStepper activeStep={4} />
+            <ReservationStepper ticket={cartTicket} page="paiement" />
 
             <main className="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">

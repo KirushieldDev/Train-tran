@@ -8,17 +8,17 @@ import {Journey, Station} from "./models/models.js";
  * Ce script permet de récupérer les gares TGV depuis l'API SNCF
  */
 async function fetchTGVStationIds() {
-    const authHeader = { Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64") };
+    const authHeader = {Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64")};
     const tgvIds = new Set();
     let page = 0;
 
     while (true) {
         const url = `${process.env.SNCF_API_URL}/physical_modes/physical_mode:LongDistanceTrain/stop_areas?count=1000&start_page=${page}`;
-        const { data } = await axios.get(url, { headers: authHeader });
+        const {data} = await axios.get(url, {headers: authHeader});
         const sas = data.stop_areas || [];
         if (!sas.length) break;
 
-        sas.forEach(sa => tgvIds.add(sa.id.split(':')[2])); // On ne garde que l'ID de numérique de la gare
+        sas.forEach(sa => tgvIds.add(sa.id.split(":")[2])); // On ne garde que l'ID de numérique de la gare
 
         if (sas.length < 1000) break;
         page++;
@@ -49,7 +49,7 @@ async function fetchAndStoreStations(pageSize = 1000, tgvIds) {
         const docs = stopAreas
             .filter(sa => {
                 // on extrait l'ID numérique « 80153452 » depuis « stop_area:SNCF:80153452 »
-                const areaIdNum = sa.id.split(':')[2];
+                const areaIdNum = sa.id.split(":")[2];
                 return tgvIds.has(areaIdNum) && sa.name;
             })
             .map(sa => ({
@@ -113,7 +113,7 @@ async function fetchAndStoreJourneys(pageSize = 1000, tgvIds) {
 
                 // Filtrer les trajets qui ne passent pas par les gares TGV
                 const departureStopPoint = stopTimes[0].stop_point;
-                const departureIdNumber = departureStopPoint.split(':')[2];
+                const departureIdNumber = departureStopPoint.split(":")[2];
                 if (!tgvIds.has(departureIdNumber)) return null;
 
                 const cal = vj.calendars?.[0]?.week_pattern || {};

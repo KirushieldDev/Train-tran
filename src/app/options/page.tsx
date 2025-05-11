@@ -11,7 +11,7 @@ import ReservationStepper from "@traintran/components/common/ReservationStepper"
 import React from "react";
 
 export default function Home() {
-    const {toggleOption} = useCart();
+    const {cartTicket, toggleOption} = useCart();
     const {selectedOptions, setSelectedOptions} = useOptionsSync();
 
     // Quand l'utilisateur change une option, on met à jour le contexte
@@ -23,7 +23,7 @@ export default function Home() {
     return (
         <div className="min-h-screen flex flex-col bg-background">
             <Header />
-            <ReservationStepper activeStep={2} />
+            <ReservationStepper ticket={cartTicket} page="options" />
             <main className="flex-grow">
                 <div className="mx-auto max-w-[1024px] px-4 py-8">
                     <h1 className="mb-6 text-2xl font-semibold text-textPrimary">Options supplémentaires</h1>
