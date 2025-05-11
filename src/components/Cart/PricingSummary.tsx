@@ -25,7 +25,7 @@ export default function PricingSummary(props: PricingSummaryProps) {
                 </div>
                 <div className="flex justify-between px-0 py-0.5">
                     <div className="text-base text-textSecondary">TVA (20%)</div>
-                    <div className="text-base text-textSecondary">{ticket.totalPrice * 0.2} €</div>
+                    <div className="text-base text-textSecondary">{(ticket.totalPrice * 0.2).toFixed(2)} €</div>
                 </div>
                 <div className="flex justify-between pt-4 border-t border-solid">
                     <div className="text-lg font-bold text-black">Total</div>

@@ -13,6 +13,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
 
     const passengerCount = ticket.passengers.length;
     const totalPrice = ticket.totalPrice;
+    const outboundOptionPrice = getOptionsPrice(ticket) / (ticket.inbound ? 2 : 1);
 
     return (
         <div className="w-full">
@@ -33,7 +34,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                 {/* Sous total de base */}
                 <div className="flex justify-between font-semibold text-textSecondary">
                     <span>Sous total</span>
-                    <span>{ticket.basePrice * ticket.passengers.length}</span>
+                    <span>{ticket.basePrice * ticket.passengers.length}€</span>
                 </div>
 
                 {/* Options sélectionnées */}
@@ -43,7 +44,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                             {reduce ? (
                                 <div className="flex justify-between text-textSecondary">
                                     <span>Options</span>
-                                    <span className="font-medium">{getOptionsPrice(ticket)}€</span>
+                                    <span className="font-medium">{outboundOptionPrice}€</span>
                                 </div>
                             ) : (
                                 selectedOptions.map((optId, i) => {
@@ -63,7 +64,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                         {/* Sous total des options */}
                         <div className="flex justify-between font-semibold text-textSecondary">
                             <span>Sous total</span>
-                            <span>{getOptionsPrice(ticket) / (ticket.inbound ? 2 : 1)}</span>
+                            <span>{outboundOptionPrice}€</span>
                         </div>
                     </>
                 )}

@@ -22,10 +22,10 @@ export default function OptionsSection(props: OptionsSectionProps) {
                             <div className="flex gap-2 items-center">
                                 {option.Icon}
                                 <div className="text-base text-gray-700">
-                                    {option.name} ({option.price}€)
+                                    {option.name} ({option.price === 0 ? "Gratuit" : option.price + "€"})
                                 </div>
                             </div>
-                            <div className="text-base text-gray-800">+ {optTotalPrice} €</div>
+                            <div className="text-base text-gray-800">{option.price === 0 ? "Gratuit" : "+" + optTotalPrice + "€"}</div>
                         </div>
                     );
                 })}
