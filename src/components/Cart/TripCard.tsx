@@ -24,7 +24,7 @@ export default function TripCard(props: TripCardProps) {
     return (
         <article className="p-6 bg-white rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
             <h2 className="mb-4 text-lg text-gray-700">
-                Trajet {segLabel} vers {journey.departureStation} le {formattedDate(journey.departureTime)}
+                Trajet {segLabel} vers {journey.arrivalStation} le {formattedDate(journey.departureTime)}
             </h2>
             <div className="flex justify-between items-start max-sm:flex-col max-sm:gap-4">
                 <div className="flex gap-4 items-center">
