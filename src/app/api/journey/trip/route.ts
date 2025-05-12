@@ -58,6 +58,7 @@ export async function GET(req: Request) {
                     fromIndex: 1,
                     toIndex: 1,
                     stop_times: 1,
+                    weekPattern: 1,
                 },
             },
         ]);

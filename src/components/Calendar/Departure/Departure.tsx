@@ -21,10 +21,9 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
     const [selectedDepartureId, setSelectedDepartureId] = useState<string | null>(null);
     const [selectedReturnId, setSelectedReturnId] = useState<string | null>(null);
 
-    // On récupere le jour de la semaine à partir de la date
+    // On récupère le jour de la semaine à partir de la date
     const getDayOfWeek = (dateStr: string) => {
         const date = new Date(dateStr);
-        // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
         return date.toLocaleDateString("en-US", {weekday: "long"});
     };
 
@@ -49,8 +48,30 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
 
                 const data = await response.json();
 
-                // Filtrer les trajets pour la date sélectionnée
-                const departJourneys = data.journeys.filter(journey => journey.day === departDate);
+                // Filtrer les trajets pour le jour de la semaine sélectionné
+                const departJourneys = data.journeys.filter((journey: any) => {
+                    const weekPattern = journey.weekPattern;
+                    if (!weekPattern) return true;
+
+                    switch (departDay.toLowerCase()) {
+                        case "monday":
+                            return weekPattern.monday;
+                        case "tuesday":
+                            return weekPattern.tuesday;
+                        case "wednesday":
+                            return weekPattern.wednesday;
+                        case "thursday":
+                            return weekPattern.thursday;
+                        case "friday":
+                            return weekPattern.friday;
+                        case "saturday":
+                            return weekPattern.saturday;
+                        case "sunday":
+                            return weekPattern.sunday;
+                        default:
+                            return false;
+                    }
+                });
 
                 // Fonctions utilitaires pour formater les horaires et calculer les durées
                 const formatTime = (timeStr: string | undefined): string => {
@@ -137,8 +158,30 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
 
                         const returnData = await returnResponse.json();
 
-                        // Filtrer les trajets pour la date de retour sélectionnée
-                        const returnJourneys = returnData.journeys.filter(journey => journey.day === returnDate);
+                        // Filtrer les trajets pour le jour de la semaine sélectionné
+                        const returnJourneys = returnData.journeys.filter((journey: any) => {
+                            const weekPattern = journey.weekPattern;
+                            if (!weekPattern) return true;
+
+                            switch (returnDay.toLowerCase()) {
+                                case "monday":
+                                    return weekPattern.monday;
+                                case "tuesday":
+                                    return weekPattern.tuesday;
+                                case "wednesday":
+                                    return weekPattern.wednesday;
+                                case "thursday":
+                                    return weekPattern.thursday;
+                                case "friday":
+                                    return weekPattern.friday;
+                                case "saturday":
+                                    return weekPattern.saturday;
+                                case "sunday":
+                                    return weekPattern.sunday;
+                                default:
+                                    return false;
+                            }
+                        });
 
                         const formattedReturnTrips = returnJourneys
                             .map(journey => {
@@ -245,9 +288,6 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                         if (returnDate && selectedReturnId) {
                             params.set("return_trip_id", selectedReturnId);
                         }
-
-                        // Rediriger vers la page des options
-                        router.push(`/options?${params.toString()}`);
                     }}
                     className={`button-base button-variant-secondary button-size-lg ${!selectedDepartureId || (returnDate && !selectedReturnId) ? "opacity-50 cursor-not-allowed" : ""}`}>
                     Continuer la commande
