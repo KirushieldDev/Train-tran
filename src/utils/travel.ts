@@ -52,3 +52,82 @@ export function calculatePriceWithDayAdjustment(
     // On arrondit le prix à deux décimales
     return Math.round(raw * 100) / 100;
 }
+
+// Fonction pour récupérer le jour de la semaine à partir d'une date
+export function getDayOfWeek(date: Date | string): string {
+    // Si la date est une chaîne, la convertir en objet Date
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    // On utilise 'en-US' pour avoir le nom du jour en anglais et 'long' pour avoir le nom complet
+    return dateObj.toLocaleDateString("en-US", { weekday: "long" });
+}
+
+// Fonction pour vérifier si un trajet est disponible pour un jour de la semaine donné
+export function isJourneyAvailableOnDay(dayOfWeek: string, weekPattern: any): boolean {
+    if (!weekPattern) return true;
+
+    const day = dayOfWeek.toLowerCase();
+    switch (day) {
+        case "monday":
+            return weekPattern.monday;
+        case "tuesday":
+            return weekPattern.tuesday;
+        case "wednesday":
+            return weekPattern.wednesday;
+        case "thursday":
+            return weekPattern.thursday;
+        case "friday":
+            return weekPattern.friday;
+        case "saturday":
+            return weekPattern.saturday;
+        case "sunday":
+            return weekPattern.sunday;
+        default:
+            return false;
+    }
+}
+
+// Convertit une heure UTC en heure locale (UTC+2)
+export function formatTime(timeStr: string | undefined): string {
+    if (!timeStr) return '';
+    
+    // Extraire les heures et minutes
+    const hours = parseInt(timeStr.substring(0, 2));
+    const minutes = parseInt(timeStr.substring(2, 4));
+    const seconds = timeStr.length >= 6 ? parseInt(timeStr.substring(4, 6)) : 0;
+    
+    // Créer une date en UTC
+    const date = new Date();
+    date.setUTCHours(hours);
+    date.setUTCMinutes(minutes);
+    date.setUTCSeconds(seconds);
+    
+    // Récupérer l'heure locale
+    const localHours = date.getHours();
+    const localMinutes = date.getMinutes();
+    
+    // Formater l'heure avec des zéros devant si nécessaire
+    const formattedHours = localHours.toString().padStart(2, '0');
+    const formattedMinutes = localMinutes.toString().padStart(2, '0');
+    
+    return `${formattedHours}:${formattedMinutes}`;
+}
+
+// Calcule la durée entre deux heures
+export function calculateDuration(depTime: string | undefined, arrTime: string | undefined): string {
+    if (!depTime || !arrTime) return '';
+    
+    const depHours = parseInt(depTime.substring(0, 2));
+    const depMinutes = parseInt(depTime.substring(2, 4));
+    const arrHours = parseInt(arrTime.substring(0, 2));
+    const arrMinutes = parseInt(arrTime.substring(2, 4));
+    
+    let durationHours = arrHours - depHours;
+    let durationMinutes = arrMinutes - depMinutes;
+    
+    if (durationMinutes < 0) {
+        durationHours--;
+        durationMinutes += 60;
+    }
+    
+    return `${durationHours}h ${durationMinutes}m`;
+}

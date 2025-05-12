@@ -1,14 +1,7 @@
 import React from "react";
 import {TripCard} from "@traintran/components/Calendar/Departure/TripCard";
 import {IconArrowRight} from "@tabler/icons-react";
-
-interface Trip {
-    id: string;
-    departureTime: string;
-    arrivalTime: string;
-    price: string;
-    duration: string;
-}
+import {Trip} from "@traintran/components/Calendar/types";
 
 interface TripSectionProps {
     title: string;

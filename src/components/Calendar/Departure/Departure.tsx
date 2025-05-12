@@ -1,7 +1,14 @@
 import React, {useState, useEffect} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import TripSection from "@traintran/components/Calendar/Departure/TripSection";
-import {calculatePriceWithDayAdjustment} from "@traintran/utils/travel";
+import {
+    calculatePriceWithDayAdjustment,
+    getDayOfWeek,
+    isJourneyAvailableOnDay,
+    formatTime,
+    calculateDuration
+} from "@traintran/utils/travel";
+import {Journey, Trip} from "@traintran/components/Calendar/types";
 
 export default function Departure({distanceKm}: {distanceKm: number}) {
     const searchParams = useSearchParams();
@@ -12,46 +19,14 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
     const departDate = searchParams.get("departure_date");
     const returnDate = searchParams.get("return_date");
 
-    const [departureTrips, setDepartureTrips] = useState<any[]>([]);
-    const [returnTrips, setReturnTrips] = useState<any[]>([]);
+    const [departureTrips, setDepartureTrips] = useState<Trip[]>([]);
+    const [returnTrips, setReturnTrips] = useState<Trip[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     // États pour stocker les trajets sélectionnés
     const [selectedDepartureId, setSelectedDepartureId] = useState<string | null>(null);
     const [selectedReturnId, setSelectedReturnId] = useState<string | null>(null);
-
-    // On récupère le jour de la semaine à partir de la date
-    const getDayOfWeek = (dateStr: string) => {
-        const date = new Date(dateStr);
-        // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
-        return date.toLocaleDateString("en-US", {weekday: "long"});
-    };
-
-    // Vérifie si un trajet est disponible pour un jour de la semaine donné
-    const isJourneyAvailableOnDay = (dayOfWeek: string, weekPattern: any) => {
-        if (!weekPattern) return true;
-
-        const day = dayOfWeek.toLowerCase();
-        switch (day) {
-            case "monday":
-                return weekPattern.monday;
-            case "tuesday":
-                return weekPattern.tuesday;
-            case "wednesday":
-                return weekPattern.wednesday;
-            case "thursday":
-                return weekPattern.thursday;
-            case "friday":
-                return weekPattern.friday;
-            case "saturday":
-                return weekPattern.saturday;
-            case "sunday":
-                return weekPattern.sunday;
-            default:
-                return false;
-        }
-    };
 
     // Calcul du jour pour chaque trajet
     const departDay = departDate ? getDayOfWeek(departDate) : getDayOfWeek(new Date().toISOString());
@@ -75,55 +50,17 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                 const data = await response.json();
 
                 // Filtrer les trajets pour le jour de la semaine sélectionné
-                const departJourneys = data.journeys.filter((journey: any) => {
+                const departJourneys = data.journeys.filter((journey: Journey) => {
                     return isJourneyAvailableOnDay(departDay, journey.weekPattern);
                 });
 
-                // Fonctions utilitaires pour formater les horaires et calculer les durées
-                const formatTime = (timeStr: string | undefined): string => {
-                    if (!timeStr) return "";
+                // Utilisation de la fonction formatTime importée depuis travel.ts
 
-                    // Convertir l'heure UTC en UTC+2 (heure locale française)
-                    const hours = parseInt(timeStr.substring(0, 2));
-                    const minutes = parseInt(timeStr.substring(2, 4));
-
-                    // Ajouter 2 heures pour passer de UTC à UTC+2
-                    let localHours = hours + 2;
-
-                    // Gérer le passage au jour suivant si nécessaire
-                    if (localHours >= 24) {
-                        localHours -= 24;
-                    }
-
-                    // Formater l'heure avec des zéros devant si nécessaire
-                    const formattedHours = localHours.toString().padStart(2, "0");
-                    const formattedMinutes = minutes.toString().padStart(2, "0");
-
-                    return `${formattedHours}:${formattedMinutes}`;
-                };
-
-                const calculateDuration = (depTime: string | undefined, arrTime: string | undefined): string => {
-                    if (!depTime || !arrTime) return "";
-
-                    const depHours = parseInt(depTime.substring(0, 2));
-                    const depMinutes = parseInt(depTime.substring(2, 4));
-                    const arrHours = parseInt(arrTime.substring(0, 2));
-                    const arrMinutes = parseInt(arrTime.substring(2, 4));
-
-                    let durationHours = arrHours - depHours;
-                    let durationMinutes = arrMinutes - depMinutes;
-
-                    if (durationMinutes < 0) {
-                        durationHours--;
-                        durationMinutes += 60;
-                    }
-
-                    return `${durationHours}h ${durationMinutes}m`;
-                };
+                // Utilisation de la fonction calculateDuration importée depuis travel.ts
 
                 // Formater les trajets pour l'affichage
                 const formattedDepartTrips = departJourneys
-                    .map(journey => {
+                    .map((journey: Journey) => {
                         // Extraire les horaires spécifiques aux gares de départ et d'arrivée
                         const departureStop = journey.stop_times[journey.fromIndex];
                         const arrivalStop = journey.stop_times[journey.toIndex];
@@ -149,7 +86,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                         };
                     })
                     // Trier les trajets du plus tôt au plus tard
-                    .sort((a, b) => a.departureTimeValue - b.departureTimeValue);
+                    .sort((a: Trip, b: Trip) => (a.departureTimeValue || 0) - (b.departureTimeValue || 0));
 
                 setDepartureTrips(formattedDepartTrips);
 
@@ -164,14 +101,14 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
 
                         const returnData = await returnResponse.json();
 
-                        // Filtrer les trajets pour le jour de la semaine sélectionné
-                        const returnJourneys = returnData.journeys.filter((journey: any) => {
+                        // Filtrer les trajets de retour pour le jour de la semaine sélectionné
+                        const returnJourneys = returnData.journeys.filter((journey: Journey) => {
                             return isJourneyAvailableOnDay(returnDay, journey.weekPattern);
                         });
 
                         const formattedReturnTrips = returnJourneys
-                            .map(journey => {
-                                // Pour le retour, nous utilisons les mêmes indices car la requête API a déjà inversé les gares
+                            .map((journey: Journey) => {
+                                // Extraire les horaires spécifiques aux gares de départ et d'arrivée
                                 const departureStop = journey.stop_times[journey.fromIndex];
                                 const arrivalStop = journey.stop_times[journey.toIndex];
 
@@ -180,10 +117,12 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
 
                                 const duration = calculateDuration(departureStop?.utc_departure_time, arrivalStop?.utc_arrival_time);
 
+                                // Calculer le prix en fonction de la distance et du jour
                                 const price = calculatePriceWithDayAdjustment(distanceKm, returnDay);
 
                                 // Ajouter la valeur numérique de l'heure pour le tri
-                                const departureTimeValue = departureStop?.utc_departure_time ? parseInt(departureStop.utc_departure_time.substring(0, 4)) : 0;
+                                const departureTimeValue = departureStop?.utc_departure_time ? 
+                                    parseInt(departureStop.utc_departure_time.substring(0, 4)) : 0;
 
                                 return {
                                     id: journey.id_vehicle_journey,
@@ -195,16 +134,26 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                                 };
                             })
                             // Trier les trajets du plus tôt au plus tard
-                            .sort((a, b) => a.departureTimeValue - b.departureTimeValue);
+                            .sort((a: Trip, b: Trip) => {
+                                // Trier par heure de départ
+                                const timeA = a.departureTime.split(":");
+                                const timeB = b.departureTime.split(":");
+                                const hourA = parseInt(timeA[0]);
+                                const hourB = parseInt(timeB[0]);
+                                if (hourA !== hourB) return hourA - hourB;
+                                const minA = parseInt(timeA[1]);
+                                const minB = parseInt(timeB[1]);
+                                return minA - minB;
+                            });
 
                         setReturnTrips(formattedReturnTrips);
                     } catch (returnError) {
                         console.error("Erreur lors du chargement des trajets de retour:", returnError);
                     }
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.error("Erreur lors du chargement des trajets:", error);
-                setError(error.message);
+                setError(error instanceof Error ? error.message : String(error));
             } finally {
                 setLoading(false);
             }

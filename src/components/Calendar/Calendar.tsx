@@ -4,38 +4,13 @@ import {fr} from "date-fns/locale";
 import {format, startOfMonth, endOfMonth} from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
 import "@traintran/style/calendar.css";
-import {calculatePriceWithDayAdjustment} from "@traintran/utils/travel";
+import {
+    calculatePriceWithDayAdjustment,
+    getDayOfWeek,
+    isJourneyAvailableOnDay
+} from "@traintran/utils/travel";
 import {useSearchParams} from "next/navigation";
-
-export interface Journey {
-    id_vehicle_journey: string;
-    day: string;
-    departureTime?: string;
-    arrivalTime?: string;
-    duration?: string;
-    fullDeparture?: string;
-    fullArrival?: string;
-    departure?: string;
-    arrival?: string;
-    fromIndex?: number;
-    toIndex?: number;
-    stop_times?: any[];
-    price?: number;
-    weekPattern?: {
-        monday: boolean;
-        tuesday: boolean;
-        wednesday: boolean;
-        thursday: boolean;
-        friday: boolean;
-        saturday: boolean;
-        sunday: boolean;
-    };
-}
-
-export interface DateWithJourneys {
-    date: Date;
-    journeys: Journey[];
-}
+import {Journey, DateWithJourneys} from "@traintran/components/Calendar/types";
 
 interface CalendarProps {
     onChange?: (date: Date | null, journeys?: Journey[]) => void;
@@ -82,10 +57,13 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
                 const journeysByDate: {[key: string]: Journey[]} = {};
 
                 data.journeys.forEach((journey: Journey) => {
-                    if (!journeysByDate[journey.day]) {
-                        journeysByDate[journey.day] = [];
+                    // Vérifier que journey.day est défini avant de l'utiliser comme index
+                    if (journey.day) {
+                        if (!journeysByDate[journey.day]) {
+                            journeysByDate[journey.day] = [];
+                        }
+                        journeysByDate[journey.day].push(journey);
                     }
-                    journeysByDate[journey.day].push(journey);
                 });
 
                 setAvailableJourneyDates(journeysByDate);
@@ -111,12 +89,6 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
         setCurrentMonth(date);
     };
 
-    // On récupere le jour de la semaine à partir de la date
-    const getDayOfWeek = (date: Date): string => {
-        // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
-        return date.toLocaleDateString("en-US", {weekday: "long"});
-    };
-
     // On récupère les trajets pour la date
     const getJourneysForDate = (date: Date | null): Journey[] => {
         if (!date) return [];
@@ -126,34 +98,12 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
 
     // Vérifier si une date a des trajets disponibles
     const hasJourneysForDayOfWeek = (date: Date): boolean => {
-        const dayOfWeek = getDayOfWeek(date).toLowerCase();
+        const dayOfWeek = getDayOfWeek(date);
 
         // Parcourir toutes les dates disponibles pour voir si un trajet est disponible pour ce jour de la semaine
         for (const dateStr in availableJourneyDates) {
             const journeys = availableJourneyDates[dateStr];
-            const hasJourney = journeys.some(journey => {
-                const weekPattern = journey.weekPattern;
-                if (!weekPattern) return true;
-
-                switch (dayOfWeek) {
-                    case "monday":
-                        return weekPattern.monday;
-                    case "tuesday":
-                        return weekPattern.tuesday;
-                    case "wednesday":
-                        return weekPattern.wednesday;
-                    case "thursday":
-                        return weekPattern.thursday;
-                    case "friday":
-                        return weekPattern.friday;
-                    case "saturday":
-                        return weekPattern.saturday;
-                    case "sunday":
-                        return weekPattern.sunday;
-                    default:
-                        return false;
-                }
-            });
+            const hasJourney = journeys.some(journey => isJourneyAvailableOnDay(dayOfWeek, journey.weekPattern));
 
             if (hasJourney) return true;
         }
@@ -173,16 +123,21 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
                 calendarClassName="custom-calendar"
                 dayClassName={date => (hasJourneysForDayOfWeek(date) ? "calendar-day available" : "calendar-day")}
                 renderDayContents={(day, date) => {
-                    if (!date || !hasJourneysForDayOfWeek(date)) return <span>{day}</span>;
+                    if (!date) return <span>{day}</span>;
 
+                    // Calcul du prix en fonction de la distance et du jour
                     const dayOfWeek = getDayOfWeek(date);
                     const price = calculatePriceWithDayAdjustment(distanceKm, dayOfWeek);
+                    
+                    // Vérifier si cette date a des trajets disponibles
+                    const hasJourneys = hasJourneysForDayOfWeek(date);
 
                     return (
                         <div className="day-cell">
                             <div className="day-content">
                                 <span className="day-number">{day}</span>
                                 <span className="day-price">{price}€</span>
+                                {!hasJourneys && <span className="day-unavailable" style={{ fontSize: '10px', color: '#999' }}>Indisponible</span>}
                             </div>
                         </div>
                     );
