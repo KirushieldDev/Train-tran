@@ -113,11 +113,10 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
 
     // On récupere le jour de la semaine à partir de la date
     const getDayOfWeek = (date: Date): string => {
-         // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
+        // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
         return date.toLocaleDateString("en-US", {weekday: "long"});
     };
 
-    
     // On récupère les trajets pour la date
     const getJourneysForDate = (date: Date | null): Journey[] => {
         if (!date) return [];

@@ -28,6 +28,31 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
         return date.toLocaleDateString("en-US", {weekday: "long"});
     };
 
+    // Vérifie si un trajet est disponible pour un jour de la semaine donné
+    const isJourneyAvailableOnDay = (dayOfWeek: string, weekPattern: any) => {
+        if (!weekPattern) return true;
+
+        const day = dayOfWeek.toLowerCase();
+        switch (day) {
+            case "monday":
+                return weekPattern.monday;
+            case "tuesday":
+                return weekPattern.tuesday;
+            case "wednesday":
+                return weekPattern.wednesday;
+            case "thursday":
+                return weekPattern.thursday;
+            case "friday":
+                return weekPattern.friday;
+            case "saturday":
+                return weekPattern.saturday;
+            case "sunday":
+                return weekPattern.sunday;
+            default:
+                return false;
+        }
+    };
+
     // Calcul du jour pour chaque trajet
     const departDay = departDate ? getDayOfWeek(departDate) : getDayOfWeek(new Date().toISOString());
     const returnDay = returnDate ? getDayOfWeek(returnDate) : departDay;
@@ -51,27 +76,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
 
                 // Filtrer les trajets pour le jour de la semaine sélectionné
                 const departJourneys = data.journeys.filter((journey: any) => {
-                    const weekPattern = journey.weekPattern;
-                    if (!weekPattern) return true;
-
-                    switch (departDay.toLowerCase()) {
-                        case "monday":
-                            return weekPattern.monday;
-                        case "tuesday":
-                            return weekPattern.tuesday;
-                        case "wednesday":
-                            return weekPattern.wednesday;
-                        case "thursday":
-                            return weekPattern.thursday;
-                        case "friday":
-                            return weekPattern.friday;
-                        case "saturday":
-                            return weekPattern.saturday;
-                        case "sunday":
-                            return weekPattern.sunday;
-                        default:
-                            return false;
-                    }
+                    return isJourneyAvailableOnDay(departDay, journey.weekPattern);
                 });
 
                 // Fonctions utilitaires pour formater les horaires et calculer les durées
@@ -161,27 +166,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
 
                         // Filtrer les trajets pour le jour de la semaine sélectionné
                         const returnJourneys = returnData.journeys.filter((journey: any) => {
-                            const weekPattern = journey.weekPattern;
-                            if (!weekPattern) return true;
-
-                            switch (returnDay.toLowerCase()) {
-                                case "monday":
-                                    return weekPattern.monday;
-                                case "tuesday":
-                                    return weekPattern.tuesday;
-                                case "wednesday":
-                                    return weekPattern.wednesday;
-                                case "thursday":
-                                    return weekPattern.thursday;
-                                case "friday":
-                                    return weekPattern.friday;
-                                case "saturday":
-                                    return weekPattern.saturday;
-                                case "sunday":
-                                    return weekPattern.sunday;
-                                default:
-                                    return false;
-                            }
+                            return isJourneyAvailableOnDay(returnDay, journey.weekPattern);
                         });
 
                         const formattedReturnTrips = returnJourneys
