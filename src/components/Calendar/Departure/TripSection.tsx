@@ -3,6 +3,7 @@ import {TripCard} from "@traintran/components/Calendar/Departure/TripCard";
 import {IconArrowRight} from "@tabler/icons-react";
 
 interface Trip {
+    id: string;
     departureTime: string;
     arrivalTime: string;
     price: string;
@@ -14,10 +15,12 @@ interface TripSectionProps {
     station1: string;
     station2: string;
     trips: Trip[];
+    selectedTripId?: string;
+    onSelectTrip?: (tripId: string) => void;
 }
 
 export default function TripSection(props: TripSectionProps) {
-    const {title, station1, station2, trips} = props;
+    const {title, station1, station2, trips, selectedTripId, onSelectTrip} = props;
     return (
         <section className="w-full max-md:max-w-full">
             <div className="flex flex-wrap mt-5 gap-10 justify-between items-center py-1 w-full max-md:max-w-full">
@@ -31,7 +34,7 @@ export default function TripSection(props: TripSectionProps) {
             <div className="mt-4 w-full max-md:max-w-full">
                 {trips.map((trip, index) => (
                     <div key={index} className={index > 0 ? "mt-4" : ""}>
-                        <TripCard {...trip} />
+                        <TripCard {...trip} isSelected={selectedTripId === trip.id} onSelect={onSelectTrip} />
                     </div>
                 ))}
             </div>

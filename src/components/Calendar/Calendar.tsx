@@ -55,38 +55,38 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
     useEffect(() => {
         const fetchJourneysForMonth = async () => {
             if (!departure || !arrival) return;
-            
+
             setLoading(true);
             try {
                 const start = startOfMonth(currentMonth);
                 const end = endOfMonth(currentMonth);
-                
+
                 // Récupérer les trajets pour chaque jour du mois
                 const response = await fetch(`/api/journey/trip?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`);
                 if (!response.ok) {
-                    throw new Error('Erreur lors de la récupération des trajets');
+                    throw new Error("Erreur lors de la récupération des trajets");
                 }
-                
+
                 const data = await response.json();
-                
+
                 // Organiser les trajets par date
                 const journeysByDate: {[key: string]: Journey[]} = {};
-                
+
                 data.journeys.forEach((journey: Journey) => {
                     if (!journeysByDate[journey.day]) {
                         journeysByDate[journey.day] = [];
                     }
                     journeysByDate[journey.day].push(journey);
                 });
-                
+
                 setAvailableJourneyDates(journeysByDate);
             } catch (error) {
-                console.error('Erreur lors du chargement des trajets:', error);
+                console.error("Erreur lors du chargement des trajets:", error);
             } finally {
                 setLoading(false);
             }
         };
-        
+
         fetchJourneysForMonth();
     }, [currentMonth, departure, arrival]);
 
@@ -114,7 +114,7 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
         const dateStr = format(date, "yyyy-MM-dd");
         return availableJourneyDates[dateStr] || [];
     };
-    
+
     // Vérifier si une date a des trajets disponibles
     const hasJourneysForDate = (date: Date): boolean => {
         const dateStr = format(date, "yyyy-MM-dd");
@@ -138,10 +138,10 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
                     // ON calcule le prix en fonction de la distance et du jour
                     const dayOfWeek = getDayOfWeek(date);
                     const price = calculatePriceWithDayAdjustment(distanceKm, dayOfWeek);
-                    
+
                     // Vérifier si cette date a des trajets disponibles
                     const hasJourneys = hasJourneysForDate(date);
-                    
+
                     return (
                         <div className="day-cell">
                             <div className="day-content">
