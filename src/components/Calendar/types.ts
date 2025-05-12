@@ -28,7 +28,6 @@ export interface Journey {
     fullDeparture?: string;
     fullArrival?: string;
     price?: number;
-    [key: string]: any;
 }
 
 export interface Trip {

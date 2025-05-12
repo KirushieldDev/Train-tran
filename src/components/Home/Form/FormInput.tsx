@@ -9,7 +9,6 @@ interface FormInputProps {
     icon?: React.ReactNode;
     type?: string;
     required?: boolean;
-    autocompleteToday?: boolean;
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     suggestions?: string[];
@@ -22,12 +21,10 @@ export const FormInput: React.FC<FormInputProps> = ({
     icon,
     type = "text",
     required,
-    autocompleteToday,
     value = "",
     onChange,
     suggestions = [],
 }) => {
-    const today = new Date().toISOString().split("T")[0];
     const [open, setOpen] = useState(false);
 
     const onBlur = () => setTimeout(() => setOpen(false), 100);

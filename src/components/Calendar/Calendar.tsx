@@ -9,31 +9,28 @@ import {
     getDayOfWeek,
     isJourneyAvailableOnDay
 } from "@traintran/utils/travel";
-import {useSearchParams} from "next/navigation";
-import {Journey, DateWithJourneys} from "@traintran/components/Calendar/types";
+import {Journey} from "@traintran/components/Calendar/types";
 
 interface CalendarProps {
     onChange?: (date: Date | null, journeys?: Journey[]) => void;
-    availableDates?: DateWithJourneys[];
     distanceKm: number;
     selectedDate?: Date | null;
     departure?: string;
     arrival?: string;
 }
 
-const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], distanceKm, selectedDate: propSelectedDate, departure, arrival}) => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(propSelectedDate || new Date());
+const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, departure, arrival}) => {
+    const [currentDate, setCurrentDate] = useState<Date | null>(selectedDate || new Date());
     const [availableJourneyDates, setAvailableJourneyDates] = useState<{[key: string]: Journey[]}>({});
     const [loading, setLoading] = useState<boolean>(false);
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-    const searchParams = useSearchParams();
 
-    // Mettre à jour l'état local si propSelectedDate change
+    // Mettre à jour l'état local si selectedDate change
     useEffect(() => {
-        if (propSelectedDate) {
-            setSelectedDate(propSelectedDate);
+        if (selectedDate) {
+            setCurrentDate(selectedDate);
         }
-    }, [propSelectedDate]);
+    }, [selectedDate]);
 
     // Charger les trajets disponibles pour le mois en cours
     useEffect(() => {
@@ -42,11 +39,13 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
 
             setLoading(true);
             try {
-                const start = startOfMonth(currentMonth);
-                const end = endOfMonth(currentMonth);
-
+                // Construire l'URL avec URLSearchParams
+                const params = new URLSearchParams();
+                params.append('from', departure);
+                params.append('to', arrival);
+                
                 // Récupérer les trajets pour chaque jour du mois
-                const response = await fetch(`/api/journey/trip?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`);
+                const response = await fetch(`/api/journey/trip?${params.toString()}`);
                 if (!response.ok) {
                     throw new Error("Erreur lors de la récupération des trajets");
                 }
@@ -78,7 +77,7 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
     }, [currentMonth, departure, arrival]);
 
     const handleDateChange = (date: Date | null) => {
-        setSelectedDate(date);
+        setCurrentDate(date);
         if (onChange) {
             const journeys = getJourneysForDate(date);
             onChange(date, journeys);
@@ -115,7 +114,7 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
         <div>
             {loading && <div className="text-center py-2 text-primary">Chargement des trajets...</div>}
             <DatePicker
-                selected={selectedDate}
+                selected={currentDate}
                 onChange={handleDateChange}
                 onMonthChange={handleMonthChange}
                 inline

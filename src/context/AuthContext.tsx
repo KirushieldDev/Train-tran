@@ -139,7 +139,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 headers["Authorization"] = `Bearer ${storedToken}`;
             }
             const res = await fetch("/api/auth/session", {headers});
-            const data = (await res.json()) as {ok: boolean; user: UserInfo | null};
+            const data = await res.json() as {ok: boolean, user: UserInfo | null};
             if (!data.ok) {
                 cleanClientData();
                 return;

@@ -41,8 +41,13 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
             setError(null);
 
             try {
+                // Construire l'URL avec URLSearchParams
+                const params = new URLSearchParams();
+                params.append('from', departure);
+                params.append('to', arrival);
+                
                 // Récupérer les trajets pour le jour de départ
-                const response = await fetch(`/api/journey/trip?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`);
+                const response = await fetch(`/api/journey/trip?${params.toString()}`);
                 if (!response.ok) {
                     throw new Error("Erreur lors de la récupération des trajets");
                 }
@@ -94,7 +99,12 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                 if (returnDate) {
                     // Faire une nouvelle requête API pour les trajets de retour en inversant les gares
                     try {
-                        const returnResponse = await fetch(`/api/journey/trip?from=${encodeURIComponent(arrival)}&to=${encodeURIComponent(departure)}`);
+                        // Construire l'URL avec URLSearchParams pour le trajet retour
+                        const returnParams = new URLSearchParams();
+                        returnParams.append('from', arrival);
+                        returnParams.append('to', departure);
+                        
+                        const returnResponse = await fetch(`/api/journey/trip?${returnParams.toString()}`);
                         if (!returnResponse.ok) {
                             throw new Error("Erreur lors de la récupération des trajets de retour");
                         }
@@ -218,7 +228,14 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                         }
 
                         // Construire les paramètres URL pour la page suivante
-                        const params = new URLSearchParams(Array.from(searchParams.entries()));
+                        const params = new URLSearchParams();
+                        
+                        // Copier tous les paramètres existants
+                        searchParams.forEach((value, key) => {
+                            params.append(key, value);
+                        });
+                        
+                        // Ajouter les IDs des trajets sélectionnés
                         params.set("departure_trip_id", selectedDepartureId);
                         if (returnDate && selectedReturnId) {
                             params.set("return_trip_id", selectedReturnId);

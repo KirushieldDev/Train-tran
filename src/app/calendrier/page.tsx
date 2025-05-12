@@ -4,7 +4,8 @@ import React, {useEffect, useState} from "react";
 import {useSearchParams, useRouter} from "next/navigation";
 import Header from "@traintran/components/Header/Header";
 import TrainJourneyDisplay from "@traintran/components/Calendar/Destination/TrainJourneyDisplay";
-import Calendar, {Journey} from "@traintran/components/Calendar/Calendar";
+import Calendar from "@traintran/components/Calendar/Calendar";
+import {Journey} from "@traintran/components/Calendar/types";
 import Departure from "@traintran/components/Calendar/Departure/Departure";
 import Footer from "@traintran/components/Footer/Footer";
 import {calculateDistance} from "@traintran/utils/travel";
@@ -52,9 +53,9 @@ export default function CalendarPage() {
                 }
                 const data = await res.json();
                 setCoords(data);
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error(err);
-                setError(err.message);
+                setError(err instanceof Error ? err.message : String(err));
             } finally {
                 setLoading(false);
             }

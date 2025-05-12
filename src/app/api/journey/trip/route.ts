@@ -72,7 +72,7 @@ export async function GET(req: Request) {
             {status: 200},
         );
     } catch (error) {
-        console.error("Erreur /api/journey/travel", error);
-        return NextResponse.json({message: "Erreur serveur"}, {status: 500});
+        console.error("Error /api/journey/trip", error);
+        return NextResponse.json({message: "Error server"}, {status: 500});
     }
 }
