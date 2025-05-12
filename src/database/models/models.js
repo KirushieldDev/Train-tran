@@ -35,6 +35,7 @@ const weekPatternSchema = new mongoose.Schema({
 const journeySchema = new mongoose.Schema(
     {
         id_vehicle_journey: {type: String, required: true, unique: true},
+        headsign: {type: String, required: true},
         stop_times: {type: [stopTimeSchema], required: true},
         departure: {type: String, required: true},
         arrival: {type: String, required: true},

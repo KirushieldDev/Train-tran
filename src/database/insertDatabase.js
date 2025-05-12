@@ -5,27 +5,41 @@ import axios from "axios";
 import {Journey, Station} from "./models/models.js";
 
 /*
- * Ce script permet de récupérer les gares TGV depuis l'API SNCF
+ * Ce script permet de récupérer les gares TGV & TER depuis l'API SNCF
  */
-async function fetchTGVStationIds() {
+async function fetchTGVandTERStationIds() {
     const authHeader = {Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64")};
-    const tgvIds = new Set();
+    const stationsIds = new Set();
     let page = 0;
 
+    // On récupère d'abord les gares TGV
     while (true) {
         const url = `${process.env.SNCF_API_URL}/physical_modes/physical_mode:LongDistanceTrain/stop_areas?count=1000&start_page=${page}`;
         const {data} = await axios.get(url, {headers: authHeader});
         const sas = data.stop_areas || [];
         if (!sas.length) break;
 
-        sas.forEach(sa => tgvIds.add(sa.id.split(":")[2])); // On ne garde que l'ID de numérique de la gare
+        sas.forEach(sa => stationsIds.add(sa.id.split(":")[2])); // On ne garde que l'ID de numérique de la gare
 
         if (sas.length < 1000) break;
         page++;
     }
 
-    console.log(`Identifiées ${tgvIds.size} gares grande vitesse.`);
-    return tgvIds;
+    // Puis les gares TER
+    while (true) {
+        const url = `${process.env.SNCF_API_URL}/physical_modes/physical_mode:Train/stop_areas?count=1000&start_page=${page}`;
+        const {data} = await axios.get(url, {headers: authHeader});
+        const sas = data.stop_areas || [];
+        if (!sas.length) break;
+
+        sas.forEach(sa => stationsIds.add(sa.id.split(":")[2])); // On ne garde que l'ID de numérique de la gare
+
+        if (sas.length < 1000) break;
+        page++;
+    }
+
+    console.log(`Identifiées ${stationsIds.size} gares.`);
+    return stationsIds;
 }
 
 /*
@@ -40,7 +54,7 @@ async function fetchAndStoreStations(pageSize = 1000, tgvIds) {
 
     while (true) {
         console.log(`Récupération gare, page ${startPage}...`);
-        const url = `${process.env.SNCF_API_URL}/physical_modes/physical_mode%3ALongDistanceTrain/stop_areas?count=${pageSize}&start_page=${startPage}`;
+        const url = `${process.env.SNCF_API_URL}/stop_areas?count=${pageSize}&start_page=${startPage}`;
         const res = await axios.get(url, {headers: authHeader});
         const stopAreas = res.data.stop_areas || [];
         if (stopAreas.length === 0) break;
@@ -48,7 +62,7 @@ async function fetchAndStoreStations(pageSize = 1000, tgvIds) {
         // Transformation des données
         const docs = stopAreas
             .filter(sa => {
-                // on extrait l'ID numérique « 80153452 » depuis « stop_area:SNCF:80153452 »
+                // on extrait l'ID numérique "80153452" depuis "stop_area:SNCF:80153452"
                 const areaIdNum = sa.id.split(":")[2];
                 return tgvIds.has(areaIdNum) && sa.name;
             })
@@ -90,6 +104,7 @@ async function fetchAndStoreJourneys(pageSize = 1000, tgvIds) {
         Authorization: "Basic " + Buffer.from(`${process.env.SNCF_API_TOKEN}:`).toString("base64"),
     };
     let totalInserted = 0;
+    const journeysIDs = new Set();
 
     while (true) {
         console.log(`Récupération trajet, page ${startPage}...`);
@@ -116,12 +131,18 @@ async function fetchAndStoreJourneys(pageSize = 1000, tgvIds) {
                 const departureIdNumber = departureStopPoint.split(":")[2];
                 if (!tgvIds.has(departureIdNumber)) return null;
 
+                // Filtrer les trajets déjà insérés grâce au headsign du trajet
+                const headsign = vj.headsign;
+                if (journeysIDs.has(headsign)) return null;
+                journeysIDs.add(headsign);
+
                 const cal = vj.calendars?.[0]?.week_pattern || {};
                 return {
                     updateOne: {
                         filter: {id_vehicle_journey: vj.id},
                         update: {
                             id_vehicle_journey: vj.id,
+                            headsign: headsign,
                             stop_times: stopTimes,
                             departure: stopTimes[0].utc_departure_time,
                             arrival: stopTimes[stopTimes.length - 1].utc_arrival_time,
@@ -167,7 +188,7 @@ async function run() {
         await Journey.deleteMany({});
 
         // Récupération des gares TGV
-        const tgvIds = await fetchTGVStationIds();
+        const tgvIds = await fetchTGVandTERStationIds();
 
         console.log("Démarrage import stations...");
         const startStations = Date.now();
