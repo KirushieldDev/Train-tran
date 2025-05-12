@@ -53,12 +53,14 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
     const searchParams = useSearchParams();
 
+    // Mettre à jour l'état local si propSelectedDate change
     useEffect(() => {
         if (propSelectedDate) {
             setSelectedDate(propSelectedDate);
         }
     }, [propSelectedDate]);
 
+    // Charger les trajets disponibles pour le mois en cours
     useEffect(() => {
         const fetchJourneysForMonth = async () => {
             if (!departure || !arrival) return;
@@ -68,11 +70,13 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
                 const start = startOfMonth(currentMonth);
                 const end = endOfMonth(currentMonth);
 
+                // Récupérer les trajets pour chaque jour du mois
                 const response = await fetch(`/api/journey/trip?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`);
                 if (!response.ok) {
                     throw new Error("Erreur lors de la récupération des trajets");
                 }
 
+                // Organiser les trajets par date
                 const data = await response.json();
 
                 const journeysByDate: {[key: string]: Journey[]} = {};
@@ -107,16 +111,21 @@ const Calendar: React.FC<CalendarProps> = ({onChange, availableDates = [], dista
         setCurrentMonth(date);
     };
 
+    // On récupere le jour de la semaine à partir de la date
     const getDayOfWeek = (date: Date): string => {
+         // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
         return date.toLocaleDateString("en-US", {weekday: "long"});
     };
 
+    
+    // On récupère les trajets pour la date
     const getJourneysForDate = (date: Date | null): Journey[] => {
         if (!date) return [];
         const dateStr = format(date, "yyyy-MM-dd");
         return availableJourneyDates[dateStr] || [];
     };
 
+    // Vérifier si une date a des trajets disponibles
     const hasJourneysForDayOfWeek = (date: Date): boolean => {
         const dayOfWeek = getDayOfWeek(date).toLowerCase();
 

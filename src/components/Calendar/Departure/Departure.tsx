@@ -24,6 +24,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
     // On récupère le jour de la semaine à partir de la date
     const getDayOfWeek = (dateStr: string) => {
         const date = new Date(dateStr);
+        // On mets en US pour avoir le nom du jour en anglais et long pour avoir le nom complet
         return date.toLocaleDateString("en-US", {weekday: "long"});
     };
 
