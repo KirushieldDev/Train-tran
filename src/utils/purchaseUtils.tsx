@@ -52,15 +52,9 @@ function buildPropsForPassenger(user: UserInfo, ticket: Ticket, passenger: Passe
     // on récupère les objets Option à partir des IDs
     const resolvedOptions: Option[] = ticket.options.map(id => getOptionById(id)).filter((o): o is Option => !!o);
 
-    // Assigne aléatoirement la voiture (1-10) et le siège (1-100)
-    const carNumber = (Math.floor(Math.random() * 10) + 1).toString();
-    const seatNumber = (Math.floor(Math.random() * 100) + 1).toString();
-
     return {
         passenger: passenger,
         journeySegment: ticket.outbound,
-        carNumber,
-        seatNumber,
         options: resolvedOptions,
     };
 }
