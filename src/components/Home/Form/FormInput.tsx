@@ -14,17 +14,7 @@ interface FormInputProps {
     suggestions?: string[];
 }
 
-export const FormInput: React.FC<FormInputProps> = ({
-    label,
-    placeholder,
-    name,
-    icon,
-    type = "text",
-    required,
-    value = "",
-    onChange,
-    suggestions = [],
-}) => {
+export const FormInput: React.FC<FormInputProps> = ({label, placeholder, name, icon, type = "text", required, value = "", onChange, suggestions = []}) => {
     const [open, setOpen] = useState(false);
 
     const onBlur = () => setTimeout(() => setOpen(false), 100);

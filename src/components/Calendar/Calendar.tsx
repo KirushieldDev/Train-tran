@@ -1,14 +1,10 @@
 import React, {useState, useEffect} from "react";
 import DatePicker from "react-datepicker";
 import {fr} from "date-fns/locale";
-import {format, startOfMonth, endOfMonth} from "date-fns";
+import {format} from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
 import "@traintran/style/calendar.css";
-import {
-    calculatePriceWithDayAdjustment,
-    getDayOfWeek,
-    isJourneyAvailableOnDay
-} from "@traintran/utils/travel";
+import {calculatePriceWithDayAdjustment, getDayOfWeek, isJourneyAvailableOnDay} from "@traintran/utils/travel";
 import {Journey} from "@traintran/components/Calendar/types";
 
 interface CalendarProps {
@@ -40,10 +36,8 @@ const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, 
             setLoading(true);
             try {
                 // Construire l'URL avec URLSearchParams
-                const params = new URLSearchParams();
-                params.append('from', departure);
-                params.append('to', arrival);
-                
+                const params = new URLSearchParams({from: departure, to: arrival});
+
                 // Récupérer les trajets pour chaque jour du mois
                 const response = await fetch(`/api/journey/trip?${params.toString()}`);
                 if (!response.ok) {
@@ -127,7 +121,7 @@ const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, 
                     // Calcul du prix en fonction de la distance et du jour
                     const dayOfWeek = getDayOfWeek(date);
                     const price = calculatePriceWithDayAdjustment(distanceKm, dayOfWeek);
-                    
+
                     // Vérifier si cette date a des trajets disponibles
                     const hasJourneys = hasJourneysForDayOfWeek(date);
 
@@ -136,7 +130,11 @@ const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, 
                             <div className="day-content">
                                 <span className="day-number">{day}</span>
                                 <span className="day-price">{price}€</span>
-                                {!hasJourneys && <span className="day-unavailable" style={{ fontSize: '10px', color: '#999' }}>Indisponible</span>}
+                                {!hasJourneys && (
+                                    <span className="day-unavailable" style={{fontSize: "10px", color: "#999"}}>
+                                        Indisponible
+                                    </span>
+                                )}
                             </div>
                         </div>
                     );

@@ -35,9 +35,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
 
             try {
                 // Construire l'URL avec URLSearchParams
-                const params = new URLSearchParams();
-                params.append('from', departure);
-                params.append('to', arrival);
+                const params = new URLSearchParams({from: departure, to: arrival});
 
                 // Récupérer les trajets pour le jour de départ
                 const response = await fetch(`/api/journey/trip?${params.toString()}`);
@@ -93,9 +91,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                     // Faire une nouvelle requête API pour les trajets de retour en inversant les gares
                     try {
                         // Construire l'URL avec URLSearchParams pour le trajet retour
-                        const returnParams = new URLSearchParams();
-                        returnParams.append('from', arrival);
-                        returnParams.append('to', departure);
+                        const returnParams = new URLSearchParams({from: arrival, to: departure});
 
                         const returnResponse = await fetch(`/api/journey/trip?${returnParams.toString()}`);
                         if (!returnResponse.ok) {
@@ -124,8 +120,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                                 const price = calculatePriceWithDayAdjustment(distanceKm, returnDay);
 
                                 // Ajouter la valeur numérique de l'heure pour le tri
-                                const departureTimeValue = departureStop?.utc_departure_time ?
-                                    parseInt(departureStop.utc_departure_time.substring(0, 4)) : 0;
+                                const departureTimeValue = departureStop?.utc_departure_time ? parseInt(departureStop.utc_departure_time.substring(0, 4)) : 0;
 
                                 return {
                                     id: journey.id_vehicle_journey,

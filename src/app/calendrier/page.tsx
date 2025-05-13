@@ -13,7 +13,7 @@ import ReservationStepper from "@traintran/components/common/ReservationStepper"
 import {useCart} from "@traintran/context/CartContext";
 
 export default function CalendarPage() {
-    const {cartTicket} = useCart();
+    const {cartTicket, setCartTicket} = useCart();
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -49,7 +49,8 @@ export default function CalendarPage() {
         async function fetchStations() {
             try {
                 // On appelle l'API pour récupérer les coordonnées des gares
-                const res = await fetch(`/api/journey/stations-coords?from=${encodeURIComponent(departure)}&to=${encodeURIComponent(arrival)}`);
+                const params = new URLSearchParams({from: departure, to: arrival});
+                const res = await fetch(`/api/journey/stations-coords?${params.toString()}`);
                 if (!res.ok) {
                     const data = await res.json();
                     throw new Error(data.message || "Erreur récupération gares");
@@ -70,6 +71,11 @@ export default function CalendarPage() {
             setLoading(false);
         }
     }, [departure, arrival]);
+
+    const handleNext = () => {
+        // TODO: Construire le ticket client et le setter dans CartContext grâce à setCartTicket()
+        router.push("/passagers");
+    };
 
     // ON affiche un message de chargement ou d'erreur
     if (loading) return <div>Chargement des données de la gare…</div>;
@@ -98,7 +104,7 @@ export default function CalendarPage() {
                     <button onClick={() => router.push("/")} className="button-base button-variant-outline button-size-lg">
                         Annuler
                     </button>
-                    <button onClick={() => router.push("/passagers")} className="button-base button-variant-secondary button-size-lg">
+                    <button onClick={handleNext} className="button-base button-variant-secondary button-size-lg">
                         Continuer la commande
                     </button>
                 </div>
