@@ -8,14 +8,17 @@ import {calculatePriceWithDayAdjustment, getDayOfWeek, isJourneyAvailableOnDay} 
 import {Journey} from "@traintran/components/Calendar/types";
 
 interface CalendarProps {
-    onChange?: (date: Date | null, journeys?: Journey[]) => void;
+    onChange?: (date: Date | null, journeys?: Journey[], type?: 'outbound' | 'inbound') => void;
     distanceKm: number;
     selectedDate?: Date | null;
     departure?: string;
     arrival?: string;
+    type?: 'outbound' | 'inbound'; // Type de date (aller ou retour)
+    minDate?: Date; // Date minimale pour le calendrier (utile pour le retour)
+    title?: string; // Titre du calendrier
 }
 
-const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, departure, arrival}) => {
+const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, departure, arrival, type = 'outbound', minDate, title}) => {
     const [currentDate, setCurrentDate] = useState<Date | null>(selectedDate || new Date());
     const [availableJourneyDates, setAvailableJourneyDates] = useState<{[key: string]: Journey[]}>({});
     const [loading, setLoading] = useState<boolean>(false);
@@ -71,10 +74,17 @@ const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, 
     }, [currentMonth, departure, arrival]);
 
     const handleDateChange = (date: Date | null) => {
+        // Vérifier si la date est dans le passé ou avant la date minimale
+        const currentMinDate = minDate || new Date();
+        if (date && date < currentMinDate) {
+            console.error("Impossible de sélectionner cette date");
+            return;
+        }
+        
         setCurrentDate(date);
         if (onChange) {
             const journeys = getJourneysForDate(date);
-            onChange(date, journeys);
+            onChange(date, journeys, type);
         }
     };
 
@@ -106,6 +116,7 @@ const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, 
 
     return (
         <div>
+            {title && <h3 className="text-lg font-semibold mb-2">{title}</h3>}
             {loading && <div className="text-center py-2 text-primary">Chargement des trajets...</div>}
             <DatePicker
                 selected={currentDate}
@@ -113,6 +124,7 @@ const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, 
                 onMonthChange={handleMonthChange}
                 inline
                 locale={fr}
+                minDate={minDate || new Date()}
                 calendarClassName="custom-calendar"
                 dayClassName={date => (hasJourneysForDayOfWeek(date) ? "calendar-day available" : "calendar-day")}
                 renderDayContents={(day, date) => {
