@@ -2,12 +2,10 @@
 
 import React, {createContext, ReactNode, useContext, useEffect, useRef, useState} from "react";
 import {useAuth} from "./AuthContext";
-import getOptionById, {Option, OptionID} from "@traintran/lib/options";
-import {TrainTicketPDFProps} from "@traintran/components/Mail/TrainTicketPDF";
+import getOptionById, {OptionID} from "@traintran/lib/options";
 import {useRouter} from "next/navigation";
 
 const STORAGE_LOCAL_CART = process.env.NEXT_PUBLIC_STORAGE_LOCAL_CART!;
-const STORAGE_SESSION_TOKEN = process.env.NEXT_PUBLIC_STORAGE_SESSION_TOKEN!;
 
 /** Segment d’un trajet */
 export interface JourneySegment {
@@ -27,10 +25,11 @@ export interface Passenger {
 /** Un ticket complet (aller + éventuel retour) */
 export interface Ticket {
     outbound: JourneySegment;
-    return?: JourneySegment;
+    inbound?: JourneySegment;
     passengers: Passenger[];
-    options: Set<OptionID>;
+    options: OptionID[];
     basePrice: number;
+    totalPrice: number;
 }
 
 interface CartContextType {
@@ -39,22 +38,27 @@ interface CartContextType {
     setCartTicket: (ticket: Ticket) => void;
     clearCart: () => void;
     loadingCart: boolean;
+    // passagers
+    addPassenger: (p: Passenger) => void;
+    updatePassenger: (index: number, p: Passenger) => void;
+    removePassenger: (index: number) => void;
+    setAllPassengers: (passengers: Passenger[]) => void;
     // options
     addOption: (optionId: OptionID) => void;
     removeOption: (optionId: OptionID) => void;
     toggleOption: (optionId: OptionID) => void;
-    // Calcul du prix total
-    getTotalPrice: () => number;
-    // Helper pour obtenir toutes les pages groupées par ticket
-    getAllPages: () => TrainTicketPDFProps[];
+    // Calcul du prix d'un ticket
+    getOptionsPrice: (ticket: Ticket) => number;
+    getTotalPrice: (ticket: Ticket) => number;
     // paiement
     purchaseCart: () => Promise<void>;
+    downloadPdf: (segment: "outbound" | "inbound") => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
-    const {user} = useAuth();
+    const {user, protectedFetch} = useAuth();
     const router = useRouter();
     const [cartTicket, setCartTicketRaw] = useState<Ticket | null>(null);
     const [loadingCart, setLoadingCart] = useState(true);
@@ -68,22 +72,21 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
             try {
                 // Ré-instancier les Set pour options
                 const obj = JSON.parse(raw) as Ticket;
-                obj.options = new Set(obj.options);
                 setCartTicketRaw(obj);
             } catch {}
         }
 
         const testTicket: Ticket = {
             outbound: {
-                departureStation: "Paris",
-                arrivalStation: "Lyon",
+                departureStation: "Paris Est",
+                arrivalStation: "Strasbourg",
                 departureTime: new Date().toISOString(),
                 arrivalTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // +2h
             },
             // optional return segment
-            return: {
-                departureStation: "Lyon",
-                arrivalStation: "Paris",
+            inbound: {
+                departureStation: "Strasbourg",
+                arrivalStation: "Paris Est",
                 departureTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // next day
                 arrivalTime: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(), // +2h after return depart
             },
@@ -91,8 +94,9 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 {firstName: "Pierre", lastName: "Dupont", age: 45},
                 {firstName: "Marie", lastName: "Dupont", age: 56},
             ],
-            options: new Set([OptionID.Quiet, OptionID.Insurance, OptionID.Baggage]),
+            options: [OptionID.Quiet, OptionID.Insurance, OptionID.Baggage],
             basePrice: 120,
+            totalPrice: 0,
         };
         setCartTicket(testTicket);
 
@@ -104,117 +108,124 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     useEffect(() => {
         if (!initialized.current) return;
         if (cartTicket) {
-            // convertir Set en array pour le JSON
-            const toStore = {
-                ...cartTicket,
-                outbound: {...cartTicket.outbound},
-                return: cartTicket.return ? {...cartTicket.return} : undefined,
-            };
-            localStorage.setItem(STORAGE_LOCAL_CART, JSON.stringify(toStore));
+            localStorage.setItem(STORAGE_LOCAL_CART, JSON.stringify({...cartTicket}));
         } else {
             localStorage.removeItem(STORAGE_LOCAL_CART);
         }
     }, [cartTicket]);
 
-    // wrapper pour ré-instancier Set automatiquement
     const setCartTicket = (ticket: Ticket) => {
-        ticket.options = new Set(ticket.options);
-        setCartTicketRaw(ticket);
+        // supprimer les doublons dans options[]
+        const uniqueOpts = Array.from(new Set(ticket.options));
+        setCartTicketRaw({...ticket, options: uniqueOpts, totalPrice: getTotalPrice(ticket)});
     };
 
     const clearCart = () => setCartTicketRaw(null);
 
+    const addPassenger = (p: Passenger) => {
+        if (!cartTicket) return;
+        setCartTicket({
+            ...cartTicket,
+            passengers: [...cartTicket.passengers, p],
+        });
+    };
+
+    const updatePassenger = (index: number, p: Passenger) => {
+        if (!cartTicket || index < 0) return;
+        const newPassengers = [...cartTicket.passengers];
+        if (index > newPassengers.length) addPassenger(p);
+        else newPassengers[index] = p;
+        setCartTicket({
+            ...cartTicket,
+            passengers: newPassengers,
+        });
+    };
+
+    const removePassenger = (index: number) => {
+        if (!cartTicket) return;
+        const newPassengers = cartTicket.passengers.filter((_, i) => i !== index);
+        setCartTicket({
+            ...cartTicket,
+            passengers: newPassengers,
+        });
+    };
+
+    const setAllPassengers = (passengers: Passenger[]) => {
+        if (!cartTicket) return;
+        setCartTicket({...cartTicket, passengers});
+    };
+
     const addOption = (optionId: OptionID) => {
         if (!cartTicket) return;
-        const opts = new Set(cartTicket.options);
-        opts.add(optionId);
-        setCartTicketRaw({...cartTicket, options: opts});
+        if (!cartTicket.options.includes(optionId)) {
+            setCartTicket({...cartTicket, options: [...cartTicket.options, optionId]});
+        }
     };
 
     const removeOption = (optionId: OptionID) => {
         if (!cartTicket) return;
-        const opts = new Set(cartTicket.options);
-        opts.delete(optionId);
-        setCartTicketRaw({...cartTicket, options: opts});
+        setCartTicket({...cartTicket, options: cartTicket.options.filter(o => o !== optionId)});
     };
 
     const toggleOption = (optionId: OptionID) => {
         if (!cartTicket) return;
-        const opts = new Set(cartTicket.options);
-        if (opts.has(optionId)) opts.delete(optionId);
-        else opts.add(optionId);
-        setCartTicketRaw({...cartTicket, options: opts});
+        const has = cartTicket.options.includes(optionId);
+        setCartTicket({...cartTicket, options: has ? cartTicket.options.filter(o => o !== optionId) : [...cartTicket.options, optionId]});
     };
 
-    // Transforme un segment + passager en props PDF en injectant orderer depuis user
-    const buildPropsForPassenger = (ticket: Ticket, passenger: Passenger): TrainTicketPDFProps => {
-        if (!user) throw new Error("Utilisateur non connecté");
-        // on récupère les objets Option à partir des IDs
-        const resolvedOptions: Option[] = Array.from(ticket.options)
-            .map(id => getOptionById(id))
-            .filter((o): o is Option => !!o);
-
-        // Assigne aléatoirement la voiture (1-10) et le siège (1-100)
-        const carNumber = (Math.floor(Math.random() * 10) + 1).toString();
-        const seatNumber = (Math.floor(Math.random() * 100) + 1).toString();
-
-        return {
-            ordererFirstName: user.firstName,
-            ordererLastName: user.lastName,
-            passengerFirstName: passenger.firstName,
-            passengerLastName: passenger.lastName,
-            journeySegment: ticket.outbound,
-            carNumber,
-            seatNumber,
-            options: resolvedOptions,
-        };
-    };
-
-    // Pour chaque ticket, une page par passager et par segment
-    const getAllPages = (): TrainTicketPDFProps[] => {
-        if (!cartTicket) return [];
-        return cartTicket.passengers.flatMap(
-            p =>
-                [
-                    buildPropsForPassenger(cartTicket, p),
-                    cartTicket.return ? buildPropsForPassenger({...cartTicket, outbound: cartTicket.return}, p) : undefined,
-                ].filter(Boolean) as TrainTicketPDFProps[],
-        );
+    const getOptionsPrice = (ticket: Ticket) => {
+        let total: number = 0;
+        const trips = ticket.inbound ? 2 : 1;
+        ticket.options.forEach(optId => {
+            const opt = getOptionById(optId);
+            if (opt) total += opt.price * ticket.passengers.length * trips;
+        });
+        return total;
     };
 
     // Calcule le prix total
-    const getTotalPrice = (): number => {
-        if (!cartTicket) return 0;
-        let total = cartTicket.basePrice * (cartTicket.return ? 2 : 1);
-        cartTicket.options.forEach(optId => {
-            const opt = getOptionById(optId);
-            if (opt) total += opt.price * cartTicket.passengers.length * (cartTicket.return ? 2 : 1);
-        });
+    const getTotalPrice = (ticket: Ticket): number => {
+        if (!ticket) return 0;
+        const trips = ticket.inbound ? 2 : 1;
+        let total = ticket.basePrice * ticket.passengers.length * trips;
+        total += getOptionsPrice(ticket);
         return total;
     };
 
     // Envoie les tickets par mail via l'API
     const purchaseCart = async (): Promise<void> => {
-        if (!user || !cartTicket) throw new Error("Pas de ticket en cours");
-        const pages = getAllPages();
-        // récupère le token de session (pour remember=false) ou laisser le cookie faire son boulot
-        const token = sessionStorage.getItem(STORAGE_SESSION_TOKEN);
-        const headers: Record<string, string> = {"Content-Type": "application/json"};
-        if (token) {
-            headers["Authorization"] = `Bearer ${token}`;
-        }
-        // sinon le cookie httpOnly sera renvoyé automatiquement
-        const res = await fetch("/api/cart/send-tickets", {
+        if (!user || !cartTicket) throw new Error("Non connecté ou aucun ticket en cours");
+        const res = await protectedFetch("/api/cart/purchase", {
             method: "POST",
-            headers: headers,
-            body: JSON.stringify({tickets: pages}),
+            body: JSON.stringify({ticket: cartTicket}),
         });
-        if (!res.ok) {
-            const {error} = await res.json();
-            throw new Error(error || "Échec de l'envoi des billets");
-        } else {
-            router.push("/confirmation");
+        const data = (await res.json()) as {ok: boolean; error?: string};
+        if (!data.ok) {
+            throw new Error(data.error || "Échec de l'envoi des billets");
         }
+        router.push("/confirmation");
+    };
+
+    const downloadPdf = async (segment: "outbound" | "inbound"): Promise<void> => {
+        if (!cartTicket) throw new Error("Aucun ticket en cours");
+        const segLabel = segment === "outbound" ? "aller" : "retour";
+        const filename = `${cartTicket.outbound.departureStation}-${cartTicket.outbound.arrivalStation}-${segLabel}.pdf`;
+
+        const res = await protectedFetch("/api/cart/ticket", {
+            method: "POST",
+            body: JSON.stringify({ticket: cartTicket, segment}),
+        });
+        if (!res.ok) throw new Error("Impossible de charger le PDF");
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
     };
 
     return (
@@ -224,12 +235,17 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 setCartTicket,
                 clearCart,
                 loadingCart,
+                addPassenger,
+                updatePassenger,
+                removePassenger,
+                setAllPassengers,
                 addOption,
                 removeOption,
                 toggleOption,
+                getOptionsPrice,
                 getTotalPrice,
-                getAllPages: getAllPages,
                 purchaseCart,
+                downloadPdf,
             }}>
             {children}
         </CartContext.Provider>

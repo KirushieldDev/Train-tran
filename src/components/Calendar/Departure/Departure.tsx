@@ -1,18 +1,11 @@
 import React, {useState, useEffect} from "react";
-import {useRouter, useSearchParams} from "next/navigation";
+import {useSearchParams} from "next/navigation";
 import TripSection from "@traintran/components/Calendar/Departure/TripSection";
-import {
-    calculatePriceWithDayAdjustment,
-    getDayOfWeek,
-    isJourneyAvailableOnDay,
-    formatTime,
-    calculateDuration
-} from "@traintran/utils/travel";
+import {calculatePriceWithDayAdjustment, getDayOfWeek, isJourneyAvailableOnDay, formatTime, calculateDuration} from "@traintran/utils/travel";
 import {Journey, Trip} from "@traintran/components/Calendar/types";
 
 export default function Departure({distanceKm}: {distanceKm: number}) {
     const searchParams = useSearchParams();
-    const router = useRouter();
 
     const departure = searchParams.get("departure") ?? "";
     const arrival = searchParams.get("arrival") ?? "";
@@ -45,7 +38,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                 const params = new URLSearchParams();
                 params.append('from', departure);
                 params.append('to', arrival);
-                
+
                 // Récupérer les trajets pour le jour de départ
                 const response = await fetch(`/api/journey/trip?${params.toString()}`);
                 if (!response.ok) {
@@ -103,7 +96,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                         const returnParams = new URLSearchParams();
                         returnParams.append('from', arrival);
                         returnParams.append('to', departure);
-                        
+
                         const returnResponse = await fetch(`/api/journey/trip?${returnParams.toString()}`);
                         if (!returnResponse.ok) {
                             throw new Error("Erreur lors de la récupération des trajets de retour");
@@ -131,7 +124,7 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                                 const price = calculatePriceWithDayAdjustment(distanceKm, returnDay);
 
                                 // Ajouter la valeur numérique de l'heure pour le tri
-                                const departureTimeValue = departureStop?.utc_departure_time ? 
+                                const departureTimeValue = departureStop?.utc_departure_time ?
                                     parseInt(departureStop.utc_departure_time.substring(0, 4)) : 0;
 
                                 return {
@@ -208,43 +201,6 @@ export default function Departure({distanceKm}: {distanceKm: number}) {
                         ))}
                 </>
             )}
-
-            <div className="flex flex-wrap gap-2.5 justify-center mt-8 mb-10 w-full text-base text-center max-md:max-w-full">
-                <button onClick={() => router.push("/")} className="button-base button-variant-outline button-size-lg">
-                    Annuler
-                </button>
-                <button
-                    onClick={() => {
-                        // Vérifier qu'un trajet aller est sélectionné
-                        if (!selectedDepartureId) {
-                            alert("Veuillez sélectionner un trajet aller");
-                            return;
-                        }
-
-                        // Vérifier qu'un trajet retour est sélectionné si une date de retour est spécifiée
-                        if (returnDate && !selectedReturnId) {
-                            alert("Veuillez sélectionner un trajet retour");
-                            return;
-                        }
-
-                        // Construire les paramètres URL pour la page suivante
-                        const params = new URLSearchParams();
-                        
-                        // Copier tous les paramètres existants
-                        searchParams.forEach((value, key) => {
-                            params.append(key, value);
-                        });
-                        
-                        // Ajouter les IDs des trajets sélectionnés
-                        params.set("departure_trip_id", selectedDepartureId);
-                        if (returnDate && selectedReturnId) {
-                            params.set("return_trip_id", selectedReturnId);
-                        }
-                    }}
-                    className={`button-base button-variant-secondary button-size-lg ${!selectedDepartureId || (returnDate && !selectedReturnId) ? "opacity-50 cursor-not-allowed" : ""}`}>
-                    Continuer la commande
-                </button>
-            </div>
         </div>
     );
 }

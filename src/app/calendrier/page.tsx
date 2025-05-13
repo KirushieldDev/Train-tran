@@ -9,8 +9,11 @@ import {Journey} from "@traintran/components/Calendar/types";
 import Departure from "@traintran/components/Calendar/Departure/Departure";
 import Footer from "@traintran/components/Footer/Footer";
 import {calculateDistance} from "@traintran/utils/travel";
+import ReservationStepper from "@traintran/components/common/ReservationStepper";
+import {useCart} from "@traintran/context/CartContext";
 
 export default function CalendarPage() {
+    const {cartTicket} = useCart();
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -78,6 +81,7 @@ export default function CalendarPage() {
     return (
         <>
             <Header />
+            <ReservationStepper ticket={cartTicket} page="calendrier" />
             <div className="px-4 md:px-40 lg:px-40">
                 <TrainJourneyDisplay />
                 <div className="bg-white rounded-lg shadow-md p-6 mt-6">
@@ -90,6 +94,14 @@ export default function CalendarPage() {
                     />
                 </div>
                 <Departure distanceKm={distanceKm} />
+                <div className="flex flex-wrap gap-2.5 justify-center mt-8 mb-10 w-full text-base text-center max-md:max-w-full">
+                    <button onClick={() => router.push("/")} className="button-base button-variant-outline button-size-lg">
+                        Annuler
+                    </button>
+                    <button onClick={() => router.push("/passagers")} className="button-base button-variant-secondary button-size-lg">
+                        Continuer la commande
+                    </button>
+                </div>
             </div>
             <Footer />
         </>

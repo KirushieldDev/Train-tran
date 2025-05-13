@@ -1,4 +1,5 @@
 import {Option, OptionID} from "@traintran/lib/options";
+import {Ticket} from "@traintran/context/CartContext";
 
 export interface OptionCardProps {
     option: Option;
@@ -12,6 +13,8 @@ export interface OptionsListProps {
 }
 
 export interface OrderSummaryProps {
+    ticket: Ticket;
     selectedOptions: OptionID[];
     showButton?: boolean;
+    reduce?: boolean;
 }

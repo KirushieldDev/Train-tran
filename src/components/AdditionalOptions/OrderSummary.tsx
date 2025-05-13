@@ -3,20 +3,17 @@
 import React from "react";
 import getOptionById from "@traintran/lib/options";
 import {OrderSummaryProps} from "@traintran/components/AdditionalOptions/types";
-import {useCart} from "@traintran/context/CartContext";
 import {useRouter} from "next/navigation";
+import {useCart} from "@traintran/context/CartContext";
 
-export const OrderSummary: React.FC<OrderSummaryProps> = ({selectedOptions, showButton = true}) => {
-    const {cartTicket, getTotalPrice} = useCart();
+export default function OrderSummary(props: OrderSummaryProps) {
+    const {ticket, selectedOptions, showButton, reduce} = props;
     const router = useRouter();
+    const {getOptionsPrice} = useCart();
 
-    if (!cartTicket) {
-        return null;
-    }
-
-    const passengersCount = cartTicket.passengers.length;
-    // Calculs de prix
-    const totalPrice = getTotalPrice();
+    const passengerCount = ticket.passengers.length;
+    const totalPrice = ticket.totalPrice;
+    const outboundOptionPrice = getOptionsPrice(ticket) / (ticket.inbound ? 2 : 1);
 
     return (
         <div className="w-full">
@@ -25,29 +22,66 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({selectedOptions, show
                 {/* Prix total des billets */}
                 <div className="flex justify-between text-textPrimary">
                     <span>Billet de base</span>
-                    <span className="font-medium">{cartTicket.basePrice}€</span>
+                    <span className="font-medium">{ticket.basePrice}€</span>
                 </div>
-
-                {/* Options sélectionnées */}
-                {selectedOptions.map((optId, i) => {
-                    const option = getOptionById(optId);
-                    if (!option) return null;
-                    return (
-                        <div key={i} className="flex justify-between text-primary">
-                            <span>{option.name}</span>
-                            <span className="font-medium">{option.price === 0 ? "Gratuit" : `+${option.price * passengersCount}€`}</span>
-                        </div>
-                    );
-                })}
 
                 {/* Nombre de passagers */}
                 <div className="flex justify-between text-textSecondary">
                     <span>Nombre de passagers</span>
-                    <span className="font-medium">{passengersCount}</span>
+                    <span className="font-medium">{passengerCount}</span>
                 </div>
 
-                {/* Total final */}
-                <div className="border-t border-borderContainer pt-3 mt-4">
+                {/* Sous total de base */}
+                <div className="flex justify-between font-semibold text-textSecondary">
+                    <span>Sous total</span>
+                    <span>{ticket.basePrice * ticket.passengers.length}€</span>
+                </div>
+
+                {/* Options sélectionnées */}
+                {selectedOptions.length > 0 && (
+                    <>
+                        <div className="flex flex-col gap-2 border-t border-borderContainer pt-3">
+                            {reduce ? (
+                                <div className="flex justify-between text-textSecondary">
+                                    <span>Options</span>
+                                    <span className="font-medium">{outboundOptionPrice}€</span>
+                                </div>
+                            ) : (
+                                selectedOptions.map((optId, i) => {
+                                    const option = getOptionById(optId);
+                                    if (!option) return null;
+                                    return (
+                                        <div key={i} className="flex justify-between text-textSecondary">
+                                            <span>{option.name}</span>
+                                            <span className="font-medium text-primary">
+                                                {option.price === 0 ? "Gratuit" : `+${option.price * passengerCount}€`}
+                                            </span>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                        {/* Sous total des options */}
+                        <div className="flex justify-between font-semibold text-textSecondary">
+                            <span>Sous total</span>
+                            <span>{outboundOptionPrice}€</span>
+                        </div>
+                    </>
+                )}
+
+                <div className="flex flex-col gap-2 justify-between text-textSecondary border-t border-borderContainer pt-3 mt-4">
+                    {/* Aller et retour */}
+                    {ticket.inbound ? (
+                        <div className="flex justify-between text-textSecondary">
+                            <span>Aller/Retour</span>
+                            <span className="font-medium">x2</span>
+                        </div>
+                    ) : (
+                        <div className="flex justify-between text-textSecondary">
+                            <span>Aller simple</span>
+                        </div>
+                    )}
+                    {/* Total final */}
                     <div className="flex justify-between font-semibold text-textPrimary">
                         <span className="text-lg">Total</span>
                         <span className="text-lg">{totalPrice}€</span>
@@ -62,4 +96,4 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({selectedOptions, show
             )}
         </div>
     );
-};
+}

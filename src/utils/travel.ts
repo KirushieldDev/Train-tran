@@ -53,6 +53,40 @@ export function calculatePriceWithDayAdjustment(
     return Math.round(raw * 100) / 100;
 }
 
+export const weekdays = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+
+/**
+ * Formate la date comme suit : 01/01/1970
+ * @param iso
+ */
+export function formattedDate(iso: string): string {
+    return new Date(iso.split("T")[0]).toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+}
+
+/**
+ * Formate la date comme suit : 20:00
+ * @param iso
+ */
+export function formattedTime(iso: string): string {
+    return new Date(iso.split("T")[0]).toLocaleDateString("fr-FR", {hour: "2-digit", minute: "2-digit"}).split(" ")[1];
+}
+
+/**
+ * Formate la date et l'heure comme suit : lundi 01/01/1970 à 20:00
+ * @param iso
+ */
+export function formatDateTime(iso: string) {
+    const d = new Date(iso);
+    const day = weekdays[d.getDay()];
+    const dateStr = formattedDate(iso);
+    const timeStr = formattedTime(iso);
+    return `${day} ${dateStr} à ${timeStr}`;
+}
+
 // Fonction pour récupérer le jour de la semaine à partir d'une date
 export function getDayOfWeek(date: Date | string): string {
     // Si la date est une chaîne, la convertir en objet Date
@@ -89,45 +123,45 @@ export function isJourneyAvailableOnDay(dayOfWeek: string, weekPattern: any): bo
 // Convertit une heure UTC en heure locale (UTC+2)
 export function formatTime(timeStr: string | undefined): string {
     if (!timeStr) return '';
-    
+
     // Extraire les heures et minutes
     const hours = parseInt(timeStr.substring(0, 2));
     const minutes = parseInt(timeStr.substring(2, 4));
     const seconds = timeStr.length >= 6 ? parseInt(timeStr.substring(4, 6)) : 0;
-    
+
     // Créer une date en UTC
     const date = new Date();
     date.setUTCHours(hours);
     date.setUTCMinutes(minutes);
     date.setUTCSeconds(seconds);
-    
+
     // Récupérer l'heure locale
     const localHours = date.getHours();
     const localMinutes = date.getMinutes();
-    
+
     // Formater l'heure avec des zéros devant si nécessaire
     const formattedHours = localHours.toString().padStart(2, '0');
     const formattedMinutes = localMinutes.toString().padStart(2, '0');
-    
+
     return `${formattedHours}:${formattedMinutes}`;
 }
 
 // Calcule la durée entre deux heures
 export function calculateDuration(depTime: string | undefined, arrTime: string | undefined): string {
     if (!depTime || !arrTime) return '';
-    
+
     const depHours = parseInt(depTime.substring(0, 2));
     const depMinutes = parseInt(depTime.substring(2, 4));
     const arrHours = parseInt(arrTime.substring(0, 2));
     const arrMinutes = parseInt(arrTime.substring(2, 4));
-    
+
     let durationHours = arrHours - depHours;
     let durationMinutes = arrMinutes - depMinutes;
-    
+
     if (durationMinutes < 0) {
         durationHours--;
         durationMinutes += 60;
     }
-    
+
     return `${durationHours}h ${durationMinutes}m`;
 }
