@@ -28,7 +28,15 @@ export default function TrainJourneyDisplay() {
                         {arrival}
                     </h2>
                 </div>
-                <Link href="/" className="flex gap-2 items-center cursor-pointer max-sm:justify-end max-sm:w-full" aria-label="Modifier le trajet">
+                <Link 
+                    href={`/?${new URLSearchParams({
+                        departure: departure || "",
+                        arrival: arrival || "",
+                        ...(departure_date && { departure_date }),
+                        ...(return_date && { return_date })
+                    }).toString()}`} 
+                    className="flex gap-2 items-center cursor-pointer max-sm:justify-end max-sm:w-full" 
+                    aria-label="Modifier le trajet">
                     <IconEdit className="text-primary" size="16" />
                     <span className="text-base text-primary">Modifier</span>
                 </Link>
