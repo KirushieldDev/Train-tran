@@ -9,25 +9,12 @@ interface FormInputProps {
     icon?: React.ReactNode;
     type?: string;
     required?: boolean;
-    autocompleteToday?: boolean;
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     suggestions?: string[];
 }
 
-export const FormInput: React.FC<FormInputProps> = ({
-    label,
-    placeholder,
-    name,
-    icon,
-    type = "text",
-    required,
-    autocompleteToday,
-    value = "",
-    onChange,
-    suggestions = [],
-}) => {
-    const today = new Date().toISOString().split("T")[0];
+export const FormInput: React.FC<FormInputProps> = ({label, placeholder, name, icon, type = "text", required, value = "", onChange, suggestions = []}) => {
     const [open, setOpen] = useState(false);
 
     const onBlur = () => setTimeout(() => setOpen(false), 100);
@@ -39,7 +26,12 @@ export const FormInput: React.FC<FormInputProps> = ({
         setOpen(false);
     };
 
-    const inputProps = type === "date" ? (autocompleteToday ? {defaultValue: today} : {}) : {value, onChange, onFocus: () => setOpen(true), onBlur};
+    const inputProps = {
+        value,
+        onChange,
+        onFocus: () => setOpen(true),
+        onBlur,
+    };
 
     return (
         <div className="flex flex-col grow shrink min-w-60 w-[323px]">
