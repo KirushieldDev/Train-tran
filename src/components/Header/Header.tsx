@@ -6,9 +6,16 @@ import Logo from "@traintran/assets/Header/Logo";
 import {NavigationLinks} from "@traintran/components/Header/NavigationLinks";
 import Link from "next/link";
 import {useAuth} from "@traintran/context/AuthContext";
+import {useTimeout} from "@traintran/context/CartContext";
+import TimeoutClock from "@traintran/components/Header/TimeoutClock";
 
 export default function Header() {
     const {user} = useAuth();
+    const {isActive: showTimeoutClock, remainingTime, stopTimeout} = useTimeout();
+
+    const handleTimeout = () => {
+        stopTimeout();
+    };
 
     return (
         <header className="flex flex-col items-start px-20 py-0 bg-white border-0 shadow-sm">
@@ -19,6 +26,9 @@ export default function Header() {
                     </Link>
                     <NavigationLinks />
                 </div>
+
+                {showTimeoutClock && <TimeoutClock initialTime={remainingTime} onTimeout={handleTimeout} />}
+
                 {user ? (
                     <IconCircleCheck size={24} className="text-green-500" title="Connecté" />
                 ) : (

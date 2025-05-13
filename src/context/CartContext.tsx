@@ -6,6 +6,10 @@ import getOptionById, {OptionID} from "@traintran/lib/options";
 import {useRouter} from "next/navigation";
 
 const STORAGE_LOCAL_CART = process.env.NEXT_PUBLIC_STORAGE_LOCAL_CART!;
+const STORAGE_LOCAL_TIMEOUT = process.env.NEXT_PUBLIC_STORAGE_LOCAL_TIMEOUT!;
+const STORAGE_LOCAL_REMAINING_TIME = process.env.NEXT_PUBLIC_STORAGE_LOCAL_REMAINING_TIME!;
+// Durée initiale du timer en secondes
+const INITIAL_TIMEOUT = 300;
 
 /** Segment d’un trajet */
 export interface JourneySegment {
@@ -55,7 +59,15 @@ interface CartContextType {
     downloadPdf: (segment: "outbound" | "inbound") => Promise<void>;
 }
 
+interface TimeoutContextValue {
+    isActive: boolean;
+    remainingTime: number;
+    startTimeout: () => void;
+    stopTimeout: () => void;
+}
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
+const TimeoutContext = createContext<TimeoutContextValue | undefined>(undefined);
 
 export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const {user, protectedFetch} = useAuth();
@@ -228,6 +240,70 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
         URL.revokeObjectURL(url);
     };
 
+    // --- Timeout state ---
+    const [startTimestamp, setStartTimestamp] = useState<number | null>(() => {
+        if (typeof window !== "undefined") {
+            const raw = localStorage.getItem(STORAGE_LOCAL_TIMEOUT);
+            if (raw) {
+                const ts = parseInt(raw, 10);
+                if (!isNaN(ts)) return ts;
+            }
+        }
+        return null;
+    });
+
+    const [remainingTime, setRemainingTime] = useState<number>(() => {
+        if (typeof window !== "undefined") {
+            const raw = localStorage.getItem(STORAGE_LOCAL_REMAINING_TIME);
+            if (raw) {
+                const rt = parseInt(raw, 10);
+                if (!isNaN(rt)) return rt;
+            }
+        }
+        return INITIAL_TIMEOUT;
+    });
+
+    // Démarrage du timer
+    const startTimeout = () => {
+        if (typeof window !== "undefined" && startTimestamp === null) {
+            const now = Date.now();
+            setStartTimestamp(now);
+            localStorage.setItem(STORAGE_LOCAL_TIMEOUT, now.toString());
+            setRemainingTime(INITIAL_TIMEOUT);
+            localStorage.setItem(STORAGE_LOCAL_REMAINING_TIME, INITIAL_TIMEOUT.toString());
+        }
+    };
+
+    // Arrêt du timer et nettoyage
+    const stopTimeout = () => {
+        if (typeof window !== "undefined") {
+            setStartTimestamp(null);
+            localStorage.removeItem(STORAGE_LOCAL_TIMEOUT);
+            localStorage.removeItem(STORAGE_LOCAL_REMAINING_TIME);
+        }
+    };
+
+    // Calcul du temps restant
+    useEffect(() => {
+        if (startTimestamp !== null) {
+            const interval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
+                const newRemainingTime = Math.max(0, INITIAL_TIMEOUT - elapsed);
+                setRemainingTime(newRemainingTime);
+                if (typeof window !== "undefined") {
+                    localStorage.setItem(STORAGE_LOCAL_REMAINING_TIME, newRemainingTime.toString());
+                }
+                if (newRemainingTime <= 0) {
+                    stopTimeout();
+                }
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [startTimestamp]);
+
+    const isActive = startTimestamp !== null && remainingTime > 0;
+
     return (
         <CartContext.Provider
             value={{
@@ -247,7 +323,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 purchaseCart,
                 downloadPdf,
             }}>
-            {children}
+            <TimeoutContext.Provider value={{isActive, remainingTime, startTimeout, stopTimeout}}>{children}</TimeoutContext.Provider>
         </CartContext.Provider>
     );
 };
@@ -255,5 +331,11 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
 export const useCart = (): CartContextType => {
     const ctx = useContext(CartContext);
     if (!ctx) throw new Error("useCart doit être utilisé dans CartProvider");
+    return ctx;
+};
+
+export const useTimeout = (): TimeoutContextValue => {
+    const ctx = useContext(TimeoutContext);
+    if (!ctx) throw new Error("useTimeout must be used within CartProvider");
     return ctx;
 };
