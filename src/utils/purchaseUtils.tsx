@@ -15,7 +15,6 @@ export async function purchaseCart(user: UserInfo, tickets: Ticket) {
 }
 
 export async function resendTicket(user: UserInfo, tickets: Ticket) {
-    await dbConnect();
     await sendTicketMail(user, tickets);
 }
 

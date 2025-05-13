@@ -79,30 +79,6 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
             } catch {}
         }
 
-        const testTicket: Ticket = {
-            outbound: {
-                departureStation: "Paris Est",
-                arrivalStation: "Strasbourg",
-                departureTime: new Date().toISOString(),
-                arrivalTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // +2h
-            },
-            // optional return segment
-            inbound: {
-                departureStation: "Strasbourg",
-                arrivalStation: "Paris Est",
-                departureTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // next day
-                arrivalTime: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(), // +2h after return depart
-            },
-            passengers: [
-                {firstName: "Pierre", lastName: "Dupont", age: 45, carNumber: 4, seatNumber: 54},
-                {firstName: "Marie", lastName: "Dupont", age: 56, carNumber: 4, seatNumber: 53},
-            ],
-            options: [OptionID.Quiet, OptionID.Insurance, OptionID.Baggage],
-            basePrice: 120,
-            totalPrice: 0,
-        };
-        setCartTicket(testTicket);
-
         initialized.current = true;
         setLoadingCart(false);
     }, []);
