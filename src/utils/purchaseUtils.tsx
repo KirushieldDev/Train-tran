@@ -14,6 +14,11 @@ export async function purchaseCart(user: UserInfo, tickets: Ticket) {
     await sendTicketMail(user, tickets);
 }
 
+export async function resendTicket(user: UserInfo, tickets: Ticket) {
+    await dbConnect();
+    await sendTicketMail(user, tickets);
+}
+
 async function saveTicket(user: UserInfo, rawTicket: Ticket) {
     await Account.updateOne(
         {_id: user.sub},

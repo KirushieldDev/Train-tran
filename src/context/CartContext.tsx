@@ -53,6 +53,7 @@ interface CartContextType {
     // paiement
     purchaseCart: () => Promise<void>;
     downloadPdf: (segment: "outbound" | "inbound") => Promise<void>;
+    resendTicket: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -228,6 +229,18 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
         URL.revokeObjectURL(url);
     };
 
+    const resendTicket = async () => {
+        if (!user || !cartTicket) throw new Error("Non connecté ou aucun ticket en cours");
+        const res = await protectedFetch("/api/cart/resend-ticket", {
+            method: "POST",
+            body: JSON.stringify({ticket: cartTicket}),
+        });
+        const data = (await res.json()) as {ok: boolean; error?: string};
+        if (!data.ok) {
+            throw new Error(data.error || "Échec de l'envoi des billets");
+        }
+    };
+
     return (
         <CartContext.Provider
             value={{
@@ -246,6 +259,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 getTotalPrice,
                 purchaseCart,
                 downloadPdf,
+                resendTicket,
             }}>
             {children}
         </CartContext.Provider>
