@@ -20,6 +20,8 @@ export interface Passenger {
     firstName: string;
     lastName: string;
     age: number;
+    carNumber: number | null;
+    seatNumber: number | null;
 }
 
 /** Un ticket complet (aller + éventuel retour) */
@@ -53,6 +55,7 @@ interface CartContextType {
     // paiement
     purchaseCart: () => Promise<void>;
     downloadPdf: (segment: "outbound" | "inbound") => Promise<void>;
+    resendTicket: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -75,30 +78,6 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 setCartTicketRaw(obj);
             } catch {}
         }
-
-        // const testTicket: Ticket = {
-        //     outbound: {
-        //         departureStation: "Paris Est",
-        //         arrivalStation: "Strasbourg",
-        //         departureTime: new Date().toISOString(),
-        //         arrivalTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // +2h
-        //     },
-        //     // optional return segment
-        //     inbound: {
-        //         departureStation: "Strasbourg",
-        //         arrivalStation: "Paris Est",
-        //         departureTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // next day
-        //         arrivalTime: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(), // +2h after return depart
-        //     },
-        //     passengers: [
-        //         {firstName: "Pierre", lastName: "Dupont", age: 45},
-        //         {firstName: "Marie", lastName: "Dupont", age: 56},
-        //     ],
-        //     options: [OptionID.Quiet, OptionID.Insurance, OptionID.Baggage],
-        //     basePrice: 120,
-        //     totalPrice: 0,
-        // };
-        // setCartTicket(testTicket);
 
         initialized.current = true;
         setLoadingCart(false);
@@ -228,6 +207,18 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
         URL.revokeObjectURL(url);
     };
 
+    const resendTicket = async () => {
+        if (!user || !cartTicket) throw new Error("Non connecté ou aucun ticket en cours");
+        const res = await protectedFetch("/api/cart/resend-ticket", {
+            method: "POST",
+            body: JSON.stringify({ticket: cartTicket}),
+        });
+        const data = (await res.json()) as {ok: boolean; error?: string};
+        if (!data.ok) {
+            throw new Error(data.error || "Échec de l'envoi des billets");
+        }
+    };
+
     return (
         <CartContext.Provider
             value={{
@@ -246,6 +237,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 getTotalPrice,
                 purchaseCart,
                 downloadPdf,
+                resendTicket,
             }}>
             {children}
         </CartContext.Provider>
