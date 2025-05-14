@@ -10,12 +10,13 @@ import Departure from "@traintran/components/Calendar/Departure/Departure";
 import Footer from "@traintran/components/Footer/Footer";
 import {calculateDistance} from "@traintran/utils/travel";
 import ReservationStepper from "@traintran/components/common/ReservationStepper";
-import {useCart, Ticket, JourneySegment} from "@traintran/context/CartContext";
+import {useCart, Ticket, JourneySegment, useTimeout} from "@traintran/context/CartContext";
 
 export default function CalendarPage() {
     const {cartTicket, setCartTicket} = useCart();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const {startTimeout} = useTimeout();
 
     const departure = searchParams.get("departure") ?? "";
     const arrival = searchParams.get("arrival") ?? "";
@@ -107,6 +108,10 @@ export default function CalendarPage() {
     };
 
     const handleNext = () => {
+        // TODO: Construire le ticket client et le setter dans CartContext grâce à setCartTicket()
+        // on démarre le compte à rebours
+        startTimeout();
+
         // Vérifier qu'un trajet aller a été sélectionné
         if (!selectedDepartureTrip) {
             alert("Veuillez sélectionner un trajet aller.");

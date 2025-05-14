@@ -25,6 +25,7 @@ interface AuthContextType {
     loading: boolean;
     login: (email: string, passwordHash: string, remember: boolean) => Promise<void>;
     logout: () => void;
+    cleanClientData: () => void;
     register: (data: {firstName: string; lastName: string; gender: UserGender; mobile: string; email: string; password: string}) => Promise<void>;
     protectedFetch: (path: string, init?: Omit<RequestInit, "headers"> & {headers?: Record<string, string>}) => Promise<Response>;
 }
@@ -176,6 +177,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 loading,
                 login,
                 logout,
+                cleanClientData,
                 register,
                 protectedFetch,
             }}>
