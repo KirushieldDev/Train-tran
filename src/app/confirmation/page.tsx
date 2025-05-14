@@ -13,7 +13,7 @@ import React from "react";
 export default function Home() {
     useRequireAuth();
     const {user} = useAuth();
-    const {cartTicket, downloadPdf} = useCart();
+    const {cartTicket, downloadPdf, resendTicket} = useCart();
 
     const reservationDetails = {
         outboundRef: "RF789456",
@@ -110,7 +110,7 @@ export default function Home() {
                                 <IconCalendarWeekFilled className="text-primary" size="20" />
                                 Ajouter au calendrier
                             </button>
-                            <button className="flex gap-1.5 items-center hover:underline">
+                            <button onClick={resendTicket} className="flex gap-1.5 items-center hover:underline">
                                 <IconMail className="text-primary" size="20" />
                                 Renvoyer le mail
                             </button>

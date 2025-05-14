@@ -18,7 +18,7 @@ export default function PassengersForm() {
     }, [cartTicket]);
 
     const handleAdd = () => {
-        setLocalPassengers([...localPassengers, {firstName: "", lastName: "", age: 0}]);
+        setLocalPassengers([...localPassengers, {firstName: "", lastName: "", age: 0,carNumber: null, seatNumber: null}]);
     };
 
     const handleChange = (idx: number, field: keyof Passenger, value: string | number) => {
@@ -46,9 +46,21 @@ export default function PassengersForm() {
 
     const handleSubmit = () => {
         if (disableSubmit()) return;
+        // Voiture du premier passager ou choix aléatoire d'une même voiture pour tous (1–10)
+        const carNumber = localPassengers[0].carNumber || Math.floor(Math.random() * 10) + 1;
+        // Siège du premier passager en start ou choix alétaoire entre 0-100
+        const maxStart = 100 - localPassengers.length + 1;
+        const seatStart = localPassengers[0].seatNumber || Math.floor(Math.random() * maxStart) + 1;
+
+        // On attribue à chaque passager sa place consécutive
+        const assigned = localPassengers.map((p, i) => ({
+            ...p,
+            carNumber,
+            seatNumber: seatStart + i,
+        }));
         // Nettoyage des passagers du context si existants
         // Ajout de l'ensemble des nouveaux passagers
-        setAllPassengers(localPassengers);
+        setAllPassengers(assigned);
         router.push("/options");
     };
 

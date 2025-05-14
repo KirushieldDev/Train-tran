@@ -14,13 +14,11 @@ const logoDataUrl = `data:image/png;base64,${logoSvg.toString("base64")}`;
 export interface TrainTicketPDFProps {
     passenger: Passenger;
     journeySegment: JourneySegment;
-    carNumber: string;
-    seatNumber: string;
     options: Option[];
 }
 
 export default function TrainTicketPDF(props: TrainTicketPDFProps) {
-    const {passenger, journeySegment, carNumber, seatNumber} = props;
+    const {passenger, journeySegment} = props;
 
     async function getTicketQrDataUrl() {
         return await qrcode.toDataURL(JSON.stringify(props));
@@ -54,11 +52,11 @@ export default function TrainTicketPDF(props: TrainTicketPDFProps) {
 
                     <View style={styles.infoRow}>
                         <Text>Nom : {passenger.lastName}</Text>
-                        <Text>Voiture : {carNumber}</Text>
+                        <Text>Voiture : {passenger.carNumber}</Text>
                     </View>
                     <View style={styles.infoRow}>
                         <Text>Prénom : {passenger.firstName}</Text>
-                        <Text>Place : {seatNumber}</Text>
+                        <Text>Place : {passenger.seatNumber}</Text>
                     </View>
                     <View style={styles.infoRow}>
                         <Text>Âge : {passenger.age}</Text>
