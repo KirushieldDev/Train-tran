@@ -10,7 +10,7 @@ import Departure from "@traintran/components/Calendar/Departure/Departure";
 import Footer from "@traintran/components/Footer/Footer";
 import {calculateDistance} from "@traintran/utils/travel";
 import ReservationStepper from "@traintran/components/common/ReservationStepper";
-import {useCart, Ticket, JourneySegment} from "@traintran/context/CartContext";
+import {useCart, Ticket, JourneySegment, useTimeout} from "@traintran/context/CartContext";
 
 export default function CalendarPage() {
     const {cartTicket, setCartTicket} = useCart();
