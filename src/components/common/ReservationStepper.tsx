@@ -43,7 +43,7 @@ export default function ReservationStepper(props: ReservationStepperProps) {
                 departure_date: ticket.outbound.departureTime.split("T")[0],
             });
             if (ticket.inbound) {
-                params.set("return_date", ticket.inbound.arrivalTime.split("T")[0]);
+                params.set("return_date", ticket.inbound.departureTime.split("T")[0]);
             }
             router.push(`/calendrier?${params.toString()}`);
         } else {

@@ -4,16 +4,24 @@ import React, {useState} from "react";
 import {FormInput} from "@traintran/components/Home/Form/FormInput";
 import TrainSVG from "@traintran/assets/Home/TrainSVG";
 import {SearchButton} from "@traintran/components/Home/Form/SearchButton";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 
 export const SearchForm: React.FC = () => {
-    const [stations, setStations] = useState<string[]>([]);
-    const [from, setFrom] = useState("");
-    const [to, setTo] = useState("");
-
-    const [departureDate, setDepartureDate] = useState(new Date().toISOString().split("T")[0]);
-    const [returnDate, setReturnDate] = useState("");
+    const searchParams = useSearchParams();
     const router = useRouter();
+    
+    // Récupérer les paramètres de l'URL
+    const departureParam = searchParams?.get("departure") || "";
+    const arrivalParam = searchParams?.get("arrival") || "";
+    const departureDateParam = searchParams?.get("departure_date") || new Date().toISOString().split("T")[0];
+    const returnDateParam = searchParams?.get("return_date") || "";
+    
+    const [stations, setStations] = useState<string[]>([]);
+    const [from, setFrom] = useState(departureParam);
+    const [to, setTo] = useState(arrivalParam);
+    const [departureDate, setDepartureDate] = useState(departureDateParam);
+    const [returnDate, setReturnDate] = useState(returnDateParam);
+    
 
     React.useEffect(() => {
         fetch("/api/journey/stations-name")
@@ -72,7 +80,6 @@ export const SearchForm: React.FC = () => {
                     placeholder="mm/dd/yyyy"
                     type="date"
                     required
-                    autocompleteToday
                     value={departureDate}
                     onChange={e => setDepartureDate(e.currentTarget.value)}
                 />
