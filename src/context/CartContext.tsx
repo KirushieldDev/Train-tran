@@ -10,6 +10,8 @@ const STORAGE_LOCAL_TIMEOUT = process.env.NEXT_PUBLIC_STORAGE_LOCAL_TIMEOUT!;
 const STORAGE_LOCAL_REMAINING_TIME = process.env.NEXT_PUBLIC_STORAGE_LOCAL_REMAINING_TIME!;
 // Durée initiale du timer en secondes
 const INITIAL_TIMEOUT = 300;
+// Réduction pour les adhérents (10%)
+const ADHERENT_DISCOUNT = 0.1;
 
 /** Segment d’un trajet */
 export interface JourneySegment {
@@ -56,6 +58,9 @@ interface CartContextType {
     // Calcul du prix d'un ticket
     getOptionsPrice: (ticket: Ticket) => number;
     getTotalPrice: (ticket: Ticket) => number;
+    // Réduction adhérent
+    getAdherentDiscountPercent: () => number;
+    getAdherentDiscountAmount: (basePrice: number) => number;
     // paiement
     purchaseCart: () => Promise<void>;
     downloadPdf: (segment: "outbound" | "inbound") => Promise<void>;
@@ -178,8 +183,17 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const getTotalPrice = (ticket: Ticket): number => {
         if (!ticket) return 0;
         const trips = ticket.inbound ? 2 : 1;
-        let total = ticket.basePrice * ticket.passengers.length * trips;
-        total += getOptionsPrice(ticket);
+        
+        // Prix de base des billets
+        let baseTicketPrice = ticket.basePrice * ticket.passengers.length * trips;
+        
+        // Appliquer la réduction pour les adhérents (seulement sur le prix de base des billets)
+        if (user) {
+            baseTicketPrice = baseTicketPrice * (1 - ADHERENT_DISCOUNT);
+        }
+        
+        let total = baseTicketPrice + getOptionsPrice(ticket);
+        
         return total;
     };
 
@@ -295,6 +309,16 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
         }
     };
 
+    // Fonction pour obtenir le pourcentage de réduction pour les adhérents
+    const getAdherentDiscountPercent = () => {
+        return user ? ADHERENT_DISCOUNT * 100 : 0;
+    };
+    
+    // Fonction pour calculer le montant de la réduction
+    const getAdherentDiscountAmount = (basePrice: number) => {
+        return user ? basePrice * ADHERENT_DISCOUNT : 0;
+    };
+
     return (
         <CartContext.Provider
             value={{
@@ -311,6 +335,8 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
                 toggleOption,
                 getOptionsPrice,
                 getTotalPrice,
+                getAdherentDiscountPercent,
+                getAdherentDiscountAmount,
                 purchaseCart,
                 downloadPdf,
                 resendTicket,
