@@ -25,24 +25,24 @@ export default function CalendarPage() {
 
     // État pour stocker la date de retour sélectionnée
     const [returnDate, setReturnDate] = useState<Date | null>(returnDateParam ? new Date(returnDateParam) : null);
-    
+
     // État pour stocker le mode de sélection de date (aller ou retour)
-    const [dateSelectionMode, setDateSelectionMode] = useState<'outbound' | 'inbound'>('outbound');
+    const [dateSelectionMode, setDateSelectionMode] = useState<"outbound" | "inbound">("outbound");
 
     // Gestion du changement de date (aller ou retour selon le mode)
-    const handleDateChange = (date: Date | null, journeys?: Journey[], type?: 'outbound' | 'inbound') => {
+    const handleDateChange = (date: Date | null, journeys?: Journey[], type?: "outbound" | "inbound") => {
         if (!date) return;
-        
+
         // Déterminer si c'est une date d'aller ou de retour en fonction du mode
-        const isOutbound = dateSelectionMode === 'outbound';
-        console.log(`Date ${isOutbound ? 'aller' : 'retour'} sélectionnée:`, date);
+        const isOutbound = dateSelectionMode === "outbound";
+        console.log(`Date ${isOutbound ? "aller" : "retour"} sélectionnée:`, date);
         console.log("Trajets disponibles:", journeys);
 
         // On formatte la date
         const isoDate = date.toISOString().split("T")[0];
         // On récupère les paramètres de la requête
         const params = new URLSearchParams(Array.from(searchParams.entries()));
-        
+
         if (isOutbound) {
             // Mode aller
             params.set("departure_date", isoDate);
@@ -138,23 +138,23 @@ export default function CalendarPage() {
         }
 
         // Extraire le prix de base
-        const basePrice = parseFloat(selectedDepartureTrip.price.replace('€', ''));
+        const basePrice = parseFloat(selectedDepartureTrip.price.replace("€", ""));
 
         // Créer le ticket
         const ticket: Ticket = {
             outbound,
-            ...(inbound && { inbound }),
+            ...(inbound && {inbound}),
             passengers: [],
             options: [],
             basePrice,
-            totalPrice: basePrice
+            totalPrice: basePrice,
         };
 
         console.log("Ticket:", ticket);
 
         // Enregistrer le ticket dans le contexte
         setCartTicket(ticket);
-        
+
         // Rediriger vers la page des passagers
         router.push("/passagers");
     };
@@ -178,28 +178,25 @@ export default function CalendarPage() {
                             <div className="inline-flex rounded-md shadow-sm mr-4" role="group">
                                 <button
                                     type="button"
-                                    onClick={() => setDateSelectionMode('outbound')}
-                                    className={`px-4 py-2 text-sm font-medium border border-gray-200 rounded-l-lg ${dateSelectionMode === 'outbound' ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
-                                >
+                                    onClick={() => setDateSelectionMode("outbound")}
+                                    className={`px-4 py-2 text-sm font-medium border border-gray-200 rounded-l-lg ${dateSelectionMode === "outbound" ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"}`}>
                                     Aller
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setDateSelectionMode('inbound')}
-                                    className={`px-4 py-2 text-sm font-medium border border-gray-200 rounded-r-lg ${dateSelectionMode === 'inbound' ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                                    onClick={() => setDateSelectionMode("inbound")}
+                                    className={`px-4 py-2 text-sm font-medium border border-gray-200 rounded-r-lg ${dateSelectionMode === "inbound" ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"}`}
                                     disabled={!departDateParam} // Désactiver si pas de date d'aller sélectionnée
                                 >
                                     Retour
                                 </button>
                             </div>
                             <h2 className="text-lg font-semibold">
-                                {dateSelectionMode === 'outbound' 
-                                    ? "Sélectionnez votre date d'aller" 
-                                    : "Sélectionnez votre date de retour"}
+                                {dateSelectionMode === "outbound" ? "Sélectionnez votre date d'aller" : "Sélectionnez votre date de retour"}
                             </h2>
                         </div>
-                        
-                        {dateSelectionMode === 'outbound' ? (
+
+                        {dateSelectionMode === "outbound" ? (
                             <Calendar
                                 onChange={handleDateChange}
                                 distanceKm={distanceKm}
@@ -221,11 +218,7 @@ export default function CalendarPage() {
                         )}
                     </div>
                 </div>
-                <Departure 
-                    distanceKm={distanceKm} 
-                    onSelectDepartureTrip={handleDepartureSelect}
-                    onSelectReturnTrip={handleReturnSelect}
-                />
+                <Departure distanceKm={distanceKm} onSelectDepartureTrip={handleDepartureSelect} onSelectReturnTrip={handleReturnSelect} />
                 <div className="flex flex-wrap gap-2.5 justify-center mt-8 mb-10 w-full text-base text-center max-md:max-w-full">
                     <button onClick={() => router.push("/")} className="button-base button-variant-outline button-size-lg">
                         Annuler

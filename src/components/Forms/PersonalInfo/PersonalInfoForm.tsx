@@ -21,6 +21,7 @@ interface FormData {
     confirmPassword: string;
 }
 
+// Formulaire d'inscription des utilisateurs avec gestion des erreurs, validation des mots de passe, et option pour basculer vers la connexion adhérent.
 export default function PersonalInfoForm(props: PersonalInfoFormProps) {
     const {register} = useAuth();
     const [data, setData] = useState<FormData>({

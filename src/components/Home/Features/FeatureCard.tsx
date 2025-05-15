@@ -7,6 +7,7 @@ interface FeatureCardProps {
     className?: string;
 }
 
+// Composant fonctionnel qui affiche une carte de fonctionnalité avec une icône, un titre et une description.
 export const FeatureCard: React.FC<FeatureCardProps> = ({icon, title, description, className = ""}) => {
     return (
         <article className={`flex flex-col items-center mt-10 self-stretch px-2 pb-2 my-auto min-w-60 w-[389px] ${className}`}>

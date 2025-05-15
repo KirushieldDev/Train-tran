@@ -1,3 +1,4 @@
+// Composant affichant les abréviations des jours de la semaine alignés horizontalement.
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function WeekDayLabels() {

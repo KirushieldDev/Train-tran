@@ -11,7 +11,7 @@ export async function GET(req: Request) {
         return NextResponse.json({message: "Paramètres 'from' et 'to' requis"}, {status: 400});
     }
 
-    await dbConnect();
+    await dbConnect(); // connexion DB
 
     try {
         // 1) Récupère id_gare pour les stations de départ et de destination

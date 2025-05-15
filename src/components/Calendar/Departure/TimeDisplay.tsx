@@ -6,6 +6,7 @@ interface TimeDisplayProps {
     label: string;
 }
 
+// Affiche une heure avec un label descriptif, centrés et stylisés pour une bonne lisibilité.
 export const TimeDisplay: React.FC<TimeDisplayProps> = ({time, label}) => {
     return (
         <article className="text-center whitespace-nowrap">

@@ -10,8 +10,10 @@ import {useCart} from "@traintran/context/CartContext";
 import ReservationStepper from "@traintran/components/common/ReservationStepper";
 import React from "react";
 
+// Page confirmation réservation – accessible uniquement si connecté
 export default function Home() {
-    useRequireAuth();
+    useRequireAuth(); // redirige si utilisateur non authentifié
+
     const {user} = useAuth();
     const {cartTicket, downloadPdf, resendTicket} = useCart();
 
@@ -20,23 +22,25 @@ export default function Home() {
         returnRef: "RF789457",
     };
 
+    // Ne rend rien si données utilisateur ou panier absentes
     if (!user || !cartTicket) return null;
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
             <Header />
             <ReservationStepper ticket={cartTicket} page="confirmation" />
+
             <main className="flex-grow">
                 <div className="max-w-[1024px] mx-auto px-4 py-8">
                     <div className="bg-white rounded-lg p-8 shadow-sm border border-borderContainer flex flex-col items-center">
-                        {/* Confirmation icon and title */}
+                        {/* Bloc de confirmation visuelle */}
                         <div className="flex flex-col items-center mb-8 text-center">
                             <IconCheck className="text-primary rounded-full bg-primary/20 p-1" size="48" />
                             <h1 className="text-2xl font-semibold text-textPrimary mt-4">Réservation confirmée !</h1>
                             <p className="text-textSecondary mt-2">Les détails de votre commande vous ont été envoyés par mail</p>
                         </div>
 
-                        {/* Reservation details */}
+                        {/* Détails des références de réservation */}
                         <div className="mb-8 w-full max-w-[600px]">
                             <h2 className="text-xl font-semibold text-textPrimary mb-4 text-left">Détails réservations</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-background p-4 rounded-lg">
@@ -53,7 +57,7 @@ export default function Home() {
                             </div>
                         </div>
 
-                        {/* Passenger information */}
+                        {/* Infos passager (nom, email) */}
                         <div className="mb-8 w-full max-w-[600px]">
                             <h2 className="text-xl font-semibold text-textPrimary mb-4 text-left">Informations</h2>
                             <div className="grid grid-cols-2 gap-4">
@@ -70,7 +74,7 @@ export default function Home() {
                             </div>
                         </div>
 
-                        {/* Download tickets */}
+                        {/* Boutons de téléchargement des billets */}
                         <div className="mb-8 w-full max-w-[600px]">
                             <h2 className="text-xl font-semibold text-textPrimary mb-4 text-left">Billets téléchargeables</h2>
                             <div className="flex flex-col md:flex-row justify-center items-start gap-8 bg-background p-4 rounded-lg">
@@ -104,7 +108,7 @@ export default function Home() {
                             </div>
                         </div>
 
-                        {/* Additional links */}
+                        {/* Liens supplémentaires (renvoi, aide, calendrier) */}
                         <div className="flex flex-wrap gap-6 text-sm text-primary justify-center">
                             <button className="flex gap-1.5 items-center hover:underline">
                                 <IconCalendarWeekFilled className="text-primary" size="20" />

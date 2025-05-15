@@ -3,6 +3,8 @@ import {IconClockHour1Filled, IconTicket, IconRosetteDiscountFilled} from "@tabl
 import {FeatureCard} from "@traintran/components/Home/Features/FeatureCard";
 
 export const Features: React.FC = () => {
+    // Tableau contenant les données des différentes fonctionnalités à afficher
+    // Chaque objet contient une icône, un titre, une description et des classes CSS optionnelles
     const features = [
         {
             icon: <IconClockHour1Filled className="text-primary bg-primaryLight rounded-full p-3" size="60" />,
@@ -26,6 +28,7 @@ export const Features: React.FC = () => {
 
     return (
         <section className="flex flex-wrap gap-10 justify-between items-center px-24 leading-none text-center mb-10">
+            {/* Parcours et rendu de chaque fonctionnalité via le composant FeatureCard */}
             {features.map((feature, index) => (
                 <FeatureCard key={index} icon={feature.icon} title={feature.title} description={feature.description} className={feature.className} />
             ))}

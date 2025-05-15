@@ -13,6 +13,7 @@ interface TripCardProps {
     onSelect?: (id: string) => void;
 }
 
+// Composant affichant une carte de trajet avec heure de départ/arrivée, prix, durée,
 export const TripCard: React.FC<TripCardProps> = ({id, departureTime, arrivalTime, price, duration, isSelected = false, onSelect}) => {
     return (
         <article

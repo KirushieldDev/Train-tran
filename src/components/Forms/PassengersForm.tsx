@@ -18,7 +18,7 @@ export default function PassengersForm() {
     }, [cartTicket]);
 
     const handleAdd = () => {
-        setLocalPassengers([...localPassengers, {firstName: "", lastName: "", age: 0,carNumber: null, seatNumber: null}]);
+        setLocalPassengers([...localPassengers, {firstName: "", lastName: "", age: 0, carNumber: null, seatNumber: null}]);
     };
 
     const handleChange = (idx: number, field: keyof Passenger, value: string | number) => {

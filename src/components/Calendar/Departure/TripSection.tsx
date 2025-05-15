@@ -12,6 +12,7 @@ interface TripSectionProps {
     onSelectTrip?: (tripId: string) => void;
 }
 
+// Composant affichant une section de trajets entre deux stations,
 export default function TripSection(props: TripSectionProps) {
     const {title, station1, station2, trips, selectedTripId, onSelectTrip} = props;
     return (

@@ -10,11 +10,12 @@ import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
 import ReservationStepper from "@traintran/components/common/ReservationStepper";
 import React from "react";
 
+// Page de sélection des options supplémentaires pendant la réservation
 export default function Home() {
     const {cartTicket, toggleOption} = useCart();
     const {selectedOptions, setSelectedOptions} = useOptionsSync();
 
-    // Quand l'utilisateur change une option, on met à jour le contexte
+    // Gestion du changement d’état d’une option
     const handleOptionChange = (id: OptionID) => {
         toggleOption(id);
         setSelectedOptions(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
@@ -30,13 +31,13 @@ export default function Home() {
                 <div className="mx-auto max-w-[1024px] px-4 py-8">
                     <h1 className="mb-6 text-2xl font-semibold text-textPrimary">Options supplémentaires</h1>
                     <div className="flex flex-col gap-8 md:flex-row md:gap-32">
-                        {/* Sélecteur d’options */}
+                        {/* Bloc de sélection des options */}
                         <div className="w-full md:w-[480px]">
                             <div className="rounded-lg border border-borderContainer bg-white p-6 shadow-sm">
                                 <OptionsList selectedOptions={selectedOptions} onOptionToggle={handleOptionChange} />
                             </div>
                         </div>
-                        {/* Récapitulatif */}
+                        {/* Bloc récapitulatif de la commande */}
                         <div className="w-full md:w-[384px]">
                             <div className="sticky top-4 rounded-lg border border-borderContainer bg-white p-6 shadow-sm">
                                 <OrderSummary ticket={cartTicket} selectedOptions={selectedOptions} showButton />

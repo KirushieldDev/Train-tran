@@ -12,12 +12,18 @@ export default function OptionsSection(props: OptionsSectionProps) {
     return (
         <section className="p-6 bg-white rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
             <h2 className="mb-4 text-lg text-gray-700">Options sélectionnées</h2>
+            {/* Liste des options du ticket */}
             <div className="flex flex-col gap-3">
                 {ticket.options.map((optionId, index) => {
+                    // Récupération de l'option complète
                     const option = getOptionById(optionId);
                     if (!option) return null;
+
+                    // Calcul prix total selon passagers et trajet retour
                     const optTotalPrice = option.price * ticket.passengers.length * (ticket.inbound ? 2 : 1);
+
                     return (
+                        // Ligne option avec nom, icône et prix
                         <div className="flex justify-between items-center" key={index}>
                             <div className="flex gap-2 items-center">
                                 {option.Icon}
