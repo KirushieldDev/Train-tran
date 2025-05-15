@@ -17,10 +17,10 @@ export default function OrderSummary(props: OrderSummaryProps) {
     const passengerCount = ticket.passengers.length;
     const totalPrice = ticket.totalPrice;
     const outboundOptionPrice = getOptionsPrice(ticket) / (ticket.inbound ? 2 : 1);
-    
+
     // Calcul du prix de base des billets
     const baseTicketPrice = ticket.basePrice * ticket.passengers.length * (ticket.inbound ? 2 : 1);
-    
+
     // Récupération des informations de réduction
     const discountPercent = getAdherentDiscountPercent();
     const discountAmount = getAdherentDiscountAmount(baseTicketPrice);
@@ -49,7 +49,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                     <span>Sous total</span>
                     <span>{ticket.basePrice * ticket.passengers.length}€</span>
                 </div>
-                
+
                 {/* Réduction adhérent */}
                 {user && discountAmount > 0 && (
                     <div className="flex justify-between text-green-600 font-medium">

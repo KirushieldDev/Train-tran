@@ -12,12 +12,12 @@ export default function PricingSummary(props: PricingSummaryProps) {
     const {ticket} = props;
     const {getOptionsPrice, getAdherentDiscountPercent, getAdherentDiscountAmount} = useCart();
     const {user} = useAuth();
-    
+
     // Prix brut sans réduction
     const trips = ticket.inbound ? 2 : 1;
     const ticketPriceOnly = ticket.basePrice * ticket.passengers.length * trips;
     const optionsPrice = getOptionsPrice(ticket);
-    
+
     // Récupération des informations de réduction
     const discountPercent = getAdherentDiscountPercent();
     const discountAmount = getAdherentDiscountAmount(ticketPriceOnly);
@@ -33,14 +33,14 @@ export default function PricingSummary(props: PricingSummaryProps) {
                     <div className="text-base text-textSecondary">Options</div>
                     <div className="text-base text-textSecondary">{optionsPrice} €</div>
                 </div>
-                
+
                 {user && discountAmount > 0 && (
                     <div className="flex justify-between px-0 py-0.5">
                         <div className="text-base font-medium text-green-600">Réduction adhérent ({discountPercent}%)</div>
                         <div className="text-base font-medium text-green-600">-{discountAmount.toFixed(2)} €</div>
                     </div>
                 )}
-                
+
                 <div className="flex justify-between px-0 py-0.5">
                     <div className="text-base text-textSecondary">TVA (20%)</div>
                     <div className="text-base text-textSecondary">{(ticket.totalPrice * 0.2).toFixed(2)} €</div>

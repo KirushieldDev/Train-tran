@@ -183,17 +183,17 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const getTotalPrice = (ticket: Ticket): number => {
         if (!ticket) return 0;
         const trips = ticket.inbound ? 2 : 1;
-        
+
         // Prix de base des billets
         let baseTicketPrice = ticket.basePrice * ticket.passengers.length * trips;
-        
+
         // Appliquer la réduction pour les adhérents (seulement sur le prix de base des billets)
         if (user) {
             baseTicketPrice = baseTicketPrice * (1 - ADHERENT_DISCOUNT);
         }
-        
+
         let total = baseTicketPrice + getOptionsPrice(ticket);
-        
+
         return total;
     };
 
@@ -313,7 +313,7 @@ export const CartProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const getAdherentDiscountPercent = () => {
         return user ? ADHERENT_DISCOUNT * 100 : 0;
     };
-    
+
     // Fonction pour calculer le montant de la réduction
     const getAdherentDiscountAmount = (basePrice: number) => {
         return user ? basePrice * ADHERENT_DISCOUNT : 0;

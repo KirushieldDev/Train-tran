@@ -9,19 +9,18 @@ import {useRouter, useSearchParams} from "next/navigation";
 export const SearchForm: React.FC = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    
+
     // Récupérer les paramètres de l'URL
     const departureParam = searchParams?.get("departure") || "";
     const arrivalParam = searchParams?.get("arrival") || "";
     const departureDateParam = searchParams?.get("departure_date") || new Date().toISOString().split("T")[0];
     const returnDateParam = searchParams?.get("return_date") || "";
-    
+
     const [stations, setStations] = useState<string[]>([]);
     const [from, setFrom] = useState(departureParam);
     const [to, setTo] = useState(arrivalParam);
     const [departureDate, setDepartureDate] = useState(departureDateParam);
     const [returnDate, setReturnDate] = useState(returnDateParam);
-    
 
     React.useEffect(() => {
         fetch("/api/journey/stations-name")
