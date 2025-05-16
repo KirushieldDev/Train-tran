@@ -72,7 +72,7 @@ export function formattedDate(iso: string): string {
  * @param iso
  */
 export function formattedTime(iso: string): string {
-    return new Date(iso.split("T")[0]).toLocaleDateString("fr-FR", {hour: "2-digit", minute: "2-digit"}).split(" ")[1];
+    return new Date(iso).toLocaleDateString("fr-FR", {hour: "2-digit", minute: "2-digit"}).split(" ")[1];
 }
 
 /**
