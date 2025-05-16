@@ -15,8 +15,11 @@ export const OptionsList: React.FC<OptionsListProps> = ({selectedOptions, onOpti
     }
 
     return (
+        // Conteneur principal de la liste d'options
         <div className="w-full">
+            {/* Liste verticale avec espace entre chaque option */}
             <div className="space-y-4">
+                {/* Parcours toutes les options et affiche une carte pour chacune */}
                 {options.map(option => (
                     <OptionCard key={option.id} option={option} isSelected={selectedOptions.includes(option.id)} onToggle={onOptionToggle} />
                 ))}

@@ -11,13 +11,18 @@ import {useOptionsSync} from "@traintran/hooks/useOptionsSync";
 import {useRequireAuth} from "@traintran/hooks/useRequireAuth";
 import ReservationStepper from "@traintran/components/common/ReservationStepper";
 
+// Page de paiement pour finaliser la réservation
 export default function Home() {
-    useRequireAuth();
-    const {cartTicket, purchaseCart} = useCart();
-    const {selectedOptions} = useOptionsSync();
+    useRequireAuth(); // Redirige si l'utilisateur n’est pas connecté
+
+    const {cartTicket, purchaseCart} = useCart(); // Données du panier et fonction d’achat
+    const {selectedOptions} = useOptionsSync(); // Options sélectionnées par l’utilisateur
+
+    // États pour les champs de carte
     const [cardNumber, setCardNumber] = useState("");
     const [expiry, setExpiry] = useState("");
 
+    // Mise en forme du numéro de carte (espaces toutes les 4 chiffres)
     const formatCard = (value: string) => {
         const digits = value.replace(/\D/g, "").slice(0, 16);
         return digits.replace(/(.{4})/g, "$1 ").trim();
@@ -27,12 +32,14 @@ export default function Home() {
         setCardNumber(formatCard(e.target.value));
     };
 
+    // Mise en forme de la date d’expiration (MM/AA)
     const handleExpiryChange = (e: ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value.replace(/\D/g, "").slice(0, 4);
         if (val.length > 2) val = val.slice(0, 2) + "/" + val.slice(2);
         setExpiry(val);
     };
 
+    // Soumission du formulaire (achat)
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
         await purchaseCart();

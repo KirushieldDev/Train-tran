@@ -3,9 +3,12 @@ import {OptionCardProps} from "./types";
 
 export const OptionCard: React.FC<OptionCardProps> = ({option, isSelected, onToggle}) => {
     return (
+        // Carte d'option avec bordure et padding
         <div className="border border-borderContainer rounded-lg p-4">
+            {/* Checkbox pour sélectionner/désélectionner l'option */}
             <label className="flex items-start gap-3 cursor-pointer">
                 <input type="checkbox" checked={isSelected} onChange={() => onToggle(option.id)} className="mt-1" />
+                {/* Contenu : nom, icône, prix et description */}
                 <div className="flex-1">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">

@@ -13,7 +13,9 @@ export default function Home() {
     return (
         <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
             <Header />
+            {/* Indique la page actuelle dans le processus de réservation */}
             <ReservationStepper ticket={cartTicket} page="passagers" />
+            {/* Formulaire de saisie des informations passagers centré */}
             <div className="w-full flex justify-center items-center">
                 <PassengersForm />
             </div>

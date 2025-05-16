@@ -1,3 +1,5 @@
+// Composant affichant un résumé des prix avec les valeurs minimale, moyenne et maximale.
+// Chaque prix est présenté avec un titre et un style spécifique.
 interface PricingSummaryProps {
     lowestPrice: number;
     averagePrice: number;

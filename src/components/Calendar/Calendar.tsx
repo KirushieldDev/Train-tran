@@ -8,17 +8,17 @@ import {calculatePriceWithDayAdjustment, getDayOfWeek, isJourneyAvailableOnDay} 
 import {Journey} from "@traintran/components/Calendar/types";
 
 interface CalendarProps {
-    onChange?: (date: Date | null, journeys?: Journey[], type?: 'outbound' | 'inbound') => void;
+    onChange?: (date: Date | null, journeys?: Journey[], type?: "outbound" | "inbound") => void;
     distanceKm: number;
     selectedDate?: Date | null;
     departure?: string;
     arrival?: string;
-    type?: 'outbound' | 'inbound'; // Type de date (aller ou retour)
+    type?: "outbound" | "inbound"; // Type de date (aller ou retour)
     minDate?: Date; // Date minimale pour le calendrier (utile pour le retour)
     title?: string; // Titre du calendrier
 }
 
-const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, departure, arrival, type = 'outbound', minDate, title}) => {
+const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, departure, arrival, type = "outbound", minDate, title}) => {
     const [currentDate, setCurrentDate] = useState<Date | null>(selectedDate || new Date());
     const [availableJourneyDates, setAvailableJourneyDates] = useState<{[key: string]: Journey[]}>({});
     const [loading, setLoading] = useState<boolean>(false);
@@ -80,7 +80,7 @@ const Calendar: React.FC<CalendarProps> = ({onChange, distanceKm, selectedDate, 
             console.error("Impossible de sélectionner cette date");
             return;
         }
-        
+
         setCurrentDate(date);
         if (onChange) {
             const journeys = getJourneysForDate(date);

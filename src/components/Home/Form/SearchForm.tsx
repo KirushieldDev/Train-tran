@@ -7,22 +7,24 @@ import {SearchButton} from "@traintran/components/Home/Form/SearchButton";
 import {useRouter, useSearchParams} from "next/navigation";
 
 export const SearchForm: React.FC = () => {
+    // Récupération des paramètres d'URL pour initialiser le formulaire (si présents)
     const searchParams = useSearchParams();
     const router = useRouter();
-    
-    // Récupérer les paramètres de l'URL
+
+    // Valeurs par défaut ou extraites de l'URL
     const departureParam = searchParams?.get("departure") || "";
     const arrivalParam = searchParams?.get("arrival") || "";
     const departureDateParam = searchParams?.get("departure_date") || new Date().toISOString().split("T")[0];
     const returnDateParam = searchParams?.get("return_date") || "";
-    
+
+    // Etats contrôlant les inputs et la liste des gares suggérées
     const [stations, setStations] = useState<string[]>([]);
     const [from, setFrom] = useState(departureParam);
     const [to, setTo] = useState(arrivalParam);
     const [departureDate, setDepartureDate] = useState(departureDateParam);
     const [returnDate, setReturnDate] = useState(returnDateParam);
-    
 
+    // Chargement des noms de gares à partir de l'API, gestion des erreurs
     React.useEffect(() => {
         fetch("/api/journey/stations-name")
             .then(res => {
@@ -33,11 +35,13 @@ export const SearchForm: React.FC = () => {
             .catch(() => setStations([]));
     }, []);
 
+    // Filtre simple pour les suggestions : correspondance au début de la chaîne (insensible à la casse)
     const filter = (q: string) => {
         const lower = q.toLowerCase();
         return stations.filter(n => n.toLowerCase().startsWith(lower));
     };
 
+    // Soumission du formulaire : création des paramètres URL et navigation vers la page calendrier
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const params = new URLSearchParams({
@@ -51,6 +55,7 @@ export const SearchForm: React.FC = () => {
         router.push(`/calendrier?${params.toString()}`);
     };
 
+    // Rendu du formulaire avec champs contrôlés, suggestions intégrées, et bouton de recherche
     return (
         <form onSubmit={onSubmit} className="flex flex-col items-center w-full">
             <div className="flex flex-wrap gap-6 items-start w-full">
