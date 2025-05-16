@@ -23,7 +23,6 @@ export default function PassengersForm() {
 
     const handleChange = (idx: number, field: keyof Passenger, value: string | number) => {
         const copy = [...localPassengers];
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         copy[idx][field] = value;
         setLocalPassengers(copy);

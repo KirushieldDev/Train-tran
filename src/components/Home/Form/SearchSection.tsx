@@ -1,3 +1,5 @@
+"use client"
+
 import {SearchForm} from "./SearchForm";
 import Image from "next/image";
 

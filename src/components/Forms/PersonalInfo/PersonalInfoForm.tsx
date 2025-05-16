@@ -136,7 +136,7 @@ export default function PersonalInfoForm(props: PersonalInfoFormProps) {
                 {errorMsg && <p className="mt-4 text-sm text-red-600">{errorMsg}</p>}
 
                 <div className="mt-3.5">
-                    <FormButton type="submit">S'inscrire</FormButton>
+                    <FormButton type="submit">S&#39;inscrire</FormButton>
                 </div>
             </div>
             <div className="flex justify-center items-center gap-4 py-px mt-4 w-full text-sm text-center">

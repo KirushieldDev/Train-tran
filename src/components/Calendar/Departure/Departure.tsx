@@ -198,7 +198,7 @@ export default function Departure({distanceKm, onSelectDepartureTrip, onSelectRe
                             onSelectTrip={tripId => setSelectedDepartureId(tripId)}
                         />
                     ) : (
-                        <div className="text-center py-4">Aucun trajet disponible pour l'aller à cette date</div>
+                        <div className="text-center py-4">Aucun trajet disponible pour l&#39;aller à cette date</div>
                     )}
 
                     {returnDate &&
