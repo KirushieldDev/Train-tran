@@ -21,6 +21,8 @@ export default function TripCard(props: TripCardProps) {
         journey = ticket.outbound;
     }
 
+    console.log(formattedTime("2025-05-21T21:46:00.000Z"));
+
     return (
         <article className="p-6 bg-white rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
             <h2 className="mb-4 text-lg text-gray-700">

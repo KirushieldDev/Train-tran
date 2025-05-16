@@ -27,11 +27,11 @@ export default function PricingSummary(props: PricingSummaryProps) {
             <div className="flex flex-col gap-3">
                 <div className="flex justify-between px-0 py-0.5">
                     <div className="text-base text-textSecondary">Sous-total</div>
-                    <div className="text-base text-textSecondary">{ticketPriceOnly} €</div>
+                    <div className="text-base text-textSecondary">{ticketPriceOnly.toFixed(2)} €</div>
                 </div>
                 <div className="flex justify-between px-0 py-0.5">
                     <div className="text-base text-textSecondary">Options</div>
-                    <div className="text-base text-textSecondary">{optionsPrice} €</div>
+                    <div className="text-base text-textSecondary">{optionsPrice.toFixed(2)} €</div>
                 </div>
 
                 {user && discountAmount > 0 && (
@@ -47,7 +47,7 @@ export default function PricingSummary(props: PricingSummaryProps) {
                 </div>
                 <div className="flex justify-between pt-4 border-t border-solid">
                     <div className="text-lg font-bold text-black">Total</div>
-                    <div className="text-lg font-bold text-primary">{ticket.totalPrice} €</div>
+                    <div className="text-lg font-bold text-primary">{ticket.totalPrice.toFixed(2)} €</div>
                 </div>
             </div>
         </section>

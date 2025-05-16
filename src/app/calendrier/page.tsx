@@ -35,8 +35,6 @@ export default function CalendarPage() {
 
         // Déterminer si c'est une date d'aller ou de retour en fonction du mode
         const isOutbound = dateSelectionMode === "outbound";
-        console.log(`Date ${isOutbound ? "aller" : "retour"} sélectionnée:`, date);
-        console.log("Trajets disponibles:", journeys);
 
         // On formatte la date
         const isoDate = date.toISOString().split("T")[0];
@@ -108,7 +106,6 @@ export default function CalendarPage() {
     };
 
     const handleNext = () => {
-        // TODO: Construire le ticket client et le setter dans CartContext grâce à setCartTicket()
         // on démarre le compte à rebours
         startTimeout();
 
@@ -149,8 +146,6 @@ export default function CalendarPage() {
             basePrice,
             totalPrice: basePrice,
         };
-
-        console.log("Ticket:", ticket);
 
         // Enregistrer le ticket dans le contexte
         setCartTicket(ticket);

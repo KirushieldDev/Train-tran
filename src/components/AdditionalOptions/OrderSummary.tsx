@@ -35,7 +35,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                 {/* Prix total des billets */}
                 <div className="flex justify-between text-textPrimary">
                     <span>Billet de base</span>
-                    <span className="font-medium">{ticket.basePrice}€</span>
+                    <span className="font-medium">{ticket.basePrice.toFixed(2)}€</span>
                 </div>
 
                 {/* Nombre de passagers */}
@@ -47,7 +47,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                 {/* Sous total de base */}
                 <div className="flex justify-between font-semibold text-textSecondary">
                     <span>Sous total</span>
-                    <span>{ticket.basePrice * ticket.passengers.length}€</span>
+                    <span>{(ticket.basePrice * ticket.passengers.length).toFixed(2)}€</span>
                 </div>
 
                 {/* Réduction adhérent */}
@@ -65,7 +65,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                             {reduce ? (
                                 <div className="flex justify-between text-textSecondary">
                                     <span>Options</span>
-                                    <span className="font-medium">{outboundOptionPrice}€</span>
+                                    <span className="font-medium">{outboundOptionPrice.toFixed(2)}€</span>
                                 </div>
                             ) : (
                                 selectedOptions.map((optId, i) => {
@@ -75,7 +75,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                                         <div key={i} className="flex justify-between text-textSecondary">
                                             <span>{option.name}</span>
                                             <span className="font-medium text-primary">
-                                                {option.price === 0 ? "Gratuit" : `+${option.price * passengerCount}€`}
+                                                {option.price === 0 ? "Gratuit" : `+${(option.price * passengerCount).toFixed(2)}€`}
                                             </span>
                                         </div>
                                     );
@@ -85,7 +85,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                         {/* Sous total des options */}
                         <div className="flex justify-between font-semibold text-textSecondary">
                             <span>Sous total</span>
-                            <span>{outboundOptionPrice}€</span>
+                            <span>{outboundOptionPrice.toFixed(2)}€</span>
                         </div>
                     </>
                 )}
@@ -105,7 +105,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                     {/* Total final */}
                     <div className="flex justify-between font-semibold text-textPrimary">
                         <span className="text-lg">Total</span>
-                        <span className="text-lg">{totalPrice}€</span>
+                        <span className="text-lg">{totalPrice.toFixed(2)}€</span>
                     </div>
                 </div>
             </div>
