@@ -22,9 +22,6 @@ export default function PricingSummary(props: PricingSummaryProps) {
     const discountPercent = getAdherentDiscountPercent();
     const discountAmount = getAdherentDiscountAmount(ticketPriceOnly);
 
-    // Calcul du prix de base du ticket en fonction des passagers et trajet retour
-    const ticketPriceOnly = ticket.basePrice * ticket.passengers.length * (ticket.inbound ? 2 : 1);
-
     return (
         <section className="p-6 bg-white rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
             <div className="flex flex-col gap-3">
