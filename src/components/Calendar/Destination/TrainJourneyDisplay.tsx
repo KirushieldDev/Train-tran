@@ -6,10 +6,12 @@ import TrainSVG from "@traintran/assets/Calendar/TrainSVG";
 import Link from "next/link";
 import {useSearchParams} from "next/navigation";
 
+// Composant affichant un résumé visuel du trajet train sélectionné,
+// avec les gares de départ et d'arrivée, la possibilité de modifier la recherche,
+// et un affichage iconographique (train + flèche).
 export default function TrainJourneyDisplay() {
     const searchParams = useSearchParams();
 
-    // Use the given searchParams from props
     const departure = searchParams?.get("departure");
     const arrival = searchParams?.get("arrival");
     const departure_date = searchParams?.get("departure_date");

@@ -13,7 +13,9 @@ export default function Home() {
     return (
         <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
             <Header />
+            {/* Stepper indique que nous sommes sur la page "panier" */}
             <ReservationStepper ticket={cartTicket} page="panier" />
+            {/* Résumé du panier */}
             <BookingSummary />
             <Footer />
         </div>

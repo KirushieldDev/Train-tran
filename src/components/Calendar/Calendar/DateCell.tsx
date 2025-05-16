@@ -1,3 +1,5 @@
+// Composant affichant une cellule de calendrier avec un jour et un prix.
+// Applique des styles différents si la cellule est sélectionnée ou non.
 interface DateCellProps {
     day: number;
     price: number;

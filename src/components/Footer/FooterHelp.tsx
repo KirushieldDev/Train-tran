@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 
+// Permet d'afficher une section d’aide dans le footer avec des liens vers FAQ, Contact et Support
 export const FooterHelp: React.FC = () => {
     return (
         <nav className="flex flex-col gap-4 justify-center items-start w-[200px]">

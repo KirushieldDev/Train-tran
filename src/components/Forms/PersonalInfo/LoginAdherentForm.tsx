@@ -15,6 +15,7 @@ interface LoginData {
     password: string;
 }
 
+// Formulaire de connexion pour les adhérents avec validation, gestion d’erreur, et option "Se souvenir de moi"
 export default function FormLoginAdherent(props: LoginAdherentFormProps) {
     const [loginData, setLogin] = useState<LoginData>({email: "", password: ""});
     const [rememberMe, setRememberMe] = useState(false);
