@@ -120,7 +120,7 @@ export default function Home() {
                             </button>
                             <button className="flex gap-1.5 items-center hover:underline">
                                 <IconHelp className="text-primary" size="20" />
-                                Besoin d'aide ?
+                                Besoin d&#39;aide ?
                             </button>
                         </div>
                     </div>

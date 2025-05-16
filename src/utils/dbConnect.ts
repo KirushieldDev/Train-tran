@@ -9,7 +9,6 @@ interface MongooseCache {
 
 // On étend l’objet global pour y stocker le cache
 declare global {
-    // eslint-disable-next-line no-var
     var _mongooseCache: MongooseCache | undefined;
 }
 

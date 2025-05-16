@@ -2,8 +2,7 @@
 
 import React, {ReactNode, useEffect, useState} from "react";
 import {IconVolume3, IconPlug, IconLuggage, IconMessagePause, IconShieldDollar} from "@tabler/icons-react";
-import dbConnect from "@traintran/utils/dbConnect";
-import {Option as OptionModel, IOption} from "@traintran/database/models/options";
+import {IOption} from "@traintran/database/models/options";
 
 export enum OptionID {
     Quiet = "quiet",
