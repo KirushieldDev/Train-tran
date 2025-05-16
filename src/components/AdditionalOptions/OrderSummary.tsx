@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import getOptionById from "@traintran/lib/options";
+import {useOptionsList, OptionID} from "@traintran/lib/options";
 import {OrderSummaryProps} from "@traintran/components/AdditionalOptions/types";
 import {useRouter} from "next/navigation";
 import {useCart} from "@traintran/context/CartContext";
@@ -10,10 +10,14 @@ export default function OrderSummary(props: OrderSummaryProps) {
     const {ticket, selectedOptions, showButton, reduce} = props;
     const router = useRouter();
     const {getOptionsPrice} = useCart();
+    const {options, loading} = useOptionsList();
 
     const passengerCount = ticket.passengers.length;
     const totalPrice = ticket.totalPrice;
     const outboundOptionPrice = getOptionsPrice(ticket) / (ticket.inbound ? 2 : 1);
+
+    // Helper pour trouver une option par son ID
+    const findOptionById = (optId: OptionID) => options.find(option => option.id === optId);
 
     return (
         <div className="w-full">
@@ -38,7 +42,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                 </div>
 
                 {/* Options sélectionnées */}
-                {selectedOptions.length > 0 && (
+                {selectedOptions.length > 0 && !loading && (
                     <>
                         <div className="flex flex-col gap-2 border-t border-borderContainer pt-3">
                             {reduce ? (
@@ -48,7 +52,7 @@ export default function OrderSummary(props: OrderSummaryProps) {
                                 </div>
                             ) : (
                                 selectedOptions.map((optId, i) => {
-                                    const option = getOptionById(optId);
+                                    const option = findOptionById(optId);
                                     if (!option) return null;
                                     return (
                                         <div key={i} className="flex justify-between text-textSecondary">
